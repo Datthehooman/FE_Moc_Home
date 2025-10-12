@@ -32,8 +32,9 @@
 :root {
   --ui-primary: #6e4e37;
   --ui-secondary: #a77a5d;
-  --ui-accent: #edb173;
+  --ui-accent: #EDB173;
   --ui-neutral: #ffd8ad;
+  --ui-background: #FFFBF8;
 }
 
 .dark {
