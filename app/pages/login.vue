@@ -1,60 +1,5 @@
 <template>
   <div class="min-h-screen bg-[#FFFBF8] flex flex-col">
-    <section
-      class="w-full h-[150px] bg-[url('banner-breadcumb.png')] bg-cover bg-center relative flex flex-col justify-center"
-    >
-      <!-- Overlay mờ nhẹ để chữ dễ đọc -->
-      <div class="absolute inset-0 bg-black/40"></div>
-
-      <!-- Nội dung -->
-      <div class="w-[85%] mx-auto relative z-10">
-        <h1 class="text-white text-[24px] font-bold mb-2">Đăng nhập</h1>
-
-        <div
-          class="flex items-center space-x-2 text-white text-[18px] font-medium"
-        >
-          <!-- Icon Trang chủ -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h5m10-11v10a1 1 0 01-1 1h-5"
-            />
-          </svg>
-          <a
-            href="/"
-            class="hover:text-[#ffd8ad] text-[16px] transition-all duration-300 ease-in-out"
-            >Trang chủ</a
-          >
-
-          <!-- Icon >> -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-8 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 5l6 7-6 7m4-14l6 7-6 7"
-            />
-          </svg>
-
-          <span class="text-gray-200 text-[16px]">Đăng nhập</span>
-        </div>
-      </div>
-    </section>
-
     <!-- 🔹 Form Login -->
     <div class="flex-grow flex items-center justify-center p-4 mt-[50px]">
       <div
@@ -63,18 +8,18 @@
         <!-- Logo -->
         <div class="text-center">
           <div
-            class="text-2xl font-bold text-[#6E4E37] mb-1 flex justify-center items-center space-x-2"
+            class="text-2xl font-bold text-primary mb-1 flex justify-center items-center space-x-2"
           >
             <img src="/logo.png" alt="Logo" class="w-30" />
           </div>
-          <p class="text-gray-600 text-sm text-primary text-[16px]">
+          <p class="text-sm text-primary text-[16px]">
             Đăng nhập bằng tài khoản Mộc Home của bạn
           </p>
           <hr class="mt-4 border-gray-300" />
         </div>
 
         <!-- Form -->
-        <form @submit.prevent="login" class="space-y-4">
+        <form @submit.prevent="login" novalidate class="space-y-4">
           <div>
             <label class="block text-sm text-gray-700 mb-1"
               >Địa chỉ Email</label
@@ -83,9 +28,11 @@
               type="email"
               v-model="email"
               placeholder="Email"
-              required
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
             />
+            <p v-if="errors.email" class="text-red-500 text-sm mt-1">
+              {{ errors.email }}
+            </p>
           </div>
 
           <div>
@@ -94,9 +41,11 @@
               type="password"
               v-model="password"
               placeholder="Nhập mật khẩu"
-              required
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
             />
+            <p v-if="errors.password" class="text-red-500 text-sm mt-1">
+              {{ errors.password }}
+            </p>
           </div>
 
           <div class="flex justify-between items-center text-sm">
@@ -108,7 +57,9 @@
               />
               <span class="text-gray-700 opacity-50">Nhớ mật khẩu</span>
             </label>
-            <a href="#" class="text-gray-600 hover:text-orange-500 font-medium"
+            <a
+              href="/reset-password"
+              class="text-gray-600 hover:text-orange-500 font-medium"
               >Quên mật khẩu?</a
             >
           </div>
@@ -118,14 +69,12 @@
             type="submit"
             class="relative overflow-hidden w-full py-3 bg-[#edb173] text-black font-medium rounded-[10px] shadow flex justify-center items-center space-x-2 group"
           >
-            <!-- Hiệu ứng hình tròn lan tỏa -->
             <span class="absolute inset-0 flex justify-center items-center">
               <span
                 class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"
               ></span>
             </span>
 
-            <!-- Nội dung nút -->
             <span
               class="relative group-hover:text-white flex justify-center items-center space-x-2 text-[16px]"
             >
@@ -151,7 +100,9 @@
         <div class="text-center text-sm text-gray-600">
           <p>
             Bạn chưa có tài khoản?
-            <a href="#" class="text-primary font-medium hover:text-secondary"
+            <a
+              href="/register"
+              class="text-primary font-medium hover:text-secondary"
               >Đăng ký</a
             >
           </p>
@@ -183,14 +134,41 @@
   </div>
 </template>
 
-<script setup lang="ts">
-  import { ref } from "vue";
+<script setup>
+  import { ref, reactive } from "vue";
 
   const email = ref("");
   const password = ref("");
   const remember = ref(false);
+  const errors = reactive({
+    email: "",
+    password: "",
+  });
 
   const login = () => {
-    console.log("Đăng nhập:", email.value, password.value, remember.value);
+    errors.email = "";
+    errors.password = "";
+
+    // ✅ Validate thủ công
+    if (!email.value) {
+      errors.email = "Vui lòng nhập email";
+    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email.value)) {
+      errors.email = "Email không hợp lệ";
+    }
+
+    if (!password.value) {
+      errors.password = "Vui lòng nhập mật khẩu";
+    } else if (password.value.length < 6) {
+      errors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+    // Nếu không có lỗi thì xử lý login
+    if (!errors.email && !errors.password) {
+      console.log(
+        "Đăng nhập thành công:",
+        email.value,
+        password.value,
+        remember.value
+      );
+    }
   };
 </script>
