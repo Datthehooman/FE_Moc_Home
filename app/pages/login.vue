@@ -2,30 +2,37 @@
   <div class="min-h-screen bg-[#FFFBF8] flex flex-col">
     <!-- 🔹 Form Login -->
     <div class="flex-grow flex items-center justify-center p-4 mt-[50px]">
-      <div class="w-full max-w-[540px] bg-white rounded-xl shadow-lg p-8 space-y-6">
-        
+      <div
+        class="w-full max-w-[540px] bg-white rounded-xl shadow-lg p-8 space-y-6"
+      >
         <!-- Logo -->
         <div class="text-center">
-          <div class="text-2xl font-bold text-primary mb-1 flex justify-center items-center space-x-2">
+          <div
+            class="text-2xl font-bold text-primary mb-1 flex justify-center items-center space-x-2"
+          >
             <img src="/logo.png" alt="Logo" class="w-30" />
           </div>
           <p class="text-sm text-primary text-[16px]">
             Đăng nhập bằng tài khoản Mộc Home của bạn
           </p>
-          <hr class="mt-4 border-gray-300">
+          <hr class="mt-4 border-gray-300" />
         </div>
 
         <!-- Form -->
-       <form @submit.prevent="login" novalidate class="space-y-4">
+        <form @submit.prevent="login" novalidate class="space-y-4">
           <div>
-            <label class="block text-sm text-gray-700 mb-1">Địa chỉ Email</label>
+            <label class="block text-sm text-gray-700 mb-1"
+              >Địa chỉ Email</label
+            >
             <input
               type="email"
               v-model="email"
               placeholder="Email"
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
             />
-            <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
+            <p v-if="errors.email" class="text-red-500 text-sm mt-1">
+              {{ errors.email }}
+            </p>
           </div>
 
           <div>
@@ -36,7 +43,9 @@
               placeholder="Nhập mật khẩu"
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
             />
-            <p v-if="errors.password" class="text-red-500 text-sm mt-1">{{ errors.password }}</p>
+            <p v-if="errors.password" class="text-red-500 text-sm mt-1">
+              {{ errors.password }}
+            </p>
           </div>
 
           <div class="flex justify-between items-center text-sm">
@@ -48,7 +57,11 @@
               />
               <span class="text-gray-700 opacity-50">Nhớ mật khẩu</span>
             </label>
-            <a href="/reset-password" class="text-gray-600 hover:text-orange-500 font-medium">Quên mật khẩu?</a>
+            <a
+              href="/reset-password"
+              class="text-gray-600 hover:text-orange-500 font-medium"
+              >Quên mật khẩu?</a
+            >
           </div>
 
           <!-- Nút đăng nhập -->
@@ -62,8 +75,15 @@
               ></span>
             </span>
 
-            <span class="relative group-hover:text-white flex justify-center items-center space-x-2 text-[16px]">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span
+              class="relative group-hover:text-white flex justify-center items-center space-x-2 text-[16px]"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -80,7 +100,11 @@
         <div class="text-center text-sm text-gray-600">
           <p>
             Bạn chưa có tài khoản?
-            <a href="/register" class="text-primary font-medium hover:text-secondary">Đăng ký</a>
+            <a
+              href="/register"
+              class="text-primary font-medium hover:text-secondary"
+              >Đăng ký</a
+            >
           </p>
           <div class="relative my-4">
             <div class="absolute inset-0 flex items-center">
@@ -111,35 +135,40 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+  import { ref, reactive } from "vue";
 
-const email = ref('')
-const password = ref('')
-const remember = ref(false)
-const errors = reactive({
-  email: '',
-  password: ''
-})
+  const email = ref("");
+  const password = ref("");
+  const remember = ref(false);
+  const errors = reactive({
+    email: "",
+    password: "",
+  });
 
-const login = () => {
-  errors.email = ''
-  errors.password = ''
+  const login = () => {
+    errors.email = "";
+    errors.password = "";
 
-  // ✅ Validate thủ công
-  if (!email.value) {
-    errors.email = 'Vui lòng nhập email'
-  } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email.value)) {
-    errors.email = 'Email không hợp lệ'
-  }
+    // ✅ Validate thủ công
+    if (!email.value) {
+      errors.email = "Vui lòng nhập email";
+    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email.value)) {
+      errors.email = "Email không hợp lệ";
+    }
 
-  if (!password.value) {
-    errors.password = 'Vui lòng nhập mật khẩu'
-  } else if (password.value.length < 6) {
-    errors.password = 'Mật khẩu phải có ít nhất 6 ký tự'
-  }
-  // Nếu không có lỗi thì xử lý login
-  if (!errors.email && !errors.password) {
-    console.log('Đăng nhập thành công:', email.value, password.value, remember.value)
-  }
-}
+    if (!password.value) {
+      errors.password = "Vui lòng nhập mật khẩu";
+    } else if (password.value.length < 6) {
+      errors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+    // Nếu không có lỗi thì xử lý login
+    if (!errors.email && !errors.password) {
+      console.log(
+        "Đăng nhập thành công:",
+        email.value,
+        password.value,
+        remember.value
+      );
+    }
+  };
 </script>
