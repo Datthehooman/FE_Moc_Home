@@ -1,5 +1,5 @@
 <template>
-  <UFooter>
+  <UFooter :ui="{ container: 'lg:p-0' }">
     <template #left>
       <p class="text-muted text-sm">
         Copyright © {{ new Date().getFullYear() }}
