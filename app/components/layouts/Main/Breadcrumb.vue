@@ -42,6 +42,8 @@ const titles = {
   about: 'Giới thiệu',
   contact: 'Liên hệ',
   product: 'Sản phẩm',
+  cart: 'Giỏ hàng',
+  checkout: 'Thanh toán',
   'san-pham-ProductDetail': 'Chi tiết sản phẩm',
   'reset-password': 'Đặt lại mật khẩu',
 }
