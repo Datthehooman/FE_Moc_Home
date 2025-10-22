@@ -1,6 +1,7 @@
 <template>
   <div>
     <UContainer class="lg:px-0">
+      <ModulesHomeBanner1 class="mb-[55px]" />
       <ModulesHomeTitle title="Danh mục hàng đầu" />
       <div class="flex justify-between">
         <ModulesHomeCateCard /><ModulesHomeCateCard /><ModulesHomeCateCard /><ModulesHomeCateCard /><ModulesHomeCateCard /><ModulesHomeCateCard />
