@@ -492,17 +492,8 @@
       </div>
       
       <!-- SẢN PHẨM LIÊN QUAN -->
-  <div class="max-w-[100%] mx-auto px-4 relative">
-
-      <!-- HEADER -->
-      <div class="flex justify-between items-left mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 flex items-center">
-          <span class="border-l-4 border-[#6E4E37] h-5 mr-2"></span>
-          Sản phẩm liên quan
-        </h2>
-        <a href="#" class="text-[#EDB173] text-sm hover:underline">Xem thêm →</a>
-      </div>
-
+  <div class="max-w-[100%] mx-auto px-4 relative mt-10">
+        <ModulesProductTitle title="Sản phẩm liên quan" />
       <!-- DANH SÁCH SẢN PHẨM -->
       <div class="relative" ref="containerRef">
         <!-- Nút trái -->
@@ -515,105 +506,22 @@
   
         <!-- KHUNG TRƯỢT -->
         <div class="overflow-hidden">
-          <div
-            class="flex transition-transform duration-500 ease-in-out"
-            :style="{ transform: `translateX(-${relatedIndex * (itemWidth + gap)}px)`, gap: gap + 'px' }"
-          >
-            <div
-              v-for="(product, i) in products"
-              :key="i"
-              class="relative group h-[330px] flex-shrink-0"
-              :style="{ width: itemWidth + 'px' }"
-            >
-              <!-- BOX NỀN DƯỚI -->
-              <div
-                class="absolute bottom-0 left-0 right-0 bg-[#FFF5EC] rounded-xl transition-all duration-500 ease-out z-0"
-                :class="['h-[180px] group-hover:h-full shadow-sm group-hover:shadow-md']"
-              ></div>
+  <div
+    class="flex transition-transform duration-500 ease-in-out gap-[20px]"
+    :style="{
+      transform: `translateX(-${relatedIndex * (itemWidth + gap)}px)`,
+    }"
+  >
 
-              <!-- NỘI DUNG -->
-              <div class="relative z-10 p-4 flex flex-col">
-                <div class="relative w-full flex justify-center mb-3">
-                  <span
-                    v-if="product.badge"
-                    :class="[ 
-                      'absolute top-1 right-2 w-[80px] h-[24px] text-[14px] flex justify-center items-center text-white font-medium rounded-full z-20',
-                      product.badge === 'Mới' && 'bg-[#E95D5D]',
-                      product.badge === 'Hot' && 'bg-[#23BDEE]',
-                      product.badge === 'Giảm 50%' && 'bg-[#EDB173]'
-                    ]"
-                  >
-                    {{ product.badge }}
-                  </span>
 
-                  <img
-                    :src="product.image"
-                    alt=""
-                    class="w-[180px] h-[180px] object-contain relative z-10 transition-transform duration-500"
-                  />
+            <ModulesProductCartProduct
+  v-for="(product, i) in products"
+  :key="i"
+  :product="product"
+  :itemWidth="itemWidth"
+  @view="viewProduct"
+/>
 
-                  <!-- ICON HOVER -->
-                  <div
-                    class="absolute left-1/2 bottom-[100px] transform -translate-x-1/2 translate-y-[120px] opacity-0 flex gap-2 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:translate-y-[90px] z-20"
-                  >
-                <button
-                  @click="viewProduct(product)"
-                  class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12s-3.75 6.75-9.75 6.75S2.25 12 2.25 12z" />
-                                        <circle cx="12" cy="12" r="3.75" />
-                                      </svg>
-                </button>
-                    <button
-                      class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.015-4.5-4.5-4.5-1.74 0-3.255.99-4 2.42a4.493 4.493 0 00-4-2.42C6.015 3.75 4 5.765 4 8.25c0 7.13 8 12 8 12s8-4.87 8-12z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                <h3 class="text-gray-800 font-semibold text-[17px] text-left px-2 leading-snug">
-                  {{ product.name }}
-                </h3>
-
-                <div class="flex mt-1 px-2 text-left">
-                  <svg
-                    v-for="n in 5"
-                    :key="n"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    class="w-4 h-4"
-                    :class="n <= product.star ? 'text-yellow-400' : 'text-gray-300'"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 15.27L16.18 18l-1.64-7.03L20 6.24l-7.19-.61L10 0 7.19 5.63 0 6.24l5.46 4.73L3.82 18z"
-                    />
-                  </svg>
-                </div>
-
-                <div class="mt-2 flex items-center justify-between w-full px-2">
-                  <div class="text-left">
-                    <span class="line-through text-gray-400 text-[14px] block">{{ product.oldPrice }}</span>
-                    <span class="text-[#E95D5D] font-semibold text-[19px] block">
-                      {{ product.price }}
-                    </span>
-                  </div>
-
-                  <button
-                    class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFFFF" class="w-6 h-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437m0 0L6.75 14.25h10.5l2.25-9H5.106m0 0L4.5 6.75m1.5 12.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -628,94 +536,21 @@
     </div>
     
   <!-- Overlay xem nhanh sản phẩm -->
-  
-<div
-  v-if="showOverlay"
-  class="fixed inset-0 bg-black/50 z-50 flex justify-center items-center"
->
-  <div class="bg-white w-[750px] rounded-[15px] relative p-4 flex">
-    
-    <!-- Nút đóng -->
-    <button
-      @click="showOverlay = false"
-      class="absolute top-3 right-3 w-8 h-8 rounded-full bg-primary hover:bg-[#F05454] flex items-center justify-center text-white text-xl font-bold transition-colors z-10"
-      aria-label="Đóng"
-    >
-      &times;
-    </button>
+  <ModulesProductQuickViewOverlay
+  :show="showOverlay"
+  :product="currentProduct"
+  @close="showOverlay = false"
+/>
 
-    <!-- Ảnh sản phẩm -->
-    <div class="w-1/2 flex items-center justify-center p-4">
-      <img :src="currentProduct.image" alt="" class="object-contain max-h-96 w-full rounded-lg" />
-
-    </div>
-
-    <!-- Thông tin sản phẩm -->
-    <div class="w-1/2 p-4 pt-10 space-y-3">
-     <h2 class="text-2xl font-bold text-gray-800">{{ currentProduct.name }}</h2>
-
-     <div class="flex items-center space-x-2">
-  <div class="flex">
-  <svg
-    v-for="n in 5"
-    :key="n"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-    class="w-5 h-5"
-    :class="n <= currentProduct.star ? 'text-yellow-400' : 'text-gray-300'"
-  >
-    <path
-      fill-rule="evenodd"
-      d="M10 15.27L16.18 18l-1.64-7.03L20 6.24l-7.19-.61L10 0 7.19 5.63 0 6.24l5.46 4.73L3.82 18z"
-    />
-  </svg>
-  <p class="text-gray-400 text-[16px] ml-[5px]">(4 người đánh giá)</p>
-</div>
-
-</div>
-      
-      <div class="flex items-baseline space-x-2 my-4">
-<p class="line-through text-gray-400 text-[16px]">{{ currentProduct.oldPrice }}</p>
-<p class="text-3xl font-bold text-primary text-[24px]">{{ currentProduct.price }}</p>
-      </div>
-
-      <div class="space-y-2 text-base">
-        <p><span class="text-gray-500">Thương hiệu:</span> <span class="font-semibold text-gray-700 ml-1">Ricordi</span></p>
-        <p><span class="text-gray-500">Loại:</span> <span class="font-bold text-gray-700 ml-1">Phòng khách</span></p>
-        <p><span class="text-gray-500">Hàng có sẵn:</span> <span class="font-bold text-primary ml-1">Có sẵn</span></p>
-        <p><span class="text-gray-500">Mã số:</span> <span class="font-semibold text-gray-700 ml-1">789FGSA</span></p>
-      </div>
-
-      <button
-  class="relative overflow-hidden mt-3 px-6 py-3 bg-[#EDB173] text-black font-semibold rounded-lg shadow-md flex justify-center items-center group"
->
-  <!-- Hiệu ứng lan tỏa -->
-  <span class="absolute inset-0 flex justify-center items-center">
-    <span
-      class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"
-    ></span>
-  </span>
-
-  <!-- Nội dung nút -->
-  <span class="relative group-hover:text-white text-[16px] font-semibold">
-    Thêm giỏ hàng
-  </span>
-</button>
-
-    </div>
-  </div>
-</div>
 
     </div>
 
     
   </div>
-</template>
+</template><script setup lang="ts">
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 
-<script setup lang="ts">
-import { ref, nextTick, watchEffect } from 'vue'
-
+// ================== SLIDER ẢNH CHÍNH ==================
 const images = [
   'https://live.themewild.com/fameo/assets/img/product/01.png',
   'https://live.themewild.com/fameo/assets/img/product/02.png',
@@ -724,10 +559,23 @@ const images = [
 ]
 
 const currentIndex = ref(0)
-const nextIndex = ref(null)
+const nextIndex = ref<number | null>(null)
 const animating = ref(false)
-const direction = ref('left')
+const direction = ref<'left' | 'right'>('left')
 const incomingAtCenter = ref(false)
+
+const startAnimation = (targetIndex: number) => {
+  animating.value = true
+  nextIndex.value = targetIndex
+  incomingAtCenter.value = false
+  setTimeout(() => (incomingAtCenter.value = true), 20)
+  setTimeout(() => {
+    currentIndex.value = targetIndex
+    animating.value = false
+    nextIndex.value = null
+    incomingAtCenter.value = false
+  }, 520)
+}
 
 const goNext = () => {
   if (animating.value) return
@@ -747,27 +595,7 @@ const changeImage = (i: number) => {
   startAnimation(i)
 }
 
-function startAnimation(targetIndex: number) {
-  animating.value = true
-  nextIndex.value = targetIndex
-  incomingAtCenter.value = false
-  setTimeout(() => {
-    incomingAtCenter.value = true
-  }, 20)
-  setTimeout(() => {
-    currentIndex.value = targetIndex
-    animating.value = false
-    nextIndex.value = null
-    incomingAtCenter.value = false
-  }, 520)
-}
-
-const colors = ['#6E4E37', '#C68642', '#EAD2AC', '#A98467']
-const selectedColor = ref(colors[0])
-const quantity = ref(1)
-const tab = ref('mota')
-
-// DỮ LIỆU REVIEW — chỉ cần thay bằng API response
+// ================== DỮ LIỆU REVIEW ==================
 const reviews = ref([
   {
     name: 'Lê Phùng Tiến Quân',
@@ -784,7 +612,6 @@ const reviews = ref([
     comment: 'Ghế rất êm, màu sắc đẹp, giao đúng như mô tả.',
     avatar: 'https://live.themewild.com/fameo/assets/img/blog/com-1.jpg',
   },
-  
 ])
 
 const userRating = ref(0)
@@ -803,10 +630,7 @@ const submitReview = () => {
   userComment.value = ''
 }
 
-
-
-
-// Dữ liệu sản phẩm
+// ================== SẢN PHẨM LIÊN QUAN ==================
 interface Product {
   name: string
   image: string
@@ -826,14 +650,13 @@ const products = ref<Product[]>([
   { name: 'Ghế bọc da sang trọng', image: 'https://live.themewild.com/fameo/assets/img/product/07.png', oldPrice: '350.000 đ', price: '290.000 đ', badge: 'Mới', star: 5 },
 ])
 
-// Slider
-const relatedIndex = ref<number>(0)
+const relatedIndex = ref(0)
 const containerRef = ref<HTMLElement | null>(null)
-const itemWidth = ref<number>(0)
-const visibleCount = ref<number>(5)
+const itemWidth = ref(0)
+const visibleCount = ref(5)
 const gap = 20
 
-// Cập nhật chiều rộng item dựa vào container
+// ✅ Hàm cập nhật chiều rộng item
 const updateItemWidth = () => {
   if (!containerRef.value) return
   const containerWidth = containerRef.value.clientWidth
@@ -842,35 +665,58 @@ const updateItemWidth = () => {
   else if (containerWidth < 1024) visibleCount.value = 3
   else visibleCount.value = 5
 
-  itemWidth.value = (containerWidth - (visibleCount.value - 1) * gap) / visibleCount.value
+  itemWidth.value =
+    (containerWidth - (visibleCount.value - 1) * gap) / visibleCount.value
 }
 
-// Tự động resize khi container thay đổi
-watchEffect(async () => {
+// ✅ Chỉ gọi sau khi DOM render xong (không bị chồng item)
+onMounted(async () => {
   await nextTick()
   updateItemWidth()
+  window.addEventListener('resize', updateItemWidth)
 })
 
-// Chuyển slide
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateItemWidth)
+})
+
+// ✅ Chuyển slide
 const nextSlide = () => {
-  if (relatedIndex.value < products.value.length - visibleCount.value) relatedIndex.value++
+  relatedIndex.value = Math.min(
+    relatedIndex.value + 1,
+    Math.max(0, products.value.length - visibleCount.value)
+  )
 }
 const prevSlide = () => {
-  if (relatedIndex.value > 0) relatedIndex.value--
+  relatedIndex.value = Math.max(relatedIndex.value - 1, 0)
 }
 
-// Overlay xem nhanh sản phẩm
+// ================== OVERLAY XEM NHANH ==================
 const showOverlay = ref(false)
 const currentProduct = ref<Product>({
   image: '',
   name: '',
   oldPrice: '',
   price: '',
-  star: 0
+  star: 0,
+  badge: '',
 })
 
 const viewProduct = (product: Product) => {
   currentProduct.value = { ...product }
   showOverlay.value = true
+}
+
+// ================== UI nhỏ (tab, quantity, colors) ==================
+const tab = ref<'mota' | 'danhgia'>('mota')
+const quantity = ref(1)
+const colors = ['#6E4E37', '#C68642', '#EAD2AC', '#A98467']
+const selectedColor = ref(colors[0])
+
+const decreaseQuantity = () => {
+  if (quantity.value > 1) quantity.value--
+}
+const increaseQuantity = () => {
+  quantity.value++
 }
 </script>
