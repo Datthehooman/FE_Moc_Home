@@ -34,11 +34,12 @@
   --ui-secondary: #a77a5d;
   --ui-info: #edb173;
   --ui-neutral: #ffd8ad;
-  --ui-background: #fffbf8;
+  --ui-bg: #fffbf8;
   --ui-success: #fed8b3;
   --ui-text-dimmed: #6e6e6e;
   --ui-text-muted: #757f95;
   --ui-text-toned: #f05454;
+  --ui-bg-toned: #f05454;
   --ui-bg-accented: #fff4e8;
 }
 
