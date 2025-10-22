@@ -1,5 +1,5 @@
 <template>
-  <UHeader>
+  <UHeader :ui="{ container: 'lg:p-0' }">
     <template #left>
       <NuxtImg src="/logo.png" />
       <UNavigationMenu :items="items" />
@@ -40,6 +40,7 @@
   </UHeader>
 </template>
 <script setup lang="ts">
+  import { header } from "#build/ui";
   import type { NavigationMenuItem } from "@nuxt/ui";
 
   const route = useRoute();
