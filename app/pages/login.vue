@@ -21,14 +21,15 @@
         <!-- Form -->
         <form @submit.prevent="login" novalidate class="space-y-4">
           <div>
-            <label class="block text-sm text-gray-700 mb-1"
-              >Địa chỉ Email</label
-            >
+            <label class="block text-sm text-gray-700 mb-1">Địa chỉ Email</label>
             <input
               type="email"
               v-model="email"
               placeholder="Email"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
+              :class="[
+                'w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400',
+                errors.email ? 'border-red-500' : 'border-gray-300'
+              ]"
             />
             <p v-if="errors.email" class="text-red-500 text-sm mt-1">
               {{ errors.email }}
@@ -41,7 +42,10 @@
               type="password"
               v-model="password"
               placeholder="Nhập mật khẩu"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
+              :class="[
+                'w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400',
+                errors.password ? 'border-red-500' : 'border-gray-300'
+              ]"
             />
             <p v-if="errors.password" class="text-red-500 text-sm mt-1">
               {{ errors.password }}
@@ -134,41 +138,47 @@
   </div>
 </template>
 
-<script setup>
-  import { ref, reactive } from "vue";
+<script setup lang="ts">
+import { ref, reactive } from "vue"
+import { useAuthStore } from "~/stores/authStore"
+import { navigateTo } from "#imports"
 
-  const email = ref("");
-  const password = ref("");
-  const remember = ref(false);
-  const errors = reactive({
-    email: "",
-    password: "",
-  });
+const auth = useAuthStore()
 
-  const login = () => {
-    errors.email = "";
-    errors.password = "";
+const email = ref("")
+const password = ref("")
+const remember = ref(false)
+const errors = reactive({
+  email: "",
+  password: "",
+})
 
-    // ✅ Validate thủ công
-    if (!email.value) {
-      errors.email = "Vui lòng nhập email";
-    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email.value)) {
-      errors.email = "Email không hợp lệ";
+const login = async () => {
+  errors.email = ''
+  errors.password = ''
+
+  if (!email.value) errors.email = 'Vui lòng nhập email'
+  if (!password.value) errors.password = 'Vui lòng nhập mật khẩu'
+
+  if (!errors.email && !errors.password) {
+    const { error, data } = await auth.login({
+      email: email.value,
+      password_hash: password.value,
+    })
+
+    if (error) {
+      if (error.statusCode === 422) {
+        errors.email = error.data.errors.email?.[0] || ''
+        errors.password = error.data.errors.password_hash?.[0] || ''
+      } else if (error.statusCode === 401) {
+        errors.email = 'Email hoặc mật khẩu không đúng'
+        errors.password = 'Email hoặc mật khẩu không đúng'
+      }
+    } else {
+      alert('Đăng nhập thành công!')
+      navigateTo('/')
     }
+  }
+}
 
-    if (!password.value) {
-      errors.password = "Vui lòng nhập mật khẩu";
-    } else if (password.value.length < 6) {
-      errors.password = "Mật khẩu phải có ít nhất 6 ký tự";
-    }
-    // Nếu không có lỗi thì xử lý login
-    if (!errors.email && !errors.password) {
-      console.log(
-        "Đăng nhập thành công:",
-        email.value,
-        password.value,
-        remember.value
-      );
-    }
-  };
 </script>
