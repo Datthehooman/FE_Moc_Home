@@ -1,3 +1,24 @@
+interface TokenData {
+  accessToken?: string
+  refreshToken?: string
+}
+
+interface UserData {
+  id: number
+  full_name: string
+  email: string
+  phone: string
+}
+
+interface AuthUser {
+  user?: UserData
+  token?: TokenData
+}
+
+interface Data {
+  data: AuthUser
+}
+
 export const useAuthStore = defineStore("auth-store", {
   state: () => {
     return {
@@ -11,7 +32,7 @@ export const useAuthStore = defineStore("auth-store", {
   actions: {
     async login(body: any) {
       this.isSubmitting = true;
-      const { data, error, execute } = useCustomFetch("/v1/auth/login", {
+      const { data, error, execute } = useCustomFetch("http://127.0.0.1:8000/api/client/login", {
         method: "POST",
         body: body,
       });

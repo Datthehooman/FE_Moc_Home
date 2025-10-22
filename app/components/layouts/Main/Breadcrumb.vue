@@ -44,6 +44,8 @@ const titles = {
   product: 'Sản phẩm',
   cart: 'Giỏ hàng',
   checkout: 'Thanh toán',
+  ProductList: 'Cửa hàng',
+  OtpVerify: 'Xác minh OTP',
   'san-pham-ProductDetail': 'Chi tiết sản phẩm',
   'reset-password': 'Đặt lại mật khẩu',
 }
