@@ -25,6 +25,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@iconify-json/tabler": "^1.2.23",
     "@iconify-json/uil": "^1.2.3",
     "@types/node": "^24.5.2"
   }
