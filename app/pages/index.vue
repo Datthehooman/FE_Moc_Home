@@ -285,6 +285,238 @@
       </div>
     </UContainer>
     <ModulesHomeBanner4 class="mb-[65px]" />
+    <UContainer class="lg:px-0">
+      <div class="text-center mb-11.5">
+        <p class="font-bold text-primary uppercase mb-4">THƯ VIỆN ẢNH</p>
+        <p class="text-[32px] font-semibold">
+          Hãy cùng xem qua <span class="text-info">Thư viện ảnh</span> của chúng
+          tôi
+        </p>
+      </div>
+      <div class="grid grid-cols-4 gap-7.5 mb-16">
+        <div class="col-span-2 rounded-xl overflow-hidden relative">
+          <div class="absolute top-51.5 left-[49px]">
+            <UTooltip
+              :delay-duration="0"
+              :content="{ side: 'bottom', sideOffset: 45, align: 'start' }"
+              :ui="{
+                content: 'ring-0 p-0',
+              }"
+            >
+              <div class="relative inline-flex">
+                <div
+                  class="absolute inset-0 size-[40px] rounded-full bg-success animate-ping opacity-75"
+                ></div>
+
+                <div
+                  class="relative size-[40px] rounded-full bg-success text-primary flex justify-center items-center text-center"
+                >
+                  <UIcon name="i-lucide-plus" class="text-2xl" />
+                </div>
+              </div>
+              <template #content>
+                <div class="flex items-center rounded-3xl bg-white p-3">
+                  <NuxtImg src="/image 10.png" class="size-[81px] mr-3" />
+                  <div>
+                    <p class="font-bold text-[16px] mb-1">Ghế sofa mini</p>
+                    <p class="text-[16px] mb-1">
+                      Giá:
+                      <span class="text-[#FF0000] font-semibold text-[13px]"
+                        >180.000 đ</span
+                      >
+                    </p>
+                    <UButton
+                      size="xl"
+                      variant="solid"
+                      class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit"
+                    >
+                      <span
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
+                      ></span>
+                      <span
+                        class="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500"
+                      >
+                        <span>Mua ngay</span>
+                        <UIcon name="i-lucide-arrow-right"></UIcon>
+                      </span>
+                    </UButton>
+                  </div>
+                </div>
+              </template>
+            </UTooltip>
+          </div>
+
+          <div class="absolute top-53.5 right-31.5">
+            <UTooltip
+              :delay-duration="0"
+              :content="{ side: 'bottom', sideOffset: 45, align: 'start' }"
+              :ui="{
+                content: 'ring-0 p-0',
+              }"
+            >
+              <div class="relative inline-flex">
+                <div
+                  class="absolute inset-0 size-[40px] rounded-full bg-success animate-ping opacity-75"
+                ></div>
+
+                <div
+                  class="relative size-[40px] rounded-full bg-success text-primary flex justify-center items-center text-center"
+                >
+                  <UIcon name="i-lucide-plus" class="text-2xl" />
+                </div>
+              </div>
+              <template #content>
+                <div class="flex items-center rounded-3xl bg-white p-3">
+                  <NuxtImg src="/image 10.png" class="size-[81px] mr-3" />
+                  <div>
+                    <p class="font-bold text-[16px] mb-1">Ghế sofa mini</p>
+                    <p class="text-[16px] mb-1">
+                      Giá:
+                      <span class="text-[#FF0000] font-semibold text-[13px]"
+                        >180.000 đ</span
+                      >
+                    </p>
+                    <UButton
+                      size="xl"
+                      variant="solid"
+                      class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit"
+                    >
+                      <span
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
+                      ></span>
+                      <span
+                        class="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500"
+                      >
+                        <span>Mua ngay</span>
+                        <UIcon name="i-lucide-arrow-right"></UIcon>
+                      </span>
+                    </UButton>
+                  </div>
+                </div>
+              </template>
+            </UTooltip>
+          </div>
+          <NuxtImg src="/Rectangle 52.png" class="w-full object-cover" />
+        </div>
+        <div class="col-span-1 rounded-xl overflow-hidden relative group">
+          <NuxtImg
+            src="/Rectangle 52.png"
+            class="h-full object-cover relative z-0"
+          />
+          <div
+            class="absolute inset-0 h-[200%] -translate-y-full group-hover:translate-y-0 transition-transform duration-1000 z-10"
+          >
+            <div class="h-1/2 bg-success/50"></div>
+            <div class="h-1/2 bg-success"></div>
+          </div>
+
+          <div
+            class="absolute inset-0 flex items-center justify-center z-20 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-1000"
+          >
+            <div
+              class="size-[50px] rounded-full bg-white text-primary flex justify-center items-center text-center"
+            >
+              <UIcon name="i-lucide-plus" class="text-4xl text-success" />
+            </div>
+          </div>
+        </div>
+        <div class="col-span-1 rounded-xl overflow-hidden relative group">
+          <NuxtImg
+            src="/Rectangle 52.png"
+            class="h-full object-cover relative z-0"
+          />
+          <div
+            class="absolute inset-0 h-[200%] -translate-y-full group-hover:translate-y-0 transition-transform duration-1000 z-10"
+          >
+            <div class="h-1/2 bg-success/50"></div>
+            <div class="h-1/2 bg-success"></div>
+          </div>
+
+          <div
+            class="absolute inset-0 flex items-center justify-center z-20 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-1000"
+          >
+            <div
+              class="size-[50px] rounded-full bg-white text-primary flex justify-center items-center text-center"
+            >
+              <UIcon name="i-lucide-plus" class="text-4xl text-success" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-1 rounded-xl overflow-hidden relative group">
+          <NuxtImg
+            src="/Rectangle 52.png"
+            class="h-full object-cover relative z-0"
+          />
+          <div
+            class="absolute inset-0 h-[200%] -translate-y-full group-hover:translate-y-0 transition-transform duration-1000 z-10"
+          >
+            <div class="h-1/2 bg-success/50"></div>
+            <div class="h-1/2 bg-success"></div>
+          </div>
+
+          <div
+            class="absolute inset-0 flex items-center justify-center z-20 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-1000"
+          >
+            <div
+              class="size-[50px] rounded-full bg-white text-primary flex justify-center items-center text-center"
+            >
+              <UIcon name="i-lucide-plus" class="text-4xl text-success" />
+            </div>
+          </div>
+        </div>
+        <div class="col-span-1 rounded-xl overflow-hidden relative group">
+          <NuxtImg
+            src="/Rectangle 52.png"
+            class="h-full object-cover relative z-0"
+          />
+          <div
+            class="absolute inset-0 h-[200%] -translate-y-full group-hover:translate-y-0 transition-transform duration-1000 z-10"
+          >
+            <div class="h-1/2 bg-success/50"></div>
+            <div class="h-1/2 bg-success"></div>
+          </div>
+
+          <div
+            class="absolute inset-0 flex items-center justify-center z-20 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-1000"
+          >
+            <div
+              class="size-[50px] rounded-full bg-white text-primary flex justify-center items-center text-center"
+            >
+              <UIcon name="i-lucide-plus" class="text-4xl text-success" />
+            </div>
+          </div>
+        </div>
+        <div class="col-span-2 rounded-xl overflow-hidden relative group">
+          <NuxtImg
+            src="/Rectangle 52.png"
+            class="w-full relative z-0 object-cover"
+          />
+          <div
+            class="absolute inset-0 h-[200%] -translate-y-full group-hover:translate-y-0 transition-transform duration-1000 z-10"
+          >
+            <div class="h-1/2 bg-success/50"></div>
+            <div class="h-1/2 bg-success"></div>
+          </div>
+
+          <div
+            class="absolute inset-0 flex items-center justify-center z-20 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-1000"
+          >
+            <div
+              class="size-[50px] rounded-full bg-white text-primary flex justify-center items-center text-center"
+            >
+              <UIcon name="i-lucide-plus" class="text-4xl text-success" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </UContainer>
+    <ModulesHomeBanner5 class="mb-15.5" />
+    <UContainer class="lg:px-0">
+      <ModulesHomeBlog class="mb-17.5" />
+      <ModulesHomeBanner6 class="mb-14.5" />
+      <ModulesHomeFacebookImages class="mb-[51px]" />
+    </UContainer>
   </div>
 </template>
 <script setup lang="ts"></script>
