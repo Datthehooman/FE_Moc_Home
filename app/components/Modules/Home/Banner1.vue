@@ -41,10 +41,40 @@
       }"
     >
       <div class="bg-transparent grid grid-cols-2 relative">
-        <div
-          class="absolute size-[40px] rounded-full bg-white top-30 right-[380px] text-primary flex justify-center items-center text-center"
-        >
-          <UIcon name="i-lucide-plus" class="text-2xl" />
+        <div class="absolute top-30 right-95">
+          <UTooltip
+            :delay-duration="0"
+            :content="{ side: 'bottom', sideOffset: 45, align: 'start' }"
+            :ui="{
+              content: 'ring-0 p-0',
+            }"
+          >
+            <div class="relative inline-flex">
+              <div
+                class="absolute inset-0 size-[40px] rounded-full bg-white animate-ping opacity-75"
+              ></div>
+
+              <div
+                class="relative size-[40px] rounded-full bg-white text-primary flex justify-center items-center text-center"
+              >
+                <UIcon name="i-lucide-plus" class="text-2xl" />
+              </div>
+            </div>
+            <template #content>
+              <div class="flex items-center rounded-3xl bg-white p-3">
+                <NuxtImg src="/image 10.png" class="size-[81px] mr-3" />
+                <div>
+                  <p class="font-bold text-[16px] mb-1">Ghế sofa mini</p>
+                  <p class="text-[16px]">
+                    Giá:
+                    <span class="text-[#FF0000] font-semibold text-[13px]"
+                      >180.000 đ</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </template>
+          </UTooltip>
         </div>
         <div class="pt-[65px]">
           <div
