@@ -11,6 +11,18 @@
   </div>
 </template>
 
-<script setup>
-const modelValue = defineModel() // hỗ trợ v-model trong Vue 3.4+
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+
+const modelValue = defineModel()
+const emit = defineEmits(['update:modelValue'])
+
+// Debounce để chờ 300ms sau khi gõ mới emit
+let timeout: any = null
+watch(modelValue, (val) => {
+  clearTimeout(timeout)
+  timeout = setTimeout(() => {
+    emit('update:modelValue', val)
+  }, 300)
+})
 </script>
