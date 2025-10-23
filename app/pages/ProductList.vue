@@ -25,12 +25,11 @@
         </div>
 
         <!-- Pagination -->
-       <ModulesProductPagination
-  :currentPage="currentPage"
-  :totalPages="totalPages"
-  @update:currentPage="currentPage = $event"
-/>
-
+        <ModulesProductModulesPagination
+          :currentPage="currentPage"
+          :totalPages="totalPages"
+          @update:currentPage="currentPage = $event"
+        />
       </div>
     </div>
 
