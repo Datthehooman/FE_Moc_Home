@@ -14,7 +14,7 @@
           <!-- First column with logo -->
           <div>
             <div class="flex justify-center">
-              <img src="/logo2.png" alt="MỘC HOME" class="w-[117px]" />
+              <img src="/logo2.png" alt="MỘC HOME1" class="w-[117px]" />
             </div>
             <ul class="space-y-4 font-medium">
               <li class="text-sm">
