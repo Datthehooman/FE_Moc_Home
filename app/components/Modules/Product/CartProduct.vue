@@ -12,31 +12,32 @@
     <!-- NỘI DUNG -->
     <div class="relative z-10 p-4 flex flex-col">
       <div class="relative w-full flex justify-center mb-3">
-<span
-  v-if="product.badge && product.badge.trim() !== ''"
-  class="absolute top-1 right-2 w-[80px] h-[24px] flex justify-center items-center text-[14px] font-medium text-white rounded-full z-20"
-  :class="{
-    'bg-[#F05454]': product.badge === 'Mới',
-    'bg-[#00BFFF]': product.badge === 'Hot',
-    'bg-[#FBA707]': product.badge === 'Giảm 50%',
-  }"
->
-  {{ product.badge }}
-</span>
+        <!-- BADGE -->
+        <span
+          v-if="item.badge && item.badge.trim() !== ''"
+          class="absolute top-1 right-2 w-[80px] h-[24px] flex justify-center items-center text-[14px] font-medium text-white rounded-full z-20"
+          :class="{
+            'bg-[#F05454]': item.badge === 'Mới',
+            'bg-[#00BFFF]': item.badge === 'Hot',
+            'bg-[#FBA707]': item.badge === 'Giảm 50%',
+          }"
+        >
+          {{ item.badge }}
+        </span>
 
-
-
+        <!-- 🖼️ HÌNH ẢNH -->
         <img
-          :src="product.image"
-          alt=""
-          class="w-[180px] h-[180px] object-contain relative z-10 transition-transform duration-500"
+          :src="resolvedThumbnail"
+          :alt="item.product_name"
+          class="w-[180px] h-[180px] object-contain relative z-10 transition-transform duration-500 ease-out"
+          @error="onImageError"
         />
 
         <!-- ICON HOVER -->
         <div
           class="absolute left-1/2 bottom-[100px] transform -translate-x-1/2 translate-y-[120px] opacity-0 flex gap-2 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:translate-y-[90px] z-20"
         >
-          <!-- Xem sản phẩm -->
+          <!-- 👁️ Xem sản phẩm -->
           <UTooltip
             :delay-duration="0"
             text="Xem sản phẩm"
@@ -49,14 +50,14 @@
             }"
           >
             <button
-              @click="$emit('view', product)"
+              @click="$emit('view', item)"
               class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
             >
               <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
             </button>
           </UTooltip>
 
-          <!-- Yêu thích -->
+          <!-- ❤️ Yêu thích -->
           <UTooltip
             :delay-duration="0"
             text="Thêm yêu thích"
@@ -77,30 +78,39 @@
         </div>
       </div>
 
-      <!-- TÊN + SAO + GIÁ -->
-      <h3 class="text-gray-800 font-semibold text-[17px] text-left px-2 leading-snug">
-        {{ product.name }}
+      <!-- TÊN -->
+      <h3
+        class="text-gray-800 font-semibold text-[17px] text-left px-2 leading-snug truncate"
+      >
+        {{ item.product_name }}
       </h3>
 
+      <!-- ⭐ RATING -->
       <div class="flex mt-1 px-2 text-left">
         <UIcon
           v-for="n in 5"
           :key="n"
-          :name="n <= product.star ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+          :name="Number(item.rating ?? 0) >= n ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
           class="w-4 h-4"
-          :class="n <= product.star ? 'text-yellow-400' : 'text-gray-300'"
+          :class="Number(item.rating ?? 0) >= n ? 'text-yellow-400' : 'text-gray-300'"
         />
       </div>
 
+      <!-- 💰 GIÁ -->
       <div class="mt-2 flex items-center justify-between w-full px-2">
         <div class="text-left">
-          <span class="line-through text-gray-400 text-[14px] block">{{ product.oldPrice }}</span>
+          <span
+            v-if="item.price_down"
+            class="line-through text-gray-400 text-[14px] block"
+          >
+            {{ formatPrice(item.price) }}
+          </span>
           <span class="text-[#E95D5D] font-semibold text-[19px] block">
-            {{ product.price }}
+            {{ formatPrice(item.price_down || item.price) }}
           </span>
         </div>
 
-        <!-- Giỏ hàng -->
+        <!-- 🛒 GIỎ HÀNG -->
         <UTooltip
           :delay-duration="0"
           text="Thêm giỏ hàng"
@@ -127,17 +137,55 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  product: {
-    name: string
-    image: string
-    oldPrice: string
-    price: string
-    badge?: string
-    star: number
-  }
+import { computed, ref } from 'vue'
+
+interface ProductItem {
+  product_id: number
+  product_name: string
+  price: number
+  price_down?: number
+  badge?: string | null
+  rating?: number | null
+  sku?: string
+  stock_quantity?: number
+  thumbnail?: string
+  images?: { image_url: string }[]
+}
+
+const props = defineProps<{
+  item: ProductItem
   itemWidth: number
 }>()
 
 defineEmits(['view'])
+
+const errorImage = ref(false)
+
+/** ✅ Xử lý ảnh thumbnail */
+const resolvedThumbnail = computed(() => {
+  if (errorImage.value) {
+    return 'https://via.placeholder.com/180?text=No+Image'
+  }
+
+  if (props.item.thumbnail && props.item.thumbnail.startsWith('http')) {
+    return props.item.thumbnail
+  }
+
+  if (props.item.images?.length && props.item.images[0].image_url) {
+    return `http://127.0.0.1:8000/storage/${props.item.images[0].image_url}`
+  }
+
+  return '/placeholder.png'
+})
+
+/** 🖼️ Khi ảnh lỗi */
+const onImageError = () => {
+  errorImage.value = true
+}
+
+/** 💰 Format giá */
+const formatPrice = (price: number | undefined) => {
+  if (!price) return ''
+  return price.toLocaleString('vi-VN') + '₫'
+}
 </script>
