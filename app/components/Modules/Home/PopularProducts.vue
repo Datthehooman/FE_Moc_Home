@@ -1,10 +1,12 @@
 <template>
   <div>
-    <div class="flex justify-between mb-[25px]">
+    <!-- Header -->
+    <div class="flex justify-between mb-[25px] relative">
       <div>
         <p class="text-primary font-semibold text-[26px]">Sản phẩm phổ biến</p>
-        <div class="absolute w-10.5 h-0.5 bg-secondary" />
+        <div class="absolute w-10.5 h-0.5 bg-secondary bottom-0" />
       </div>
+
       <UTabs
         v-model="activeTab"
         :items="items"
@@ -20,69 +22,51 @@
       />
     </div>
 
-    <div
-      v-show="activeTab === 'Tất cả'"
-      class="mt-4 flex justify-between items-center"
-    >
-      <SharedProductCard :stars="2" />
-      <SharedProductCard :stars="2" />
-      <SharedProductCard :stars="2" />
-      <SharedProductCard :stars="2" />
-      <SharedProductCard :stars="2" />
+    <!-- Product Grid -->
+    <div v-if="!products || !products.length" class="text-center py-10">
+      Không có sản phẩm nào.
     </div>
 
-    <div
-      v-show="activeTab === 'Phòng ngủ'"
-      class="mt-4 flex justify-between items-center"
-    >
-      <SharedProductCard :stars="3.5" />
-      <SharedProductCard :stars="3.5" />
-      <SharedProductCard :stars="3.5" />
-      <SharedProductCard :stars="3.5" />
-      <SharedProductCard :stars="3.5" />
-    </div>
-    <div
-      v-show="activeTab === 'Trang trí'"
-      class="mt-4 flex justify-between items-center"
-    >
-      <SharedProductCard :stars="4" />
-      <SharedProductCard :stars="4" />
-      <SharedProductCard :stars="4" />
-      <SharedProductCard :stars="4" />
-      <SharedProductCard :stars="4" />
-    </div>
-    <div
-      v-show="activeTab === 'Phòng khách'"
-      class="mt-4 flex justify-between items-center"
-    >
-      <SharedProductCard :stars="5" />
-      <SharedProductCard :stars="5" />
-      <SharedProductCard :stars="5" />
-      <SharedProductCard :stars="5" />
-      <SharedProductCard :stars="5" />
+    <div v-else class="mt-4 grid grid-cols-5 gap-6 items-start">
+      <SharedProductCard
+        v-for="product in filteredProducts.slice(0, 5)"
+        :key="product.product_id"
+        :title="product.product_name"
+        :image="product.thumbnail"
+        :price="Number(product.price).toLocaleString('vi-VN')"
+        :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
+        :stars="4.5"
+        :badge="'Hot'"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  const items = [
-    {
-      label: "Tất cả",
-      value: "Tất cả",
-    },
-    {
-      label: "Phòng ngủ",
-      value: "Phòng ngủ",
-    },
-    {
-      label: "Trang trí",
-      value: "Trang trí",
-    },
-    {
-      label: "Phòng khách",
-      value: "Phòng khách",
-    },
-  ];
+  const props = defineProps<{
+    products: Product[];
+  }>();
 
   const activeTab = ref("Tất cả");
+
+  const items = [
+    { label: "Tất cả", value: "Tất cả" },
+    { label: "Phòng ngủ", value: "Phòng ngủ" },
+    { label: "Trang trí", value: "Trang trí" },
+    { label: "Phòng khách", value: "Phòng khách" },
+  ];
+
+  // 🧠 Filter logic based on category_id mapping
+  const filteredProducts = computed(() => {
+    if (activeTab.value === "Tất cả") return props.products;
+
+    const categoryMap: Record<string, number[]> = {
+      "Phòng ngủ": [2], // example IDs — match your tblcategories
+      "Trang trí": [5],
+      "Phòng khách": [4, 11],
+    };
+
+    const targetIds = categoryMap[activeTab.value] || [];
+    return props.products.filter((p) => targetIds.includes(p.category_id));
+  });
 </script>

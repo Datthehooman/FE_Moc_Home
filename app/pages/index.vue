@@ -3,23 +3,48 @@
     <UContainer class="lg:px-0">
       <ModulesHomeBanner1 class="mb-[55px]" />
       <ModulesHomeTitle title="Danh mục hàng đầu" />
-      <div class="flex justify-between">
-        <ModulesHomeCateCard /><ModulesHomeCateCard /><ModulesHomeCateCard /><ModulesHomeCateCard /><ModulesHomeCateCard /><ModulesHomeCateCard />
+      <div class="flex justify-between flex-wrap gap-4">
+        <ModulesHomeCateCard
+          v-for="category in categories"
+          :key="category.id"
+          :image="category.image"
+          :title="category.category_name"
+          :quantity="30"
+        />
       </div>
       <ModulesHomeTitle title="Sản phẩm thịnh hành" />
-      <div class="flex justify-between items-center">
-        <SharedProductCard :stars="3.5" />
-        <SharedProductCard :stars="3.5" />
-        <SharedProductCard :stars="3.5" />
-        <SharedProductCard :stars="3.5" />
-        <SharedProductCard :stars="3.5" />
+      <div v-if="isLoadingProducts" class="text-center py-10">
+        Đang tải sản phẩm...
+      </div>
+
+      <div v-else class="flex flex-wrap justify-between items-center">
+        <SharedProductCard
+          v-for="product in products.slice(0, 5)"
+          :key="product.product_id"
+          :title="product.product_name"
+          :image="product.thumbnail"
+          :price="Number(product.price).toLocaleString('vi-VN')"
+          :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
+          :stars="4.5"
+          :badge="'Hot'"
+        />
       </div>
       <ModulesHomeBanner2 />
       <ModulesHomeTitle title="Sản phẩm nổi bật" />
-      <div class="flex justify-between mb-20">
-        <SharedProductCard :big="true" :stars="5" />
-        <SharedProductCard :big="true" :stars="5" />
-        <SharedProductCard :big="true" :stars="5" />
+      <div v-if="isLoadingProducts" class="text-center py-10">Đang tải...</div>
+
+      <div v-else class="flex justify-between flex-wrap mb-20">
+        <SharedProductCard
+          v-for="product in products.slice(5, 8)"
+          :key="product.product_id"
+          :big="true"
+          :title="product.product_name"
+          :image="product.thumbnail"
+          :price="Number(product.price).toLocaleString('vi-VN')"
+          :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
+          :stars="4.8"
+          :badge="'Nổi bật'"
+        />
       </div>
       <div
         class="flex justify-between items-center pt-10.5 pb-9.5 pl-[72px] pr-16 border border-success rounded-2xl mb-[55px]"
@@ -69,7 +94,7 @@
           </div>
         </div>
       </div>
-      <ModulesHomePopularProducts class="mb-[86px]" />
+      <ModulesHomePopularProducts :products="products" class="mb-[86px]" />
       <div class="flex justify-between items-center mb-[37px]">
         <div class="w-[410px]">
           <p class="font-bold text-secondary uppercase">
@@ -243,6 +268,7 @@
     <ModulesHomeBanner3 class="mb-[118px]" />
     <UContainer class="lg:px-0">
       <div class="grid grid-cols-3 gap-[31px] text-black mb-[57px]">
+        <!-- Đang giảm giá -->
         <div>
           <div
             class="mb-[39px] relative h-[47px] border-b border-[#EBEBEB] border-solid"
@@ -250,12 +276,24 @@
             <p class="font-semibold text-2xl">Đang giảm giá</p>
             <div class="absolute w-10.5 h-0.5 bg-secondary bottom-0" />
           </div>
-          <div class="flex flex-col gap-6.5">
-            <ModulesHomeSmallProductCard :stars="4" />
-            <ModulesHomeSmallProductCard :stars="4" />
-            <ModulesHomeSmallProductCard :stars="4" />
+
+          <div v-if="isLoadingProducts" class="text-center py-6">
+            Đang tải...
+          </div>
+          <div v-else class="flex flex-col gap-6.5">
+            <ModulesHomeSmallProductCard
+              v-for="product in products.slice(0, 3)"
+              :key="product.product_id"
+              :title="product.product_name"
+              :image="product.thumbnail"
+              :price="Number(product.price).toLocaleString('vi-VN')"
+              :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
+              :stars="4"
+            />
           </div>
         </div>
+
+        <!-- Bán chạy nhất -->
         <div>
           <div
             class="mb-[39px] relative h-[47px] border-b border-[#EBEBEB] border-solid"
@@ -263,12 +301,24 @@
             <p class="font-semibold text-2xl">Bán chạy nhất</p>
             <div class="absolute w-10.5 h-0.5 bg-secondary bottom-0" />
           </div>
-          <div class="flex flex-col gap-6.5">
-            <ModulesHomeSmallProductCard :stars="4" />
-            <ModulesHomeSmallProductCard :stars="4" />
-            <ModulesHomeSmallProductCard :stars="4" />
+
+          <div v-if="isLoadingProducts" class="text-center py-6">
+            Đang tải...
+          </div>
+          <div v-else class="flex flex-col gap-6.5">
+            <ModulesHomeSmallProductCard
+              v-for="product in products.slice(0, 3)"
+              :key="product.product_id"
+              :title="product.product_name"
+              :image="product.thumbnail"
+              :price="Number(product.price).toLocaleString('vi-VN')"
+              :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
+              :stars="4.5"
+            />
           </div>
         </div>
+
+        <!-- Đánh giá cao nhất -->
         <div>
           <div
             class="mb-[39px] relative h-[47px] border-b border-[#EBEBEB] border-solid"
@@ -276,10 +326,20 @@
             <p class="font-semibold text-2xl">Đánh giá cao nhất</p>
             <div class="absolute w-10.5 h-0.5 bg-secondary bottom-0" />
           </div>
-          <div class="flex flex-col gap-6.5">
-            <ModulesHomeSmallProductCard :stars="4" />
-            <ModulesHomeSmallProductCard :stars="4" />
-            <ModulesHomeSmallProductCard :stars="4" />
+
+          <div v-if="isLoadingProducts" class="text-center py-6">
+            Đang tải...
+          </div>
+          <div v-else class="flex flex-col gap-6.5">
+            <ModulesHomeSmallProductCard
+              v-for="product in products.slice(0, 3)"
+              :key="product.product_id"
+              :title="product.product_name"
+              :image="product.thumbnail"
+              :price="Number(product.price).toLocaleString('vi-VN')"
+              :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
+              :stars="5"
+            />
           </div>
         </div>
       </div>
@@ -519,4 +579,15 @@
     </UContainer>
   </div>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  const {
+    categories,
+    fetchCategories,
+    isLoading: isLoadingCategories,
+  } = useCategories();
+  const {
+    products,
+    isLoading: isLoadingProducts,
+    fetchProducts,
+  } = useProducts();
+</script>
