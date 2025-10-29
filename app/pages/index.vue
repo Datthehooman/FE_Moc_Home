@@ -25,8 +25,8 @@
           :image="product.thumbnail"
           :price="Number(product.price).toLocaleString('vi-VN')"
           :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-          :stars="4.5"
-          :badge="'Hot'"
+          :stars="product.rating || 4.5"
+          :badge="product.badge || 'Hot'"
         />
       </div>
       <ModulesHomeBanner2 />
@@ -42,8 +42,8 @@
           :image="product.thumbnail"
           :price="Number(product.price).toLocaleString('vi-VN')"
           :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-          :stars="4.8"
-          :badge="'Nổi bật'"
+          :stars="product.rating || 4.8"
+          :badge="product.badge || 'Nổi bật'"
         />
       </div>
       <div
@@ -288,7 +288,7 @@
               :image="product.thumbnail"
               :price="Number(product.price).toLocaleString('vi-VN')"
               :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-              :stars="4"
+              :stars="product.rating || 4"
             />
           </div>
         </div>
@@ -313,7 +313,7 @@
               :image="product.thumbnail"
               :price="Number(product.price).toLocaleString('vi-VN')"
               :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-              :stars="4.5"
+              :stars="product.rating || 4.5"
             />
           </div>
         </div>
@@ -338,7 +338,7 @@
               :image="product.thumbnail"
               :price="Number(product.price).toLocaleString('vi-VN')"
               :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-              :stars="5"
+              :stars="product.rating || 5"
             />
           </div>
         </div>
