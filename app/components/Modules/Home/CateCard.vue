@@ -25,6 +25,6 @@
   defineProps<{
     image?: string;
     title?: string;
-    quantity?: string | number;
+    quantity?: number;
   }>();
 </script>
