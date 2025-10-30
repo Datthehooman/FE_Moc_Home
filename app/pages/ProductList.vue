@@ -60,35 +60,44 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useProduct } from '~/composables/useProduct'
+import { useRoute, useRouter } from 'vue-router'
 
 const { products, loading, fetchProducts } = useProduct()
 
-// --- State ---
-const searchQuery = ref('')
+// --- Route và router để nhận query từ header ---
+const route = useRoute()
+const router = useRouter()
+const searchQuery = ref<string>((route.query.search as string) || '')
+
+// --- Filter / Sort ---
 const selectedCategories = ref<string[]>([])
 const selectedBrands = ref<string[]>([])
 const sortOption = ref('Mặc định')
 const currentPage = ref(1)
 const itemsPerPage = 18
 
-// --- Hàm đổi giá ---
-const parsePrice = (price: number | string) =>
-  Number(String(price).replace(/\D/g, ''))
+const parsePrice = (price: number | string) => Number(String(price).replace(/\D/g, ''))
 
 const filteredProducts = computed(() => {
   let result = products.value || []
 
-  // --- Lọc theo thương hiệu ---
+  // Lọc theo keyword
+  if (searchQuery.value.trim()) {
+    const keyword = searchQuery.value.toLowerCase()
+    result = result.filter(p => p.product_name.toLowerCase().includes(keyword))
+  }
+
+  // Lọc theo thương hiệu
   if (selectedBrands.value.length) {
     result = result.filter(p => selectedBrands.value.includes(p.brand ?? ''))
   }
 
-  // --- Lọc theo danh mục (dựa theo category_id) ---
+  // Lọc theo danh mục
   if (selectedCategories.value.length) {
     result = result.filter(p => selectedCategories.value.includes(String(p.category_id)))
   }
 
-  // --- Sắp xếp ---
+  // Sắp xếp
   if (sortOption.value === 'Tên A-Z') {
     result = [...result].sort((a, b) =>
       a.product_name.localeCompare(b.product_name, 'vi', { sensitivity: 'base' })
@@ -110,7 +119,6 @@ const filteredProducts = computed(() => {
 const totalPages = computed(() =>
   Math.ceil(filteredProducts.value.length / itemsPerPage)
 )
-
 const paginatedProducts = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage
   return filteredProducts.value.slice(start, start + itemsPerPage)
@@ -119,14 +127,19 @@ const paginatedProducts = computed(() => {
 // --- Quick view ---
 const showQuickView = ref(false)
 const selectedProduct = ref<any>(null)
-
-const openQuickView = (product: any) => {
-  selectedProduct.value = product
-  showQuickView.value = true
-}
+const openQuickView = (product: any) => { selectedProduct.value = product; showQuickView.value = true }
 const closeQuickView = () => (showQuickView.value = false)
 
-// --- Search bằng API ---
+// --- Watch query route từ header ---
+watch(
+  () => route.query.search,
+  (keyword) => {
+    searchQuery.value = (keyword as string) || ''
+  },
+  { immediate: true }
+)
+
+// --- Watch searchQuery để gọi API search ---
 let timeout: any = null
 watch(searchQuery, (keyword) => {
   clearTimeout(timeout)
@@ -145,10 +158,9 @@ watch(searchQuery, (keyword) => {
       const json = await res.json()
       const list = json?.result?.data || []
 
-      // --- Chỉ set giá số thô, hiển thị format ở component con
       products.value = list.map((p: any) => ({
         ...p,
-        price: Number(p.price),       // đảm bảo là number
+        price: Number(p.price),
         price_down: p.price_down ? Number(p.price_down) : undefined,
         thumbnail: p.thumbnail
           ? p.thumbnail
@@ -165,8 +177,7 @@ watch(searchQuery, (keyword) => {
   }, 300)
 })
 
-
-// --- Lần đầu load ---
+// --- Load lần đầu ---
 onMounted(() => {
   fetchProducts()
 })
