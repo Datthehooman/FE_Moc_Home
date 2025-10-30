@@ -33,6 +33,8 @@ export interface Product {
   thumbnail: string;
   discount_percentage: number;
   images: ProductImage[];
+  rating: number;
+  badge: string;
 }
 
 export interface Pagination {
