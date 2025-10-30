@@ -5,11 +5,13 @@
       <ModulesHomeTitle title="Danh mục hàng đầu" />
       <div class="flex justify-between flex-wrap gap-4">
         <ModulesHomeCateCard
-          v-for="category in categories"
+          v-for="category in categories.filter(
+            (c) => categoryProductCount[c.id]
+          )"
           :key="category.id"
           :image="category.image"
           :title="category.category_name"
-          :quantity="30"
+          :quantity="categoryProductCount[category.id]"
         />
       </div>
       <ModulesHomeTitle title="Sản phẩm thịnh hành" />
@@ -585,9 +587,21 @@
     fetchCategories,
     isLoading: isLoadingCategories,
   } = useCategories();
+
   const {
     products,
     isLoading: isLoadingProducts,
     fetchProducts,
   } = useProducts();
+
+  const categoryProductCount = computed(() => {
+    const countMap: Record<number, number> = {};
+
+    for (const product of products.value) {
+      const catId = product.category_id;
+      countMap[catId] = (countMap[catId] || 0) + 1;
+    }
+
+    return countMap;
+  });
 </script>
