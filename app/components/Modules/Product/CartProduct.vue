@@ -29,7 +29,8 @@
         <img
           :src="resolvedThumbnail"
           :alt="item.product_name"
-          class="w-[180px] h-[180px] object-contain relative z-10 transition-transform duration-500 ease-out"
+          @click="goToDetail"
+          class="w-[180px] h-[180px] object-contain relative z-10 transition-transform duration-500 ease-out cursor-pointer"
           @error="onImageError"
         />
 
@@ -138,6 +139,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 interface ProductItem {
   product_id: number
@@ -150,6 +152,7 @@ interface ProductItem {
   stock_quantity?: number
   thumbnail?: string
   images?: { image_url: string }[]
+  slug?: string
 }
 
 const props = defineProps<{
@@ -157,7 +160,7 @@ const props = defineProps<{
   itemWidth: number
 }>()
 
-defineEmits(['view'])
+const emit = defineEmits(['view'])
 
 const errorImage = ref(false)
 
@@ -188,4 +191,20 @@ const formatPrice = (price: number | undefined) => {
   if (!price) return ''
   return price.toLocaleString('vi-VN') + '₫'
 }
+
+const router = useRouter()
+
+/** 💡 Click vào ảnh chỉ đi detail, không tăng view */
+// Thêm 1 flag tránh tăng view 2 lần
+let hasViewed = false
+
+const goToDetail = () => {
+  if (!hasViewed) {
+    // Chỉ emit 1 lần nếu muốn
+    // emit('view', item) // <-- không cần emit ở đây nữa
+    hasViewed = true
+  }
+  router.push(`/san-pham/${props.item.slug}`)
+}
+
 </script>

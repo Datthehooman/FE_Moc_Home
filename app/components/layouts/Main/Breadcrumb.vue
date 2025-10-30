@@ -29,10 +29,9 @@
       </div>
     </div>
   </section>
-</template>
-
-<script setup>
-import { useRoute } from 'vue-router'
+</template><script setup>
+import { useRoute, useRouter } from 'vue-router'
+import { computed } from 'vue'
 
 const route = useRoute()
 
@@ -46,10 +45,12 @@ const titles = {
   checkout: 'Thanh toán',
   ProductList: 'Cửa hàng',
   OtpVerify: 'Xác minh OTP',
-  'san-pham-ProductDetail': 'Chi tiết sản phẩm',
   'reset-password': 'Đặt lại mật khẩu',
 }
 
-const pageTitle = titles[route.name] || 'Trang'
+// pageTitle sẽ tự động cập nhật khi route thay đổi
+const pageTitle = computed(() => {
+  if (route.path.startsWith('/san-pham/')) return 'Chi tiết sản phẩm'
+  return titles[route.name] || 'Trang'
+})
 </script>
-
