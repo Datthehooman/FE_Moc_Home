@@ -8,17 +8,27 @@ export interface Category {
 export interface Product {
   product_id: number
   product_name: string
+  slug: string
   price: number
   price_down?: number
   badge?: string | null
-  brand?: string | { brand_name: string }
-  images?: { image_url: string }[]
+  brand?: string
+  images?: { full_image_url: string; alt_text?: string }[]
   rating?: number
   sku?: string
   stock_quantity?: number
   category_id?: number
   category?: Category
-  thumbnail?: string // ✅ thêm thumbnail vào interface
+  thumbnail?: string
+  description?: string
+  material?: string
+  size?: string
+  color?: string
+  weight?: string
+  view?: number
+  status?: string
+  created_at?: string
+  updated_at?: string
 }
 
 export const useProduct = () => {
@@ -26,6 +36,10 @@ export const useProduct = () => {
   const categories = ref<Category[]>([])
   const loading = ref(false)
   const error = ref('')
+
+  const productDetail = ref<Product | null>(null)
+  const loadingDetail = ref(false)
+  const errorDetail = ref('')
 
   const fetchCategories = async () => {
     try {
@@ -40,9 +54,8 @@ export const useProduct = () => {
   const fetchProducts = async () => {
     loading.value = true
     error.value = ''
-
     try {
-      await fetchCategories() // fetch danh mục trước
+      await fetchCategories()
 
       const res = await fetch('http://127.0.0.1:8000/api/client/products')
       if (!res.ok) throw new Error('Lỗi khi load sản phẩm')
@@ -51,34 +64,29 @@ export const useProduct = () => {
 
       products.value = apiProducts.map((p: any) => {
         const category = categories.value.find(c => c.id === p.category_id) || null
-
-        // ✅ xử lý thumbnail
-        const thumbnail =
-          p.thumbnail
-            ? p.thumbnail
-            : p.images?.[0]?.image_url
-            ? `http://127.0.0.1:8000/storage/${p.images[0].image_url}`
-            : '/placeholder.png'
+        const thumbnail = p.thumbnail || (p.images?.[0]?.full_image_url ?? '/placeholder.png')
+        const images = p.images?.map((img: any) => ({
+          full_image_url: img.full_image_url,
+          alt_text: img.alt_text ?? p.product_name
+        })) || []
 
         return {
           product_id: p.product_id,
           product_name: p.product_name,
+          slug: p.slug, // ✅ ĐÃ THÊM SLUG
           price: Number(p.price),
           price_down: Number(p.price_down || p.price),
           badge: p.badge,
           brand: typeof p.brand === 'object' ? p.brand.brand_name : p.brand,
-          images: p.images || [],
+          images,
           rating: p.rating != null ? Number(p.rating) : 0,
           sku: p.sku ?? 'N/A',
           stock_quantity: p.stock_quantity ?? 0,
           category_id: p.category_id,
           category,
-          thumbnail, // ✅ gán thêm thumbnail
+          thumbnail,
         }
       })
-
-      console.log('✅ Parsed products:', products.value)
-      console.table(products.value.map(p => ({ id: p.product_id, thumb: p.thumbnail }))) // 👀 debug thumbnail
 
     } catch (err: any) {
       error.value = err.message || 'Đã xảy ra lỗi khi tải dữ liệu.'
@@ -88,10 +96,66 @@ export const useProduct = () => {
     }
   }
 
+  const fetchProductDetail = async (slug: string) => {
+    loadingDetail.value = true
+    errorDetail.value = ''
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/client/product/${slug}`)
+      if (!res.ok) throw new Error('Lỗi khi load chi tiết sản phẩm')
+      const json = await res.json()
+      const p = json?.result?.data || json?.result
+
+      if (!p) throw new Error('Không tìm thấy sản phẩm')
+
+      const category = categories.value.find(c => c.id === p.category_id) || null
+      const thumbnail = p.thumbnail || (p.images?.[0]?.full_image_url ?? '/placeholder.png')
+      const images = p.images?.map((img: any) => ({
+        full_image_url: img.full_image_url,
+        alt_text: img.alt_text ?? p.product_name
+      })) || []
+
+      productDetail.value = {
+        product_id: p.product_id,
+        product_name: p.product_name,
+        slug: p.slug, // ✅ ĐÃ THÊM SLUG CHO CHI TIẾT
+        price: Number(p.price),
+        price_down: Number(p.price_down || p.price),
+        badge: p.badge,
+        brand: typeof p.brand === 'object' ? p.brand.brand_name : p.brand,
+        images,
+        rating: p.rating != null ? Number(p.rating) : 0,
+        sku: p.sku ?? 'N/A',
+        stock_quantity: p.stock_quantity ?? 0,
+        category_id: p.category_id,
+        category,
+        thumbnail,
+        description: p.description,
+        material: p.material,
+        size: p.size,
+        color: p.color,
+        weight: p.weight,
+        view: p.view,
+        status: p.status,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+      }
+    } catch (err: any) {
+      errorDetail.value = err.message || 'Lỗi khi fetch chi tiết sản phẩm'
+      console.error('❌ Product detail API error:', err)
+    } finally {
+      loadingDetail.value = false
+    }
+  }
+
   return {
     products,
     loading,
     error,
     fetchProducts,
+
+    productDetail,
+    loadingDetail,
+    errorDetail,
+    fetchProductDetail,
   }
 }
