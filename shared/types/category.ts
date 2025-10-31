@@ -15,5 +15,5 @@ export interface Category {
 export interface FetchCategoriesResponse {
   status: boolean;
   message: string;
-  result: Category[];
+  result: { data: Category[] };
 }

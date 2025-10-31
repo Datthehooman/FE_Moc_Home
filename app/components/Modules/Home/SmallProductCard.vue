@@ -58,10 +58,16 @@
         </template>
       </div>
       <div class="flex items-center font-semibold text-[15px]">
-        <p class="line-through text-[#afafaf] mr-3">
-          {{ price || "250.000 " }} đ
-        </p>
-        <p class="text-toned">{{ salePrice || "190.000 " }} đ</p>
+        <div v-if="Number(salePrice) === 0">
+          <p class="mr-3">&nbsp;</p>
+          <p class="text-toned">{{ price || "190.000 " }} đ</p>
+        </div>
+        <div v-else>
+          <p class="line-through text-[#afafaf] mr-3">
+            {{ price || "250.000 " }} đ
+          </p>
+          <p class="text-toned">{{ salePrice || "190.000 " }} đ</p>
+        </div>
       </div>
     </div>
   </div>
