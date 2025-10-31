@@ -86,6 +86,17 @@ export const useAuthStore = defineStore("auth-store", {
     // },
 
     async logout() {
+      try {
+        // Call logout API if logged in
+        if (this.isLogged && this.authUser.access_token) {
+          await useCustomFetch("/api/client/logout", { method: "POST" });
+        }
+      } catch (error) {
+        console.error("Logout API error:", error);
+        // Even if it fails, still clear local data
+      }
+
+      // Clear local session regardless
       this.authUser = {};
       this.isLogged = false;
       navigateTo("/");
