@@ -1,99 +1,89 @@
-interface TokenData {
-  accessToken?: string;
-  refreshToken?: string;
-}
-
-interface UserData {
-  id: number;
-  full_name: string;
-  email: string;
-  phone: string;
-}
-
-interface AuthUser {
-  user?: UserData;
-  token?: TokenData;
-}
-
-interface Data {
-  data: AuthUser;
-}
-
 export const useAuthStore = defineStore("auth-store", {
-  state: () => {
-    return {
-      authUser: {} as AuthUser,
-      isLogged: false,
-      isSubmitting: false,
-    };
-  },
+  state: () => ({
+    authUser: {} as AuthUser,
+    isLogged: false,
+    isSubmitting: false,
+  }),
 
   persist: true,
+
   actions: {
     async login(body: any) {
       this.isSubmitting = true;
-      const { data, error, execute } = useCustomFetch("/api/client/login", {
-        method: "POST",
-        body: body,
-      });
+      const { data, error, execute } = useCustomFetch<ApiAuthResponse>(
+        "/api/client/login",
+        {
+          method: "POST",
+          body,
+        }
+      );
       await execute();
       this.isSubmitting = false;
 
-      if (error.value) {
-        return { error: error.value, data: null };
-      }
+      if (error.value) return { error: error.value, data: null };
 
-      const payload = data.value as Data;
+      const payload = data.value!;
       this.authUser = payload.data;
       this.isLogged = true;
+
       return { error: null, data: payload };
     },
 
     async register(body: any) {
       this.isSubmitting = true;
-      const { data, error, execute } = useCustomFetch("/v1/auth/register", {
-        method: "POST",
-        body: body,
-      });
-      await execute();
-      this.isSubmitting = false;
-      return { error: error.value || null, data: data.value || null };
-    },
-
-    async loginWithGoogle(token: string) {
-      this.isSubmitting = true;
-      const { data, error, execute } = useCustomFetch("/v1/auth/login/google", {
-        method: "POST",
-        body: { accessToken: token },
-      });
+      const { data, error, execute } = useCustomFetch<ApiAuthResponse>(
+        "/api/client/register",
+        {
+          method: "POST",
+          body,
+        }
+      );
       await execute();
       this.isSubmitting = false;
 
-      if (error.value) {
-        return { error: error.value, data: null };
-      }
+      if (error.value) return { error: error.value, data: null };
 
-      const payload = data.value as Data;
+      const payload = data.value!;
       this.authUser = payload.data;
       this.isLogged = true;
+
       return { error: null, data: payload };
     },
 
-    async refreshToken() {
-      const { data, error, execute } = useCustomFetch("/v1/auth/refresh", {
-        method: "POST",
-        body: { refreshToken: this.authUser.token?.refreshToken?.token },
-      });
-      await execute();
+    // async loginWithGoogle(token: string) {
+    //   this.isSubmitting = true;
+    //   const { data, error, execute } = useCustomFetch("/v1/auth/login/google", {
+    //     method: "POST",
+    //     body: { accessToken: token },
+    //   });
+    //   await execute();
+    //   this.isSubmitting = false;
 
-      const payload = data.value as Data;
+    //   if (error.value) {
+    //     return { error: error.value, data: null };
+    //   }
 
-      if (this.authUser.token) {
-        this.authUser.token.accessToken = payload.data.accessToken;
-      }
+    //   const payload = data.value as Data;
+    //   this.authUser = payload.data;
+    //   this.isLogged = true;
+    //   return { error: null, data: payload };
+    // },
 
-      return { error: error.value || null, data: data.value || null };
-    },
+    // async refreshToken() {
+    //   const { data, error, execute } = useCustomFetch("/v1/auth/refresh", {
+    //     method: "POST",
+    //     body: { refreshToken: this.authUser.token?.refreshToken?.token },
+    //   });
+    //   await execute();
+
+    //   const payload = data.value as Data;
+
+    //   if (this.authUser.token) {
+    //     this.authUser.token.accessToken = payload.data.accessToken;
+    //   }
+
+    //   return { error: error.value || null, data: data.value || null };
+    // },
 
     async logout() {
       this.authUser = {};
@@ -101,37 +91,37 @@ export const useAuthStore = defineStore("auth-store", {
       navigateTo("/");
     },
 
-    async getProfile() {
-      const { data, error, execute } = useCustomFetch(
-        "/v1/account/get-profile"
-      );
-      await execute();
+    // async getProfile() {
+    //   const { data, error, execute } = useCustomFetch(
+    //     "/v1/account/get-profile"
+    //   );
+    //   await execute();
 
-      const payload = data.value as Data;
+    //   const payload = data.value as Data;
 
-      this.authUser.user = payload.data.user;
+    //   this.authUser.user = payload.data.user;
 
-      return { error: error.value || null, data: data.value || null };
-    },
+    //   return { error: error.value || null, data: data.value || null };
+    // },
 
-    async updateProfile(body: any) {
-      this.isSubmitting = true;
-      const { data, error, execute } = useCustomFetch(
-        "/v1/account/update-profile",
-        {
-          method: "PUT",
-          body,
-        }
-      );
-      await execute();
-      this.isSubmitting = false;
+    // async updateProfile(body: any) {
+    //   this.isSubmitting = true;
+    //   const { data, error, execute } = useCustomFetch(
+    //     "/v1/account/update-profile",
+    //     {
+    //       method: "PUT",
+    //       body,
+    //     }
+    //   );
+    //   await execute();
+    //   this.isSubmitting = false;
 
-      const payload = data.value as Data;
+    //   const payload = data.value as Data;
 
-      this.authUser.user = payload.data.user;
+    //   this.authUser.user = payload.data.user;
 
-      return { error: error.value || null, data: data.value || null };
-    },
+    //   return { error: error.value || null, data: data.value || null };
+    // },
 
     async resendOtp(body: any) {
       this.isSubmitting = true;
