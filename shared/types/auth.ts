@@ -1,4 +1,4 @@
-export interface UserData {
+interface UserData {
   user_id: number;
   full_name: string;
   email: string;
@@ -8,12 +8,12 @@ export interface UserData {
   updated_at: string;
 }
 
-export interface AuthUser {
+interface AuthUser {
   user?: UserData;
   access_token?: string;
 }
 
-export interface ApiAuthResponse {
+interface ApiAuthResponse {
   success: boolean;
   message: string;
   data: AuthUser;
