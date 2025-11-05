@@ -9,7 +9,7 @@ export function useCategories() {
 
     try {
       const { data, error: fetchError } = await useCustomFetch(
-        "api/client/category",
+        "http://127.0.0.1:8000/api/client/category",
         {
           method: "GET",
         }
