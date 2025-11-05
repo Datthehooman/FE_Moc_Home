@@ -59,7 +59,7 @@
           </div>
         </div>
 
-        <button class="w-full bg-[#F7C59F] hover:bg-[#E8B58C] text-[#6E4E37] font-semibold py-2 mt-5 rounded-lg transition">
+        <button class="w-full bg-[#FED8B3] hover:bg-[#E8B58C] text-[#000000] font-semibold py-2 mt-5 rounded-lg transition">
           <a href="/checkout" class="w-full block text-center">Tiến hành thanh toán</a>
         </button>
 
@@ -76,6 +76,10 @@
 </template>
 
 <script setup lang="ts">
+// definePageMeta({
+//   middleware: 'auth'
+// })
+
 import { ref, onMounted } from 'vue'
 import { useCart } from '~/composables/useCart'
 import { useProduct } from '~/composables/useProduct'
@@ -141,4 +145,5 @@ function applyDiscount() {
 function formatPrice(num: number | string) {
   return Number(num).toLocaleString('vi-VN')
 }
+
 </script>

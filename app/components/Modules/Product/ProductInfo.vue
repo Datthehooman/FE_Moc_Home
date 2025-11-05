@@ -128,21 +128,21 @@
     <!-- NÚT -->
 <div class="flex space-x-3 mt-6">
 
-  <!-- Thêm giỏ hàng -->
-  <button
-    class="relative overflow-hidden px-5 py-3 bg-[#ffd8ad] rounded-lg text-black font-medium shadow flex justify-center items-center group transition-colors duration-500"
-  >
-    <span class="absolute inset-0 flex justify-center items-center">
-      <span
-        class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"
-      ></span>
-    </span>
+ <!-- NÚT THÊM GIỎ HÀNG -->
+<button
+  @click="handleAddToCart"
+  class="relative overflow-hidden px-5 py-3 bg-[#ffd8ad] rounded-lg text-black font-medium shadow flex justify-center items-center group transition-colors duration-500"
+>
+  <span class="absolute inset-0 flex justify-center items-center">
     <span
-      class="relative z-10 group-hover:text-white text-[16px] transition-colors duration-300"
-    >
-      Thêm giỏ hàng
-    </span>
-  </button>
+      class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"
+    ></span>
+  </span>
+  <span class="relative z-10 group-hover:text-white text-[16px] transition-colors duration-300">
+    Thêm giỏ hàng
+  </span>
+</button>
+
 
   <!-- Mua ngay -->
   <button
@@ -156,7 +156,8 @@
     <span
       class="relative z-10 group-hover:text-white text-[16px] transition-colors duration-300"
     >
-      Mua ngay
+    <a href="/checkout">
+      Mua ngay</a>
     </span>
   </button>
 
@@ -191,7 +192,23 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useProduct } from '~/composables/useProduct'
+
+const { addToCart } = useCart()
+
+const handleAddToCart = async () => {
+  if (!productDetail.value?.product_id) {
+    alert('❌ Sản phẩm không hợp lệ')
+    return
+  }
+
+  try {
+    const result = await addToCart(productDetail.value.product_id, quantity.value)
+    if (result) alert('✅ Đã thêm vào giỏ hàng!')
+    else alert('❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.')
+  } catch (error: any) {
+    alert('❌ Lỗi khi thêm vào giỏ hàng: ' + (error?.message || 'Không rõ nguyên nhân'))
+  }
+}
 
 // API
 const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()
