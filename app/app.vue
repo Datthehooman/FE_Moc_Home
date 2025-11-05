@@ -5,3 +5,4 @@
     </NuxtLayout>
   </UApp>
 </template>
+  
