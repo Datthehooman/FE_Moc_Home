@@ -8,12 +8,10 @@ export function useCategories() {
     error.value = null;
 
     try {
-      const { data, error: fetchError } = await useCustomFetch(
-        "api/client/category",
-        {
+      const { data, error: fetchError } =
+        await useCustomFetch<FetchCategoriesResponse>("api/client/category", {
           method: "GET",
-        }
-      );
+        });
 
       if (fetchError.value) {
         console.log("Fetch error:", fetchError.value);
