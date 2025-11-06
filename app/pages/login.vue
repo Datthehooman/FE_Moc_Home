@@ -19,7 +19,8 @@
         </div>
 
         <!-- Form -->
-        <form @submit.prevent="login" novalidate class="space-y-4">
+     <form @submit.prevent="handleLogin" novalidate class="space-y-4">
+
           <div>
             <label class="block text-sm text-gray-700 mb-1">Địa chỉ Email</label>
             <input
@@ -137,23 +138,23 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
-import { ref, reactive } from "vue"
-import { useAuthStore } from "~/stores/authStore"
-import { navigateTo } from "#imports"
+import { ref, reactive, watch } from 'vue'
+import { useAuth } from '~/composables/useAuth'
+import { navigateTo } from '#imports'
 
-const auth = useAuthStore()
+const { login, tokenCookie } = useAuth()
 
-const email = ref("")
-const password = ref("")
+const email = ref('')
+const password = ref('')
 const remember = ref(false)
-const errors = reactive({
-  email: "",
-  password: "",
-})
+const errors = reactive({ email: '', password: '' })
 
-const login = async () => {
+// reactive token để debug hoặc show UI
+const tokenValue = ref(tokenCookie.value)
+watch(tokenCookie, (newVal) => { tokenValue.value = newVal })
+
+const handleLogin = async () => {
   errors.email = ''
   errors.password = ''
 
@@ -161,24 +162,22 @@ const login = async () => {
   if (!password.value) errors.password = 'Vui lòng nhập mật khẩu'
 
   if (!errors.email && !errors.password) {
-    const { error, data } = await auth.login({
-      email: email.value,
-      password_hash: password.value,
-    })
+    const { data, token, error } = await login({ email: email.value, password_hash: password.value })
 
     if (error) {
       if (error.statusCode === 422) {
-        errors.email = error.data.errors.email?.[0] || ''
-        errors.password = error.data.errors.password_hash?.[0] || ''
+        errors.email = error.data?.errors?.email?.[0] || ''
+        errors.password = error.data?.errors?.password_hash?.[0] || ''
       } else if (error.statusCode === 401) {
         errors.email = 'Email hoặc mật khẩu không đúng'
         errors.password = 'Email hoặc mật khẩu không đúng'
       }
     } else {
       alert('Đăng nhập thành công!')
-      navigateTo('/')
+      console.log('Token:', token)
+      console.log('User info:', data)
+      navigateTo('/') // redirect về trang chủ
     }
   }
 }
-
 </script>
