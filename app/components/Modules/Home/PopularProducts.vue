@@ -35,7 +35,7 @@
         :image="product.thumbnail"
         :price="Number(product.price).toLocaleString('vi-VN')"
         :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-        :stars="4.5"
+        :stars="product.rating"
         :badge="'Hot'"
       />
     </div>
