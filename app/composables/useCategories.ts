@@ -12,8 +12,7 @@ export function useCategories() {
         "http://127.0.0.1:8000/api/client/category",
         {
           method: "GET",
-        }
-      );
+        });
 
       if (fetchError.value) {
         console.log("Fetch error:", fetchError.value);
@@ -27,7 +26,7 @@ export function useCategories() {
         return;
       } else {
         console.log("Success, data:", data.value);
-        const response = data.value as any;
+        const response = data.value as FetchCategoriesResponse;
         categories.value = response?.result?.data || [];
         error.value = null; // Clear any previous errors on success
       }

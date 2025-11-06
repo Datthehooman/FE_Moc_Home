@@ -70,11 +70,16 @@
       </div>
     </UTooltip>
     <div class="relative z-10">
-      <NuxtImg
-        :src="image || '/image 10.png'"
-        class="w-full max-h-[207px] object-contain mb-[13px] mx-auto"
-      />
-      <p class="font-semibold text-[17px]">
+      <div
+        class="w-full h-[207px] mb-[13px] mx-auto flex justify-center items-center"
+      >
+        <NuxtImg
+          :src="image || '/image 10.png'"
+          class="w-full max-h-[207px] object-contain"
+        />
+      </div>
+
+      <p class="font-semibold text-[17px] truncate">
         {{ title || "Ghế Denim đơn giản" }}
       </p>
       <div class="flex items-center gap-1 my-[9px]">
@@ -102,12 +107,20 @@
           />
         </template>
       </div>
-      <p class="line-through text-muted text-sm mb-1">
-        {{ price || "250.000 " }} đ&nbsp;
-      </p>
-      <p class="text-toned text-[19px] font-medium">
-        {{ salePrice || "190.000 " }} đ
-      </p>
+      <div v-if="Number(salePrice) === 0">
+        <p class="text-sm mb-1">&nbsp;</p>
+        <p class="text-toned text-[19px] font-medium">
+          {{ price || "190.000 " }} đ
+        </p>
+      </div>
+      <div v-else>
+        <p class="line-through text-muted text-sm mb-1">
+          {{ price || "250.000 " }} đ&nbsp;
+        </p>
+        <p class="text-toned text-[19px] font-medium">
+          {{ salePrice || "190.000 " }} đ
+        </p>
+      </div>
     </div>
   </div>
 </template>

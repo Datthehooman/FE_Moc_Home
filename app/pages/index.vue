@@ -5,13 +5,11 @@
       <ModulesHomeTitle title="Danh mục hàng đầu" />
       <div class="flex justify-between flex-wrap gap-4">
         <ModulesHomeCateCard
-          v-for="category in categories.filter(
-            (c) => categoryProductCount[c.id]
-          )"
-          :key="category.id"
-          :image="category.image"
-          :title="category.category_name"
-          :quantity="categoryProductCount[category.id]"
+          v-for="room in rooms"
+          :key="room.id"
+          :image="room.full_image_url"
+          :title="room.room_name"
+          :quantity="30"
         />
       </div>
       <ModulesHomeTitle title="Sản phẩm thịnh hành" />
@@ -27,7 +25,7 @@
           :image="product.thumbnail"
           :price="Number(product.price).toLocaleString('vi-VN')"
           :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-          :stars="product.rating || 4.5"
+          :stars="product.rating"
           :badge="product.badge || 'Hot'"
         />
       </div>
@@ -44,7 +42,7 @@
           :image="product.thumbnail"
           :price="Number(product.price).toLocaleString('vi-VN')"
           :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-          :stars="product.rating || 4.8"
+          :stars="product.rating"
           :badge="product.badge || 'Nổi bật'"
         />
       </div>
@@ -315,7 +313,7 @@
               :image="product.thumbnail"
               :price="Number(product.price).toLocaleString('vi-VN')"
               :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-              :stars="product.rating || 4.5"
+              :stars="product.rating"
             />
           </div>
         </div>
@@ -582,26 +580,11 @@
   </div>
 </template>
 <script setup lang="ts">
-  const {
-    categories,
-    fetchCategories,
-    isLoading: isLoadingCategories,
-  } = useCategories();
+  const { rooms, fetchRooms, isLoading: isLoadingRooms } = useRooms();
 
   const {
     products,
     isLoading: isLoadingProducts,
     fetchProducts,
   } = useProducts();
-
-  const categoryProductCount = computed(() => {
-    const countMap: Record<number, number> = {};
-
-    for (const product of products.value) {
-      const catId = product.category_id;
-      countMap[catId] = (countMap[catId] || 0) + 1;
-    }
-
-    return countMap;
-  });
 </script>
