@@ -1,0 +1,5 @@
+deployment:
+  tasks:
+    - export NODE_ENV=production
+    - npm install --production
+    - npm run build
