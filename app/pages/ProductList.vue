@@ -56,11 +56,24 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useProduct } from '~/composables/useProduct'
 import { useRoute, useRouter } from 'vue-router'
+
+// === Hàm bỏ dấu tiếng Việt ===
+const normalizeText = (str: string) => {
+  return str
+    ?.normalize("NFD")
+    ?.replace(/[\u0300-\u036f]/g, "")       
+    ?.replace(/đ/g, "d")
+    ?.replace(/Đ/g, "D")
+    ?.replace(/[^a-zA-Z0-9 ]/g, "")       
+    ?.replace(/\s+/g, " ")               
+    ?.trim()
+    ?.toLowerCase() || ""
+}
+
 
 const { products, loading, fetchProducts } = useProduct()
 
@@ -81,10 +94,12 @@ const parsePrice = (price: number | string) => Number(String(price).replace(/\D/
 const filteredProducts = computed(() => {
   let result = products.value || []
 
-  // Lọc theo keyword
+  // Lọc theo keyword (Không dấu)
   if (searchQuery.value.trim()) {
-    const keyword = searchQuery.value.toLowerCase()
-    result = result.filter(p => p.product_name.toLowerCase().includes(keyword))
+    const keyword = normalizeText(searchQuery.value)
+    result = result.filter(p =>
+      normalizeText(p.product_name).includes(keyword)
+    )
   }
 
   // Lọc theo thương hiệu
@@ -139,13 +154,18 @@ watch(
   { immediate: true }
 )
 
-// --- Watch searchQuery để gọi API search ---
+// --- Watch searchQuery gọi API search (convert keyword → không dấu) ---
 let timeout: any = null
 watch(searchQuery, (keyword) => {
   clearTimeout(timeout)
   timeout = setTimeout(async () => {
     currentPage.value = 1
-    if (!keyword) {
+
+    // ✅ đặt đây và đúng indent
+    const normalized = normalizeText(keyword)
+
+    // ✅ nếu chuỗi rỗng thì mới gọi lại tất cả
+    if (!normalized || normalized.length < 1) {
       await fetchProducts()
       return
     }
@@ -153,8 +173,9 @@ watch(searchQuery, (keyword) => {
     loading.value = true
     try {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/client/product-search?keyword=${encodeURIComponent(keyword)}`
+        `http://127.0.0.1:8000/api/client/product-search?keyword=${encodeURIComponent(normalized)}`
       )
+
       const json = await res.json()
       const list = json?.result?.data || []
 
@@ -176,6 +197,7 @@ watch(searchQuery, (keyword) => {
     }
   }, 300)
 })
+
 
 // --- Load lần đầu ---
 onMounted(() => {

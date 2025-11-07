@@ -4,14 +4,16 @@ export function useCustomFetch<T>(
   url: string | (() => string),
   options: UseFetchOptions<T> = {}
 ) {
+  const token = useCookie("token");
+
   return useFetch(url, {
     ...options,
     dedupe: "cancel",
-    $fetch: useNuxtApp().$customFetch,
 
-    headers:
-      options.body instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json", ...(options.headers || {}) },
+    headers: {
+      ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+      ...(options.headers || {}),
+      ...(token.value ? { Authorization: `Bearer ${token.value}` } : {}),
+    }
   });
 }

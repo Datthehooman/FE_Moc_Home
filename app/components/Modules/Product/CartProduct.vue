@@ -39,19 +39,8 @@
           class="absolute left-1/2 bottom-[100px] transform -translate-x-1/2 translate-y-[120px] opacity-0 flex gap-2 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:translate-y-[90px] z-20"
         >
           <!-- 👁️ Xem sản phẩm -->
-          <UTooltip
-            :delay-duration="0"
-            text="Xem sản phẩm"
-            :content="{ side: 'top', sideOffset: 1 }"
-            arrow
-            :ui="{
-              content:
-                'bg-primary text-white text-[10px] font-semibold rounded-xl ring-primary shadow-none py-0',
-              arrow: 'fill-primary',
-            }"
-          >
-            <button
-              @click="$emit('view', item)"
+          <UTooltip text="Xem sản phẩm">
+            <button @click="$emit('view', item)"
               class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
             >
               <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
@@ -59,17 +48,7 @@
           </UTooltip>
 
           <!-- ❤️ Yêu thích -->
-          <UTooltip
-            :delay-duration="0"
-            text="Thêm yêu thích"
-            :content="{ side: 'top', sideOffset: 1 }"
-            arrow
-            :ui="{
-              content:
-                'bg-primary text-white text-[10px] font-semibold rounded-xl ring-primary shadow-none py-0',
-              arrow: 'fill-primary',
-            }"
-          >
+          <UTooltip text="Thêm yêu thích">
             <button
               class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
             >
@@ -101,7 +80,7 @@
       <div class="mt-2 flex items-center justify-between w-full px-2">
         <div class="text-left">
           <span
-            v-if="item.price_down"
+            v-if="item.badge === 'Giảm 50%' && item.price_down"
             class="line-through text-gray-400 text-[14px] block"
           >
             {{ formatPrice(item.price) }}
@@ -112,34 +91,24 @@
         </div>
 
         <!-- 🛒 GIỎ HÀNG -->
-        <UTooltip
-          :delay-duration="0"
-          text="Thêm giỏ hàng"
-          :content="{ side: 'top', sideOffset: 1 }"
-          arrow
-          :ui="{
-            content:
-              'bg-primary text-white text-[10px] font-semibold rounded-xl ring-primary shadow-none py-0',
-            arrow: 'fill-primary',
-          }"
-        >
-          <button
-            class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
-          >
-            <UIcon
-              name="i-heroicons-shopping-bag-solid"
-              class="w-5 h-5 text-white"
-            />
-          </button>
-        </UTooltip>
+       <UTooltip text="Thêm giỏ hàng">
+  <button
+    @click="handleAddToCart"
+    class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
+  >
+    <UIcon name="i-heroicons-shopping-bag-solid" class="w-5 h-5 text-white" />
+  </button>
+</UTooltip>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { useCart } from '~/composables/useCart'
+
 
 interface ProductItem {
   product_id: number
@@ -161,50 +130,45 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['view'])
+const router = useRouter()
+const { addToCart } = useCart()
 
 const errorImage = ref(false)
 
-/** ✅ Xử lý ảnh thumbnail */
 const resolvedThumbnail = computed(() => {
-  if (errorImage.value) {
-    return 'https://via.placeholder.com/180?text=No+Image'
-  }
-
-  if (props.item.thumbnail && props.item.thumbnail.startsWith('http')) {
-    return props.item.thumbnail
-  }
-
-  if (props.item.images?.length && props.item.images[0].image_url) {
+  if (errorImage.value) return 'https://via.placeholder.com/180?text=No+Image'
+  if (props.item.thumbnail?.startsWith('http')) return props.item.thumbnail
+  if (props.item.images?.length && props.item.images[0].image_url)
     return `http://127.0.0.1:8000/storage/${props.item.images[0].image_url}`
-  }
-
   return '/placeholder.png'
 })
 
-/** 🖼️ Khi ảnh lỗi */
-const onImageError = () => {
-  errorImage.value = true
-}
+const onImageError = () => { errorImage.value = true }
+const formatPrice = (price: number | undefined) =>
+  price ? price.toLocaleString('vi-VN') + '₫' : ''
 
-/** 💰 Format giá */
-const formatPrice = (price: number | undefined) => {
-  if (!price) return ''
-  return price.toLocaleString('vi-VN') + '₫'
-}
-
-const router = useRouter()
-
-/** 💡 Click vào ảnh chỉ đi detail, không tăng view */
-// Thêm 1 flag tránh tăng view 2 lần
 let hasViewed = false
-
 const goToDetail = () => {
-  if (!hasViewed) {
-    // Chỉ emit 1 lần nếu muốn
-    // emit('view', item) // <-- không cần emit ở đây nữa
-    hasViewed = true
-  }
+  if (!hasViewed) hasViewed = true
   router.push(`/san-pham/${props.item.slug}`)
+}
+const handleAddToCart = async () => {
+  if (!props.item.product_id) {
+    alert('❌ Sản phẩm không hợp lệ')
+    return
+  }
+
+  try {
+    const result = await addToCart(props.item.product_id, 1)
+
+    if (result) {
+      alert('✅ Đã thêm vào giỏ hàng!')
+    } else {
+      alert('❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.')
+    }
+  } catch (error: any) {
+    alert('❌ Lỗi khi thêm vào giỏ hàng: ' + (error?.message || 'Không rõ nguyên nhân'))
+  }
 }
 
 </script>

@@ -11,7 +11,7 @@ export function useProducts() {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<ProductApiResponse>(
-          `/api/client/products?page=${page}`,
+          `http://127.0.0.1:8000/api/client/products?page=${page}`,
           { method: "GET" }
         );
 

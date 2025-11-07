@@ -26,16 +26,15 @@
           <li class="relative group">
             <button class="flex items-center gap-1 text-black hover:text-[#654538] transition-colors">
               Danh mục
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transform transition-transform duration-300 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
+              <UIcon
+                name="heroicons:chevron-down"
+                class="w-5 h-5 transform transition-transform duration-300 group-hover:rotate-180"
+              />
             </button>
 
             <!-- Mega menu -->
             <div class="absolute left-1/2 -translate-x-[35%] top-full w-[85vw] max-w-[1200px] bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 translate-y-2 transition-all duration-300 mt-4 p-8">
               <div class="grid grid-cols-6 gap-10 items-start">
-                
-                <!-- 3 Cột danh mục -->
                 <div class="col-span-4 grid grid-cols-3 gap-8">
                   <div v-for="(cat, i) in categories" :key="i">
                     <h3 class="ml-4 text-[18px] font-semibold mb-3 text-[#654538]">{{ cat.title }}</h3>
@@ -49,8 +48,6 @@
                     </ul>
                   </div>
                 </div>
-
-                <!-- Ảnh banner -->
                 <div class="col-span-2 flex justify-center items-center">
                   <NuxtImg src="https://live.themewild.com/fameo/assets/img/banner/mega-menu-banner.jpg" class="rounded-lg object-cover w-[377px] h-[200px]" alt="banner"/>
                 </div>
@@ -64,8 +61,9 @@
         </ul>
       </nav>
 
-      <!-- Tool icons + Search -->
+      <!-- Tool icons + Search + User -->
       <div class="flex items-center gap-4 text-[#654538] transition-all duration-500">
+        <!-- Search -->
         <div class="relative">
           <input
             type="text"
@@ -74,28 +72,61 @@
             @keydown.enter="goSearch"
             class="border border-[#A77A5D] rounded-lg px-3 py-1.5 pr-8 text-sm focus:border-[#654538] outline-none bg-transparent"
           />
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-[#654538]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
-          </svg>
+          <UIcon
+            name="heroicons:magnifying-glass"
+            class="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-[#654538]"
+          />
         </div>
 
-        <Icon name="heroicons:heart" class="w-5 h-6 cursor-pointer hover:text-[#A77A5D]" />
-        <Icon name="heroicons:shopping-bag" class="w-5 h-5 cursor-pointer hover:text-[#A77A5D]" />
+        <!-- Wishlist -->
+       <div @click="goWishlist">
+  <UIcon name="heroicons:heart" class="w-5 h-6 cursor-pointer hover:text-[#A77A5D]" />
+</div>
+
+        <!-- Cart -->
+        <NuxtLink to="/cart">
+          <UIcon name="heroicons:shopping-bag" class="w-5 h-5 cursor-pointer hover:text-[#A77A5D]" />
+        </NuxtLink>
+
+        <!-- User -->
         <div class="relative flex items-center" ref="userDropdownRef">
-          <Icon name="heroicons:user" class="w-5 h-5 cursor-pointer hover:text-[#A77A5D]" @click="toggleUserDropdown" />
+          <UIcon
+            name="heroicons:user"
+            class="w-5 h-5 cursor-pointer hover:text-[#A77A5D]"
+            @click="toggleUserDropdown"
+          />
+
           <div
             v-if="isUserDropdownOpen"
             class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] opacity-0 translate-y-2 transition-all duration-300"
-            :class="{'opacity-100 translate-y-0': isUserDropdownOpen}"
+            :class="{ 'opacity-100 translate-y-0': isUserDropdownOpen }"
           >
             <div class="p-4">
-              <template v-if="auth.isLogged">
-                <div class="text-sm text-gray-700 mb-2">Xin chào, {{ auth.authUser.user.full_name }}</div>
-                <button @click="logout" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded-lg">Đăng xuất</button>
+              <!-- Nếu đã đăng nhập -->
+              <template v-if="isLogged">
+                <NuxtLink
+                  to="/user/dashboard"
+                  class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
+                >
+                  Tài khoản của tôi
+                </NuxtLink>
+
+                <button
+                  @click="logout"
+                  class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded-lg text-red-600"
+                >
+                  Đăng xuất
+                </button>
               </template>
+
+              <!-- Nếu chưa đăng nhập -->
               <template v-else>
-                <NuxtLink to="/login" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2">Đăng nhập</NuxtLink>
-                <NuxtLink to="/register" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg">Đăng ký</NuxtLink>
+                <NuxtLink to="/login" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2">
+                  Đăng nhập
+                </NuxtLink>
+                <NuxtLink to="/register" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg">
+                  Đăng ký
+                </NuxtLink>
               </template>
             </div>
           </div>
@@ -107,11 +138,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watchEffect, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '~/composables/useAuth'
 
-const auth = useAuthStore()
+const auth = useAuth()
 const router = useRouter()
+
+// Reactive isLogged
+const isLogged = ref(auth.isLogged.value)
+watchEffect(() => {
+  isLogged.value = auth.isLogged.value
+})
 
 // Scroll header
 const isScrolled = ref(false)
@@ -122,7 +160,22 @@ const isUserDropdownOpen = ref(false)
 const userDropdownRef = ref<HTMLElement | null>(null)
 const toggleUserDropdown = () => { isUserDropdownOpen.value = !isUserDropdownOpen.value }
 const closeUserDropdown = () => { isUserDropdownOpen.value = false }
-const logout = () => { auth.logout(); closeUserDropdown(); alert('Đăng xuất thành công 🎉') }
+const logout = async () => {
+  await auth.logout()
+  closeUserDropdown()
+  alert('Đăng xuất thành công 🎉')
+  router.push('/')
+}
+const goWishlist = () => {
+  if (!isLogged.value) {
+    alert('Vui lòng đăng nhập để xem danh sách yêu thích 🎯')
+    router.push('/login')
+  } else {
+    router.push('/user/wishlist')
+  }
+}
+
+// Click ngoài dropdown
 const handleClickOutside = (e: MouseEvent) => {
   if (userDropdownRef.value && !userDropdownRef.value.contains(e.target as Node)) closeUserDropdown()
 }
@@ -151,7 +204,7 @@ const fetchCategoriesAndProducts = async () => {
         return { title: cat.category_name, items }
       })
       .filter(cat => cat.items.length > 0)
-      .slice(0, 3) // chỉ lấy 3 danh mục
+      .slice(0, 3)
   } catch (err) {
     console.error('❌ Lỗi fetch categories/products:', err)
   }
