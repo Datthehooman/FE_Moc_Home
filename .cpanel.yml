@@ -1,5 +1,5 @@
+---
 deployment:
   tasks:
-    - export NODE_ENV=production
-    - npm install --production
-    - npm run build
+    - echo "Deploying static site..."
+    - cp -R * /home/eal236bnt9pe/public_html/
