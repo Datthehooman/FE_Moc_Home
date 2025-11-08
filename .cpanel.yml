@@ -1,8 +1,8 @@
 ---
 deployment:
   tasks:
-    # Remove old files from public_html
-    - export DEPLOYPATH=/home/eal236bnt9pe/public_html/
+    # Remove old files from mocfurni.shop
+    - export DEPLOYPATH=/home/eal236bnt9pe/client/
     - /bin/rm -rf $DEPLOYPATH*
 
     # Copy new build files to public_html
