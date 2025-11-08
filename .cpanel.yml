@@ -1,21 +1,12 @@
 ---
-version: 2
 deployment:
   tasks:
-    - task: Install Dependencies
-      commands:
-        - echo "Installing dependencies..."
-        - npm install
+    # Remove old files from public_html
+    - export DEPLOYPATH=/home/username/public_html/
+    - /bin/rm -rf $DEPLOYPATH*
 
-    - task: Build Nuxt Project
-      commands:
-        - echo "Building Nuxt 4 project..."
-        - npx nuxi build
-        - npx nuxi generate
+    # Copy new build files to public_html
+    - /bin/cp -R .output/public/* $DEPLOYPATH
 
-    - task: Deploy to public_html
-      commands:
-        - echo "Deploying to public_html..."
-        # Remove old files but keep .htaccess if exists
-        - find $HOME/public_html ! -name ".htaccess" -type f -exec rm -f {} +
-        - rsync -av --delete .output/public/ $HOME/public_html/
+    # Set proper permissions
+    - /bin/chmod -R 755 $DEPLOYPATH
