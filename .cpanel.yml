@@ -4,4 +4,4 @@ deployment:
     - echo "Deploying Nuxt 4 static site..."
     - npm install
     - npm run build
-    - cp -R .output/public/* /home/username/public_html/
+    - cp -R .output/public/* /home/eal236bnt9pe/public_html/
