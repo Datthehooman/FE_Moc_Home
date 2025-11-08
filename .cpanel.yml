@@ -1,7 +1,21 @@
 ---
+version: 2
 deployment:
   tasks:
-    - echo "Deploying Nuxt 4 static site..."
-    - npm install
-    - npm run build
-    - cp -R .output/public/* /home/eal236bnt9pe/public_html/
+    - task: Install Dependencies
+      commands:
+        - echo "Installing dependencies..."
+        - npm install
+
+    - task: Build Nuxt Project
+      commands:
+        - echo "Building Nuxt 4 project..."
+        - npx nuxi build
+        - npx nuxi generate
+
+    - task: Deploy to public_html
+      commands:
+        - echo "Deploying to public_html..."
+        # Remove old files but keep .htaccess if exists
+        - find $HOME/public_html ! -name ".htaccess" -type f -exec rm -f {} +
+        - rsync -av --delete .output/public/ $HOME/public_html/
