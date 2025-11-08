@@ -24,6 +24,22 @@ export const useAuth = () => {
       return { data: null, token: null, error: { message: errMsg, statusCode: error?.status || 500, data: error?.data } }
     }
   }
+const register = async (data: RegisterData): Promise<{ success: boolean; message?: string; errors?: any }> => {
+  try {
+    const response = await $fetch('http://127.0.0.1:8000/api/client/register', {
+      method: 'POST',
+      body: data,
+    })
+
+    return { success: true, message: 'Đăng ký thành công', errors: null }
+  } catch (error: any) {
+    if (error?.data?.errors) {
+      return { success: false, message: 'Validation lỗi', errors: error.data.errors }
+    }
+    return { success: false, message: error?.data?.message || 'Lỗi kết nối server', errors: null }
+  }
+}
+
 
   const logout = () => {
     tokenCookie.value = null
@@ -44,6 +60,7 @@ export const useAuth = () => {
       throw error.data || { message: 'Không thể gửi mã OTP' }
     }
   }
-  return { login, logout, sendResetPasswordOtp, tokenCookie, isLogged }
+  return { login, logout, sendResetPasswordOtp, register, tokenCookie, isLogged }
+
 }
 
