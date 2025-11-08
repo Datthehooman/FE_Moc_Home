@@ -10,10 +10,9 @@ export function useProducts() {
 
     try {
       const { data, error: fetchError } =
-        await useCustomFetch<ProductApiResponse>(
-          `http://127.0.0.1:8000/api/client/products?page=${page}`,
-          { method: "GET" }
-        );
+        await useCustomFetch<ProductApiResponse>(`/client/products`, {
+          method: "GET",
+        });
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
