@@ -1,12 +1,15 @@
 ---
 deployment:
   tasks:
-    # Remove old files from mocfurni.shop
-    - export DEPLOYPATH=/home/eal236bnt9pe/public_html/
+    # Set paths - repository and deployment target
+    - export REPOPATH=/home/username/repositories/FE_Moc_Home/
+    - export DEPLOYPATH=/home/username/public_html/
+
+    # Remove old files from public_html
     - /bin/rm -rf $DEPLOYPATH*
 
-    # Copy new build files to public_html
-    - /bin/cp -R .output/public/* $DEPLOYPATH
+    # Copy new build files from repository to public_html
+    - /bin/cp -R $REPOPATH.output/public/* $DEPLOYPATH
 
     # Set proper permissions
     - /bin/chmod -R 755 $DEPLOYPATH
