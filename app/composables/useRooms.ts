@@ -9,7 +9,7 @@ export function useRooms() {
 
     try {
       const { data, error: fetchError } = await useCustomFetch<RoomApiResponse>(
-        "/api/client/rooms",
+        "http://127.0.0.1:8000/api/client/rooms",
         { method: "GET" }
       );
 

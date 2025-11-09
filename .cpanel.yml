@@ -1,5 +1,12 @@
+---
 deployment:
   tasks:
-    - export NODE_ENV=production
-    - npm install --production
-    - npm run build
+    # Remove old files from mocfurni.shop
+    - export DEPLOYPATH=/home/eal236bnt9pe/public_html/
+    - /bin/rm -rf $DEPLOYPATH*
+
+    # Copy new build files to public_html
+    - /bin/cp -R .output/public/* $DEPLOYPATH
+
+    # Set proper permissions
+    - /bin/chmod -R 755 $DEPLOYPATH

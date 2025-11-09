@@ -148,19 +148,17 @@ const errors = reactive({
 const register = async () => {
   Object.keys(errors).forEach(k => (errors[k] = ''))
 
-  // ✅ FRONT-END VALIDATION KHỚP BACKEND
   if (!fullName.value) errors.fullName = 'Tên không được để trống'
 
   if (!email.value) errors.email = 'Email không được để trống'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errors.email = 'Email không đúng định dạng'
 
-  if (!password.value) errors.password = 'Mật khẩu không được để trốngc'
+  if (!password.value) errors.password = 'Mật khẩu không được để trống'
   else if (password.value.length < 8) errors.password = 'Mật khẩu phải có ít nhất 8 ký tự'
 
   if (!confirmPassword.value) errors.confirmPassword = 'Vui lòng nhập lại mật khẩu'
   else if (password.value !== confirmPassword.value) errors.confirmPassword = 'Xác nhận mật khẩu không khớp'
 
-  // phone optional
   if (phone.value && !/^(0|\+84)[0-9]{9}$/.test(phone.value)) errors.phone = 'Số điện thoại không hợp lệ'
 
   if (!Object.values(errors).some(e => e)) {
@@ -174,22 +172,20 @@ const register = async () => {
         password_hash_confirmation: confirmPassword.value
       })
 
-      if (res?.status === 200 || res?.success) {
+      if (res.success) {
         alert('✅ Đăng ký thành công!')
         navigateTo('/login')
       } else {
-        alert(res?.message || 'Đăng ký thất bại!')
+        if (res.errors) {
+          if (res.errors.full_name) errors.fullName = res.errors.full_name[0]
+          if (res.errors.email) errors.email = res.errors.email[0]
+          if (res.errors.password_hash) errors.password = res.errors.password_hash[0]
+        } else {
+          alert(res.message)
+        }
       }
-    } catch (err: any) {
-      // ✅ MAP LỖI BACKEND
-      if (err?.response?._data?.errors) {
-        const backendErrors = err.response._data.errors
-        if (backendErrors.full_name) errors.fullName = backendErrors.full_name[0]
-        if (backendErrors.email) errors.email = backendErrors.email[0]
-        if (backendErrors.password_hash) errors.password = backendErrors.password_hash[0]
-      } else {
-        alert(err?.response?._data?.message || 'Đăng ký thất bại!')
-      }
+    } catch (err) {
+      alert('Đăng ký thất bại!')
     } finally {
       loading.value = false
     }
