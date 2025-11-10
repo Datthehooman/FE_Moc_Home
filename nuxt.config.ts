@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { config } from "dotenv";
+config();
 export default defineNuxtConfig({
   ssr: false,
   image: {
