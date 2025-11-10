@@ -43,7 +43,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiUrl: "process.env.NUXT_APP_API_URL",
+      apiUrl: "https://api.mocfurni.shop",
     },
   },
 });
