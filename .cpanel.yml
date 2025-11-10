@@ -1,15 +1,27 @@
 ---
 deployment:
   tasks:
-    # Set paths - repository and deployment target
+    # Define paths
     - export REPOPATH=/home/eal236bnt9pe/repositories/FE_Moc_Home/
     - export DEPLOYPATH=/home/eal236bnt9pe/public_html/
 
-    # Remove old files from public_html
-    - /bin/rm -rf $DEPLOYPATH*
+    # Ensure Node.js 20 is available
+    - export PATH=/opt/cpanel/ea-nodejs20/bin:$PATH
 
-    # Copy new build files from repository to public_html
-    - /bin/cp -R $REPOPATH.output/public/* $DEPLOYPATH
+    # Go to repository directory
+    - cd $REPOPATH
+
+    # Clean install dependencies (omit dev for production)
+    - npm ci --omit=dev
+
+    # Build Nuxt project
+    - npm run build
+
+    # Remove old files in public_html (keep .htaccess if present)
+    - find $DEPLOYPATH -mindepth 1 ! -name '.htaccess' -exec rm -rf {} +
+
+    # Copy fresh build output to public_html
+    - cp -R $REPOPATH/.output/public/* $DEPLOYPATH
 
     # Set proper permissions
-    - /bin/chmod -R 755 $DEPLOYPATH
+    - chmod -R 755 $DEPLOYPATH
