@@ -9,7 +9,7 @@ export function useRooms() {
 
     try {
       const { data, error: fetchError } = await useCustomFetch<RoomApiResponse>(
-        "/api/client/rooms",
+        "http://api.mocfurni.shop/api/client/rooms",
         { method: "GET" }
       );
 
