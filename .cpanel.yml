@@ -5,23 +5,25 @@ deployment:
     - export REPOPATH=/home/eal236bnt9pe/repositories/FE_Moc_Home/
     - export DEPLOYPATH=/home/eal236bnt9pe/public_html/
 
-    # Ensure Node.js 20 is available
-    - export PATH=/opt/cpanel/ea-nodejs20/bin:$PATH
+    # Try all common Node.js paths
+    - export PATH=/opt/cpanel/ea-nodejs20/bin:/opt/alt/alt-nodejs20/root/usr/bin:$PATH
 
-    # Go to repository directory
+    # Confirm Node and npm
+    - node -v
+    - npm -v
+
+    # Go to repository
     - cd $REPOPATH
 
-    # Clean install dependencies (omit dev for production)
+    # Install dependencies and build Nuxt
     - npm ci --omit=dev
-
-    # Build Nuxt project
     - npm run build
 
-    # Remove old files in public_html (keep .htaccess if present)
+    # Clean public_html (keep .htaccess if exists)
     - find $DEPLOYPATH -mindepth 1 ! -name '.htaccess' -exec rm -rf {} +
 
-    # Copy fresh build output to public_html
+    # Copy build output to public_html
     - cp -R $REPOPATH/.output/public/* $DEPLOYPATH
 
-    # Set proper permissions
+    # Fix permissions
     - chmod -R 755 $DEPLOYPATH
