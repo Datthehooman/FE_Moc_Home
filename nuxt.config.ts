@@ -1,6 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { config } from "dotenv";
-config();
 export default defineNuxtConfig({
   ssr: false,
   image: {
@@ -45,7 +43,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiUrl: process.env.NUXT_APP_API_URL,
+      apiUrl: "http://api.mocfurni.shop",
     },
   },
 });
