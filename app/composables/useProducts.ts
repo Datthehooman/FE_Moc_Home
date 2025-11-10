@@ -10,7 +10,7 @@ export function useProducts() {
 
     try {
       const { data, error: fetchError } =
-        await useCustomFetch<ProductApiResponse>(`/client/products`, {
+        await useCustomFetch<ProductApiResponse>(`/api/client/products`, {
           method: "GET",
         });
 
