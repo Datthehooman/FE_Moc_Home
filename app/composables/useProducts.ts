@@ -10,9 +10,12 @@ export function useProducts() {
 
     try {
       const { data, error: fetchError } =
-        await useCustomFetch<ProductApiResponse>(`/api/client/products`, {
-          method: "GET",
-        });
+        await useCustomFetch<ProductApiResponse>(
+          `https://api.mocfurni.shop/api/client/products`,
+          {
+            method: "GET",
+          }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
