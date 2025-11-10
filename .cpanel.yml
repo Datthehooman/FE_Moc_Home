@@ -16,7 +16,7 @@ deployment:
     - cd $REPOPATH
 
     # Install dependencies and build Nuxt
-    - npm ci --omit=dev
+    - npm install --omit=dev
     - npm run build
 
     # Clean public_html (keep .htaccess if exists)
