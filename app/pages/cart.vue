@@ -16,25 +16,55 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in cart" :key="item.cart_id" class="border-b border-gray-100">
-              <td class="py-4">
-                <img :src="item.thumbnail || '/placeholder.png'" alt="sản phẩm" class="w-20 h-20 rounded-lg object-cover"/>
-              </td>
-              <td><p class="font-semibold">{{ item.product_name }}</p></td>
-              <td class="font-semibold">{{ formatPrice(item.product_sale || item.product_price) }} đ</td>
-              <td>
-                <div class="flex items-center gap-2">
-                  <button @click="decreaseQty(item)" class="w-6 h-6 flex items-center justify-center rounded-full bg-[#FFE8D9] text-[#6E4E37] text-xl">–</button>
-                  <input v-model.number="item.quantity" type="number" min="1" class="w-12 text-center border rounded"/>
-                  <button @click="increaseQty(item)" class="w-6 h-6 flex items-center justify-center rounded-full bg-[#FFE8D9] text-[#6E4E37] text-xl">+</button>
-                  <button @click="updateQty(item)" class="ml-2 px-2 py-1 bg-[#F7C59F] rounded text-sm text-[#6E4E37] hover:bg-[#E8B58C]">Cập nhật</button>
-                </div>
-              </td>
-              <td class="font-semibold">{{ formatPrice(item.subtotal) }} đ</td>
-              <td class="text-center">
-                <button @click="removeItemFromCart(item.cart_id, index)" class="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 hover:border-red-500 transition">×</button>
-              </td>
-            </tr>
+            <template v-for="(item, index) in cart" :key="item.cart_id">
+              <tr>
+                <td class="py-4">
+                  <div class="w-22 h-22 flex items-center justify-center rounded-[10px] border border-[#FED8B3] overflow-hidden">
+                    <img 
+                      :src="item.thumbnail || '/placeholder.png'" 
+                      alt="sản phẩm" 
+                      class="object-contain max-w-full max-h-full p-2"
+                    />
+                  </div>
+                </td>
+                <td><p class="font-semibold">{{ item.product_name }}</p>
+                  <!-- <p class="text-gray-500 text-sm">Mã sản phẩm: {{ item.sku }}</p>
+                  <p class="text-gray-500 text-sm">Thương hiệu: {{ item.brand }}</p> -->
+                </td>
+                <td class="font-semibold">{{ formatPrice(item.product_sale || item.product_price) }} đ</td>
+                <td>
+                  <div class="flex items-center gap-3">
+                    <button 
+                      @click="decreaseQty(item)" 
+                      class="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFE8D9] text-[#6E4E37] text-lg font-semibold">
+                      –
+                    </button>
+                  <input 
+                      v-model.number="item.quantity" 
+                      type="number" 
+                      min="1"
+                      class="w-10 h-8 text-center text-sm border border-gray-300 rounded outline-none focus:ring-1 focus:ring-[#F7C59F] text-[15px]"
+                    />
+
+                    <button 
+                      @click="increaseQty(item)" 
+                      class="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFE8D9] text-[#6E4E37] text-lg font-semibold">
+                      +
+                    </button>
+                  </div>
+                </td>
+                <td class="font-semibold">{{ formatPrice(item.subtotal) }} đ</td>
+                <td class="text-center">
+                  <button @click="removeItemFromCart(item.cart_id, index)" class="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 hover:border-red-500 transition">×</button>
+                </td>
+              </tr>
+              <!-- Đường kẻ ngang phân cách sản phẩm -->
+              <tr v-if="index < cart.length - 1">
+                <td colspan="6">
+                  <hr class="border-t border-gray-200 my-2" />
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
 
@@ -108,13 +138,19 @@ async function fetchCartData() {
 }
 onMounted(fetchCartData)
 
-// Tăng/giảm số lượng
-function increaseQty(item: any) { item.quantity++ }
-function decreaseQty(item: any) { if(item.quantity > 1) item.quantity-- }
-async function updateQty(item: any) {
-  if(item.quantity < 1) item.quantity = 1
+// Tăng/giảm số lượng —> TỰ CẬP NHẬT
+async function increaseQty(item: any) {
+  item.quantity++
   await updateQuantity(item.product_id, item.quantity)
   await fetchCartData()
+}
+
+async function decreaseQty(item: any) {
+  if (item.quantity > 1) {
+    item.quantity--
+    await updateQuantity(item.product_id, item.quantity)
+    await fetchCartData()
+  }
 }
 
 // Xóa sản phẩm
@@ -142,3 +178,14 @@ function formatPrice(num: number | string) {
   return Number(num).toLocaleString('vi-VN')
 }
 </script>
+
+<style>
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+</style>
