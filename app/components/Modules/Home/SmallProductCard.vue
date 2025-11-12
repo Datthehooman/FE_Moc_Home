@@ -1,4 +1,4 @@
-<template>
+v<template>
   <div
     class="h-[140px] w-[410px] p-[11px] relative group flex items-center bg-accented rounded-2xl"
   >
