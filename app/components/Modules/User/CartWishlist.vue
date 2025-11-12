@@ -135,6 +135,7 @@
             class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
           >
             <UIcon name="i-heroicons-shopping-bag-solid" class="w-5 h-5 text-white" />
+            <div>{{ data.id }}</div>
           </button>
         </UTooltip>
 

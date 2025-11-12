@@ -41,15 +41,16 @@
 
           <!-- LIST SẢN PHẨM -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            
            <ModulesUserCartWishlist 
-  v-for="(item, index) in paginatedFavorites" 
+  v-for="(item, index) in wishlists" 
   :key="index" 
   :data="item"
   :select-mode="isSelecting"
   :selected="selectedList.includes(item)"
   @toggle="toggleSelect(item)"
   @view="openOverview"
-+ @remove="removeOne(item)"
+  @remove="removeOne(item)"
 />
 
           </div>
@@ -157,4 +158,5 @@ const removeOne = (product) => {
   selectedList.value = selectedList.value.filter(p => p !== product)
 }
 
+const {wishlists, fetchWislist, deleteWishlist} = useWishlist();
 </script>
