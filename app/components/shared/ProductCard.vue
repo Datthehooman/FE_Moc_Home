@@ -42,6 +42,7 @@
       >
         <div
           class="bg-primary size-10 flex justify-center items-center rounded-full cursor-pointer translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
+          @click="postWishlist(id)"
         >
           <UIcon class="size-[19px] text-white" name="i-heroicons-heart" />
         </div>
@@ -134,5 +135,8 @@
     price?: string;
     salePrice?: string;
     badgeColor?: string;
+    id: number;
   }>();
+  const {postWishlist , deleteWishlist } = useWishlist();
+
 </script>

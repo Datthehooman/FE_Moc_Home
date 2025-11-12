@@ -21,6 +21,7 @@
         <SharedProductCard
           v-for="product in products.slice(0, 5)"
           :key="product.product_id"
+          :id="product.product_id"
           :title="product.product_name"
           :image="product.thumbnail"
           :price="Number(product.price).toLocaleString('vi-VN')"
@@ -587,4 +588,5 @@
     isLoading: isLoadingProducts,
     fetchProducts,
   } = useProducts();
+
 </script>
