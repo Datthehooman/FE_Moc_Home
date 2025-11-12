@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 flex flex-col h-[591px]">
+  <div class="flex-1 flex flex-col h-[591px] relative">
     <div v-if="loadingDetail" class="text-center py-10 text-gray-500">
       Đang tải sản phẩm...
     </div>
@@ -103,19 +103,18 @@
           <span class="relative z-10 group-hover:text-white text-[16px] transition-colors duration-300">Mua ngay</span>
         </button>
 
-        <!-- Icon like -->
-        <button class="relative overflow-hidden w-[50px] h-[50px] bg-primary rounded-lg text-white shadow flex justify-center items-center group transition-colors duration-500">
-          <span class="absolute inset-0 flex justify-center items-center">
-            <span class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"></span>
-          </span>
-          <svg class="relative z-10 w-5 h-4 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-8.682a4.5 4.5 0 010-6.364z"></path>
-          </svg>
-        </button>
-
       </div>
-
     </div>
+
+    <!-- Toast thông báo thêm giỏ hàng -->
+    <transition name="slide-fade">
+      <div v-if="showToast" class="fixed bottom-5 right-5 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Thêm giỏ hàng thành công!</span>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -149,9 +148,16 @@ const discountPercent = computed(() => {
 const checkoutStore = useCheckoutStore()
 const { addToCart } = useCart()
 
+// Toast
+const showToast = ref(false)
+
 const handleAddToCart = async () => {
   if(!productDetail.value) return
   await addToCart(productDetail.value.product_id, quantity.value)
+
+  // Hiển thị toast
+  showToast.value = true
+  setTimeout(() => showToast.value = false, 2000) // 2s tự ẩn
 }
 
 const handleBuyNow = () => {
@@ -166,3 +172,17 @@ const handleBuyNow = () => {
   router.push('/checkout')
 }
 </script>
+
+<style>
+.slide-fade-enter-active, .slide-fade-leave-active {
+  transition: all 0.5s ease;
+}
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+</style>

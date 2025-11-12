@@ -24,7 +24,7 @@
                   </div>
                 </td>
                 <td class="font-semibold">{{ item.product_name }}</td>
-                <td class="font-semibold">{{ formatPrice(item.product_sale || item.product_price) }} đ</td>
+                <td class="font-semibold">{{ formatPrice(item.product_sale || item.product_price) }}</td>
                 <td>
                   <div class="flex items-center gap-3">
                     <button @click="decreaseQty(item)" class="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFE8D9] text-[#6E4E37] text-lg font-semibold">–</button>
@@ -32,9 +32,9 @@
                     <button @click="increaseQty(item)" class="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFE8D9] text-[#6E4E37] text-lg font-semibold">+</button>
                   </div>
                 </td>
-                <td class="font-semibold">{{ formatPrice(item.subtotal) }} đ</td>
+                <td class="font-semibold">{{ formatPrice(item.quantity * (item.product_sale || item.product_price)) }}</td>
                 <td class="text-center">
-                  <button @click="removeItemFromCart(item.cart_id, index)" class="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 hover:border-red-500 transition">×</button>
+                  <button @click="removeItemFromCart(item.cart_id)" class="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 hover:border-red-500 transition">×</button>
                 </td>
               </tr>
               <tr v-if="index < cart.length - 1">
@@ -54,12 +54,12 @@
         <h2 class="text-lg font-semibold mb-4">Hóa đơn</h2>
 
         <div class="space-y-2 text-sm">
-          <div class="flex justify-between"><span>Tạm tính:</span><span>{{ formatPrice(apiTotal) }} đ</span></div>
-          <div class="flex justify-between"><span>Giảm giá:</span><span class="text-red-500">-{{ formatPrice(discount) }} đ</span></div>
+          <div class="flex justify-between"><span>Tạm tính:</span><span>{{ formatPrice(apiTotal) }}</span></div>
+          <div class="flex justify-between"><span>Giảm giá:</span><span class="text-red-500">-{{ formatPrice(discount) }}</span></div>
           <div class="flex justify-between"><span>Vận chuyển:</span><span>Miễn phí</span></div>
           <div class="border-t pt-3 flex justify-between font-semibold">
             <span>Tổng thanh toán:</span>
-            <span>{{ formatPrice(apiTotal - discount) }} đ</span>
+            <span>{{ formatPrice(apiTotal - discount) }}</span>
           </div>
         </div>
 
@@ -88,33 +88,37 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCart } from '~/composables/useCart'
 import { useCheckout } from '~/composables/useCheckout'
-import { useProduct } from '~/composables/useProduct'
+import { useProduct } from '~/composables/useProduct' // cần để lấy thumbnail
 
 const router = useRouter()
 const { cart, getCart, removeItem, updateQuantity } = useCart()
 const { setCartItems } = useCheckout()
-const { products, fetchProducts } = useProduct()
+const { products, fetchProducts } = useProduct() // danh sách sản phẩm
 
 const discount = ref(0)
 const discountCode = ref('')
 const apiTotal = ref(0)
 
-// Lấy dữ liệu
 async function fetchCartData() {
-  await fetchProducts()
+  await fetchProducts() // đảm bảo products đã load
   const data = await getCart()
 
   if (data) {
     apiTotal.value = data.total
     cart.value = data.items.map((item: any) => {
       const prod = products.value.find(p => p.product_id === item.product_id)
-      return { ...item, thumbnail: prod?.thumbnail || '/placeholder.png' }
+      return {
+        ...item,
+        thumbnail: prod?.thumbnail || '/placeholder.png',
+        subtotal: item.quantity * (item.product_sale || item.product_price),
+      }
     })
   } else {
     apiTotal.value = 0
     cart.value = []
   }
 }
+
 onMounted(fetchCartData)
 
 async function increaseQty(item: any) {
@@ -131,37 +135,23 @@ async function decreaseQty(item: any) {
   }
 }
 
-async function removeItemFromCart(cart_id: number, index: number) {
-  const success = await removeItem(cart_id)
-  if (success) fetchCartData()
+async function removeItemFromCart(cart_id: number) {
+  await removeItem(cart_id)
+  fetchCartData()
 }
 
 function applyDiscount() {
-  if (discountCode.value === 'giam-50') discount.value = 50000
-  else discount.value = 0
+  discount.value = discountCode.value === 'giam-50' ? 50000 : 0
 }
 
 function formatPrice(num: number) {
   return Number(num).toLocaleString('vi-VN')
 }
 
-// ✅ Lưu giỏ → chuyển qua checkout
 function goCheckout() {
-  console.log('🛒 Cart trước khi checkout:', cart.value)
-  if (cart.value.length === 0) {
-    console.warn("Giỏ hàng trống")
-    return alert("Giỏ hàng trống")
-  }
-
-  console.log('💾 Gọi setCartItems...')
+  if (!cart.value.length) return alert('Giỏ hàng trống')
   setCartItems(cart.value)
-  console.log('✅ setCartItems xong, chuyển trang /checkout')
-
-  try {
-    router.push('/checkout')
-  } catch (err) {
-    console.error('❌ Router push lỗi:', err)
-  }
+  router.push('/checkout')
 }
 
 </script>

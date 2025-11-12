@@ -40,70 +40,48 @@
           </div>
 
           <!-- Địa chỉ -->
-<div>
-  <label class="block font-medium mb-1 text-[#6E4E37]">Địa chỉ</label>
-
-  <!-- Hàng 1: Tỉnh / Thành phố + Quận / Huyện -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="relative">
-      <select 
-        v-model="selectedProvince" 
-        @change="updateDistricts"
-        class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-      >
-        <option disabled value="">Tỉnh / Thành phố</option>
-        <option v-for="p in provinces" :key="p.name" :value="p.name">{{ p.name }}</option>
-      </select>
-      <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
-      <p v-if="errors.province" class="text-red-500 text-xs mt-1">{{ errors.province }}</p>
-    </div>
-
-    <div class="relative">
-      <select 
-        v-model="selectedDistrict" 
-        @change="updateWards"
-        class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-      >
-        <option disabled value="">Quận / Huyện</option>
-        <option v-for="d in districts" :key="d.name" :value="d.name">{{ d.name }}</option>
-      </select>
-      <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
-      <p v-if="errors.district" class="text-red-500 text-xs mt-1">{{ errors.district }}</p>
-    </div>
-  </div>
-
-  <!-- Hàng 2: Xã / Phường + Địa chỉ cụ thể -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-    <div class="relative">
-      <select 
-        v-model="selectedWard"
-        class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-      >
-        <option disabled value="">Xã / Phường</option>
-        <option v-for="w in wards" :key="w" :value="w">{{ w }}</option>
-      </select>
-      <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
-      <p v-if="errors.ward" class="text-red-500 text-xs mt-1">{{ errors.ward }}</p>
-    </div>
-
-    <div>
-      <input 
-        type="text" 
-        v-model="form.addressDetail" 
-        placeholder="Địa chỉ cụ thể" 
-        class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-      />
-      <p v-if="errors.addressDetail" class="text-red-500 text-xs mt-1">{{ errors.addressDetail }}</p>
-    </div>
-  </div>
-</div>
-
+          <div>
+            <label class="block font-medium mb-1 text-[#6E4E37]">Địa chỉ</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="relative">
+                <select v-model="selectedProvince" @change="updateDistricts"
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition">
+                  <option disabled value="">Tỉnh / Thành phố</option>
+                  <option v-for="p in provinces" :key="p.name" :value="p.name">{{ p.name }}</option>
+                </select>
+                <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+                <p v-if="errors.province" class="text-red-500 text-xs mt-1">{{ errors.province }}</p>
+              </div>
+              <div class="relative">
+                <select v-model="selectedDistrict" @change="updateWards"
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition">
+                  <option disabled value="">Quận / Huyện</option>
+                  <option v-for="d in districts" :key="d.name" :value="d.name">{{ d.name }}</option>
+                </select>
+                <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+                <p v-if="errors.district" class="text-red-500 text-xs mt-1">{{ errors.district }}</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+              <div class="relative">
+                <select v-model="selectedWard"
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition">
+                  <option disabled value="">Xã / Phường</option>
+                  <option v-for="w in wards" :key="w" :value="w">{{ w }}</option>
+                </select>
+                <p v-if="errors.ward" class="text-red-500 text-xs mt-1">{{ errors.ward }}</p>
+              </div>
+              <div>
+                <input type="text" v-model="form.addressDetail" placeholder="Địa chỉ cụ thể"
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition" />
+                <p v-if="errors.addressDetail" class="text-red-500 text-xs mt-1">{{ errors.addressDetail }}</p>
+              </div>
+            </div>
+          </div>
 
           <!-- Ghi chú -->
           <div>
@@ -116,9 +94,10 @@
             <h3 class="font-medium text-[#6E4E37] mb-3">Hình thức vận chuyển</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <label v-for="(ship, i) in shippingMethods" :key="i"
-                     class="relative border rounded-xl p-4 cursor-pointer flex flex-col gap-1 items-start"
-                     :class="selectedShipping === ship.name ? 'border-[#A77A5D] bg-[#A77A5D]/10' : ''">
-                <input type="radio" name="shipping" :value="ship.name" v-model="selectedShipping" class="absolute top-3 right-3 w-4 h-4 accent-[#A77A5D]" />
+                class="relative border rounded-xl p-4 cursor-pointer flex flex-col gap-1 items-start"
+                :class="selectedShipping === ship.name ? 'border-[#A77A5D] bg-[#A77A5D]/10' : ''">
+                <input type="radio" name="shipping" :value="ship.name" v-model="selectedShipping"
+                  class="absolute top-3 right-3 w-4 h-4 accent-[#A77A5D]" />
                 <strong>{{ ship.name }}</strong>
                 <p class="text-xs text-gray-600">{{ ship.desc }}</p>
                 <span class="text-sm font-medium text-[#A77A5D]">{{ ship.price }}</span>
@@ -135,7 +114,6 @@
                 <input type="radio" name="payment" value="online" v-model="paymentMethod" class="accent-[#A77A5D] w-5 h-5" />
                 <span>Thanh toán Online (VNPAY)</span>
               </label>
-
               <label class="flex items-center gap-3 cursor-pointer">
                 <input type="radio" name="payment" value="offline" v-model="paymentMethod" class="accent-[#A77A5D] w-5 h-5" />
                 <span>Thanh toán khi nhận hàng (Cọc 50%)</span>
@@ -154,7 +132,21 @@
       <div class="flex-[1] w-full max-w-[360px] bg-[#A77A5D]/10 rounded-2xl p-6 shadow-sm h-fit md:sticky md:top-10">
         <h2 class="text-lg font-semibold mb-4 text-[#6E4E37]">Hóa đơn</h2>
 
-        <div v-if="buyNowItem" class="space-y-2 text-sm">
+        <div v-if="checkoutItems.length" class="space-y-2 text-sm">
+          <div v-for="item in checkoutItems" :key="item.product_id" class="flex justify-between">
+            <span>{{ item.product_name }} x {{ item.quantity }}</span>
+            <span>{{ formatPrice(item.quantity * (item.product_sale || item.product_price)) }}</span>
+          </div>
+          <div class="flex justify-between"><span>Giảm giá:</span><span class="text-red-500">-0 đ</span></div>
+          <div class="flex justify-between"><span>Vận chuyển:</span><span>{{ selectedShipping === 'Nhanh' ? '30.000 đ' : 'Miễn phí' }}</span></div>
+          <div class="flex justify-between"><span>Thuế:</span><span>0 đ</span></div>
+          <div class="border-t pt-3 flex justify-between font-semibold">
+            <span>Tổng tiền:</span>
+            <span>{{ formatPrice(totalAmount) }}</span>
+          </div>
+        </div>
+
+        <div v-else-if="buyNowItem" class="space-y-2 text-sm">
           <div class="flex justify-between">
             <span>{{ buyNowItem.product_name }} x {{ buyNowItem.quantity }}</span>
             <span>{{ formatPrice(buyNowItem.price * buyNowItem.quantity) }}</span>
@@ -164,12 +156,12 @@
           <div class="flex justify-between"><span>Thuế:</span><span>0 đ</span></div>
           <div class="border-t pt-3 flex justify-between font-semibold">
             <span>Tổng tiền:</span>
-            <span>{{ formatPrice(buyNowItem.price * buyNowItem.quantity + (selectedShipping === 'Nhanh' ? 30000 : 0)) }}</span>
+            <span>{{ formatPrice(totalAmount) }}</span>
           </div>
         </div>
 
         <div v-else class="text-center text-red-500">
-          Không có sản phẩm Buy Now, quay lại sản phẩm để mua
+          Không có sản phẩm để thanh toán, quay lại sản phẩm để mua
         </div>
 
         <a href="/cart" class="flex items-center gap-2 text-sm mt-3 text-gray-600 hover:underline">
@@ -182,18 +174,30 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCheckoutStore } from '@/stores/checkout'
 import { useCheckout } from '@/composables/useCheckout'
 import { useCookie } from '#app'
 
+const router = useRouter()
 const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout()
 const checkoutStore = useCheckoutStore()
 const buyNowItem = checkoutStore.buyNowItem
 const tokenCookie = useCookie('token')
 const isLoggedIn = computed(() => !!tokenCookie.value)
 
-// form
+// Cart items
+const checkoutItems = computed(() => checkoutStore.cartItems || [])
+
+// Nếu không có sản phẩm => redirect /error
+onMounted(() => {
+  if (!checkoutItems.value.length && !buyNowItem) {
+    router.replace('/error')
+  }
+})
+
+// Form
 const form = reactive({
   firstName: '',
   lastName: '',
@@ -203,11 +207,11 @@ const form = reactive({
   note: ''
 })
 
-// payment method & shipping
+// Payment & shipping
 const paymentMethod = ref('')
 const selectedShipping = ref('Tiêu chuẩn')
 
-// location
+// Location
 const selectedProvince = ref('')
 const selectedDistrict = ref('')
 const selectedWard = ref('')
@@ -260,9 +264,18 @@ function validate() {
   return valid
 }
 
+const totalAmount = computed(() => {
+  const items = checkoutItems.value.length ? checkoutItems.value : buyNowItem ? [buyNowItem] : []
+  const total = items.reduce((acc, i) => acc + (i.product_sale || i.product_price || i.price) * i.quantity, 0)
+  return total + (selectedShipping.value === 'Nhanh' ? 30000 : 0)
+})
+
 async function submitPayment() {
-  if (!buyNowItem) {
+  const itemsToPay = checkoutItems.value.length ? checkoutItems.value : buyNowItem ? [buyNowItem] : []
+
+  if (!itemsToPay.length) {
     alert('Không có sản phẩm để thanh toán')
+    router.replace('/error')
     return
   }
 
@@ -274,53 +287,47 @@ async function submitPayment() {
   const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`
 
   try {
-    // === THANH TOÁN ONLINE (VNPAY) ===
     if (paymentMethod.value === 'online') {
-      const price = Number(buyNowItem.price)
-      const amount = Math.round(price * buyNowItem.quantity + (selectedShipping.value === 'Nhanh' ? 30000 : 0))
-      const orderInfo = `Thanh toan don hang #${buyNowItem.product_id}`
-      const orderType = 'topup'
-      await payWithVNPAY(amount, orderInfo, orderType)
+      await payWithVNPAY({
+        amount: totalAmount.value,
+        orderInfo: `Thanh toán đơn hàng`,
+        shipping_address
+      })
       return
     }
 
     if (isLoggedIn.value) {
-      // ✅ User đăng nhập -> buyNow
-      const payload = {
-        product_id: buyNowItem.product_id,
-        quantity: buyNowItem.quantity,
+      const payloadUser = {
         shipping_address,
         note: form.note || '',
-        payment_method_id: 2 // offline
+        payment_method_id: 2,
+        items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity }))
       }
-      console.log('🔥 Dữ liệu gửi buyNow:', payload)
-      const response = await buyNow(payload)
-      console.log('✅ API response:', response)
+      await buyNow(payloadUser)
     } else {
-      // ✅ Guest -> buyNowGuest
-      const payload = {
-        product_id: buyNowItem.product_id,
-        quantity: buyNowItem.quantity,
+      const payloadGuest = {
         customer_name: `${form.firstName} ${form.lastName}`,
         customer_phone: form.phone,
         customer_email: form.email,
         shipping_address,
         note: form.note || '',
-        payment_method_id: 2
+        payment_method_id: 2,
+        items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity }))
       }
-      console.log('🔥 Dữ liệu gửi buyNowGuest:', payload)
-      const response = await buyNowGuest(payload)
-      console.log('✅ API response:', response)
+      await buyNowGuest(payloadGuest)
     }
 
-alert('Thanh toán thành công! 🎉')
-checkoutStore.clearCheckout()
-
+    alert('Thanh toán thành công! 🎉')
+    checkoutStore.clearCheckout()
+    router.push('/')  // ✅ chuyển về trang chủ
   } catch (err: any) {
     console.error('❌ Lỗi khi gọi API:', err)
     alert(err?.message || 'Thanh toán thất bại, vui lòng thử lại sau')
   }
 }
 
-const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+function formatPrice(value: number) {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+}
 </script>
+

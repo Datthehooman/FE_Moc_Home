@@ -21,38 +21,28 @@ export function useCheckout() {
     checkoutStore.setCartItems(items)
   }
 
-  // 🔥 Thanh toán khi có đăng nhập
-const buyNow = async (data: {
-  product_id: number
-  quantity: number
-  shipping_address: string
-  note?: string
-  payment_method_id: number
-}) => {
-  if (!tokenCookie.value) throw new Error('Vui lòng đăng nhập để thanh toán')
+  // 🔥 Thanh toán 1 sản phẩm buy-now
+  const buyNow = async (payload: {
+    product_id: number
+    quantity: number
+    shipping_address: string
+    note?: string
+    payment_method_id: number
+  }) => {
+    if (!tokenCookie.value) throw new Error('Vui lòng đăng nhập để thanh toán')
 
-  // lấy user_id từ store/token nếu muốn
-  const user_id = checkoutStore.user?.id || null;
+    const user_id = checkoutStore.user?.id || null
+    const body = { ...payload, user_id }
 
-  const payload = {
-    ...data,
-    user_id
+    return await $fetch('http://127.0.0.1:8000/api/client/buy-now', {
+      method: 'POST',
+      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+      body
+    })
   }
 
-  const res = await $fetch('http://127.0.0.1:8000/api/client/buy-now', {
-    method: 'POST',
-    headers: {
-      ...getAuthHeader(),
-      'Content-Type': 'application/json'
-    },
-    body: payload,
-  })
-  return res
-}
-
-
-  // 🔥 Thanh toán cho KHÁCH (Không đăng nhập)
-  const buyNowGuest = async (data: {
+  // 🔥 Thanh toán 1 sản phẩm cho guest
+  const buyNowGuest = async (payload: {
     product_id: number
     quantity: number
     customer_name: string
@@ -62,54 +52,92 @@ const buyNow = async (data: {
     note?: string
     payment_method_id: number
   }) => {
-    console.log('🚀 Thanh toán guest:', data)
     try {
-      const res = await $fetch('http://127.0.0.1:8000/api/client/buy-now/guest', {
+      return await $fetch('http://127.0.0.1:8000/api/client/buy-now/guest', {
         method: 'POST',
-        body: data,
+        body: payload
       })
-      console.log('✅ Response server (guest):', res)
-      return res
     } catch (error: any) {
       console.error('❌ Lỗi server guest:', error.data || error)
       throw new Error('Lỗi server')
     }
   }
 
-  // 💳 Thanh toán online qua VNPAY (đảm bảo đúng định dạng)
-const payWithVNPAY = async (amount: number, orderInfo: string, orderType: string) => {
-  if (!amount || amount <= 0) return alert('Số tiền thanh toán không hợp lệ');
+  // 🔥 Thanh toán cả giỏ hàng (cart)
+  const checkoutCart = async (shipping_address: string, note = '', payment_method_id = 2) => {
+    if (!checkoutStore.cartItems.length) throw new Error('Giỏ hàng rỗng')
 
-  try {
-    // ✅ Log dữ liệu trước khi gửi
-    console.log('🔥 Dữ liệu gửi VNPAY:', {
-      amount,
-      order_info: orderInfo,
-      order_type: orderType
-    });
-
-    const res: any = await $fetch('http://127.0.0.1:8000/api/client/vnpay-payment', {
-      method: 'POST',
-      body: { amount, order_info: orderInfo, order_type: orderType },
-    });
-
-    console.log('✅ Phản hồi từ server VNPAY:', res);
-
-    if (res?.data) {
-      window.location.href = res.data; // redirect sang VNPAY
-    } else {
-      alert('Không nhận được link thanh toán từ server');
+    const payload = {
+      user_id: checkoutStore.user?.id || null,
+      items: checkoutStore.cartItems.map(i => ({
+        product_id: i.product_id,
+        quantity: i.quantity
+      })),
+      shipping_address,
+      note,
+      payment_method_id
     }
-  } catch (err: any) {
-    console.error('❌ Lỗi VNPAY:', err?.data || err);
-    alert('Thanh toán VNPAY thất bại!');
+
+    if (tokenCookie.value) {
+      return await $fetch('http://127.0.0.1:8000/api/client/buy-now/cart', {
+        method: 'POST',
+        headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+        body: payload
+      })
+    } else {
+      // Guest cart
+      const guestPayload = {
+        items: checkoutStore.cartItems.map(i => ({
+          product_id: i.product_id,
+          quantity: i.quantity
+        })),
+        shipping_address,
+        note,
+        payment_method_id
+      }
+      return await $fetch('http://127.0.0.1:8000/api/client/buy-now/guest-cart', {
+        method: 'POST',
+        body: guestPayload
+      })
+    }
   }
-};
 
+  // 💳 Thanh toán online qua VNPAY
+  const payWithVNPAY = async (amount: number, orderInfo: string, orderType: string) => {
+    if (!amount || amount <= 0) return alert('Số tiền thanh toán không hợp lệ')
 
+    try {
+      console.log('🔥 Dữ liệu gửi VNPAY:', { amount, order_info: orderInfo, order_type: orderType })
 
+      const res: any = await $fetch('http://127.0.0.1:8000/api/client/vnpay-payment', {
+        method: 'POST',
+        body: { amount, order_info: orderInfo, order_type: orderType }
+      })
 
+      console.log('✅ Phản hồi từ server VNPAY:', res)
 
+      if (res?.data) {
+        window.location.href = res.data
+      } else {
+        alert('Không nhận được link thanh toán từ server')
+      }
+    } catch (err: any) {
+      console.error('❌ Lỗi VNPAY:', err?.data || err)
+      alert('Thanh toán VNPAY thất bại!')
+    }
+  }
 
-  return { setBuyNowItem, setCartItems, buyNow, buyNowGuest, payWithVNPAY }
+  const clearCheckout = () => {
+    checkoutStore.clearCheckout()
+  }
+
+  return {
+    setBuyNowItem,
+    setCartItems,
+    buyNow,
+    buyNowGuest,
+    checkoutCart,
+    payWithVNPAY,
+    clearCheckout
+  }
 }
