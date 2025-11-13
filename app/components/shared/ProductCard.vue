@@ -44,7 +44,7 @@
       >
         <div
           class="bg-primary size-10 flex justify-center items-center rounded-full cursor-pointer translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
-          @click="postWishlist(id)"
+          @click="handleAddToWishlist(id)"
         >
           <UIcon class="size-[19px] text-white" name="i-heroicons-heart" />
         </div>
@@ -260,38 +260,15 @@
     slug: string;
   }>();
 
-  const { postWishlist, deleteWishlist } = useWishlist();
-  const { addToCart } = useCart();
-  const toast = useToast();
-  const router = useRouter();
-
-  const goToDetail = (slug: string) => {
-    router.push(`/san-pham/${slug}`);
-  };
-
-  // Modal state
-  const isModalOpen = ref(false);
-
-  const handleAddToCart = async () => {
-    if (!props.id) {
-      toast.add({ title: "Sản phẩm không hợp lệ", color: "error" });
-      return;
-    }
-
+  const { postWishlist } = useWishlist();
+  // Thêm hàm xử lý với alert
+  const handleAddToWishlist = async (productId: number) => {
     try {
-      const result = await addToCart(props.id, 1);
-      if (result) {
-        toast.add({ title: "Đã thêm vào giỏ hàng!", color: "success" });
-      } else {
-        toast.add({ title: "Thêm giỏ hàng thất bại!", color: "error" });
-      }
-    } catch (error: any) {
-      toast.add({
-        title:
-          "Lỗi khi thêm vào giỏ hàng: " +
-          (error?.message || "Không rõ nguyên nhân"),
-        color: "error",
-      });
+      await postWishlist(productId);
+      alert('✅ Đã thêm sản phẩm vào yêu thích!');
+    } catch (error) {
+      alert('❌ Không thể thêm vào yêu thích!');
     }
   };
+
 </script>

@@ -51,7 +51,7 @@
           <!-- ❤️ Yêu thích -->
           <UTooltip text="Thêm yêu thích">
             <button
-              @click="postWishlist(item.product_id)"
+              @click="handleAddToWishlist"
               class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
             >
               <UIcon name="i-heroicons-heart" class="w-5 h-5 text-white" />
@@ -116,9 +116,10 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, nextTick } from "vue";
-  import { useRouter } from "vue-router";
-  import { useCart } from "~/composables/useCart";
+import { computed, ref, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+import { useCart } from '~/composables/useCart'
+import { useWishlist } from '~/composables/useWishlist' // Đảm bảo import useWishlist
 
   interface ProductItem {
     product_id: number;
@@ -134,16 +135,16 @@
     slug?: string;
   }
 
-  const props = defineProps<{
-    item: ProductItem;
-    itemWidth: number;
-  }>();
+const props = defineProps<{
+  item: ProductItem
+  itemWidth: number
+}>()
 
-  const emit = defineEmits(["view"]);
-  const router = useRouter();
-  const { addToCart } = useCart();
-  const { postWishlist } = useWishlist();
-  const errorImage = ref(false);
+const emit = defineEmits(['view'])
+const router = useRouter()
+const { addToCart } = useCart()
+const { postWishlist } = useWishlist() // Sử dụng postWishlist từ composable
+const errorImage = ref(false)
 
   const resolvedThumbnail = computed(() => {
     if (errorImage.value)
@@ -160,11 +161,11 @@
   const formatPrice = (price: number | undefined) =>
     price ? price.toLocaleString("vi-VN") + "₫" : "";
 
-  let hasViewed = false;
-  const goToDetail = () => {
-    if (!hasViewed) hasViewed = true;
-    router.push(`/san-pham/${props.item.slug}`);
-  };
+let hasViewed = false
+const goToDetail = () => {
+  if (!hasViewed) hasViewed = true
+  router.push(`/san-pham/${props.item.slug}`)
+}
 
   const handleAddToCart = async () => {
     if (!props.item.product_id) {
@@ -175,16 +176,33 @@
     try {
       const result = await addToCart(props.item.product_id, 1);
 
-      if (result) {
-        alert("✅ Đã thêm vào giỏ hàng!");
-      } else {
-        alert("❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.");
-      }
-    } catch (error: any) {
-      alert(
-        "❌ Lỗi khi thêm vào giỏ hàng: " +
-          (error?.message || "Không rõ nguyên nhân")
-      );
+    if (result) {
+      alert('✅ Đã thêm vào giỏ hàng!')
+    } else {
+      alert('❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.')
     }
-  };
+  } catch (error: any) {
+    alert('❌ Lỗi khi thêm vào giỏ hàng: ' + (error?.message || 'Không rõ nguyên nhân'))
+  }
+}
+
+// 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI ALERT
+const handleAddToWishlist = async () => {
+  if (!props.item.product_id) {
+    alert('❌ Sản phẩm không hợp lệ')
+    return
+  }
+
+  try {
+    const success = await postWishlist(props.item.product_id)
+    
+    if (success) {
+      alert('✅ Đã thêm sản phẩm vào yêu thích!')
+    } else {
+      alert('❌ Không thể thêm vào yêu thích!')
+    }
+  } catch (error: any) {
+    alert('❌ Lỗi khi thêm vào yêu thích: ' + (error?.message || 'Không rõ nguyên nhân'))
+  }
+}
 </script>
