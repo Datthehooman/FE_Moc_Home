@@ -3,13 +3,14 @@
     <UContainer class="lg:px-0">
       <ModulesHomeBanner1 class="mb-[55px]" />
       <ModulesHomeTitle title="Danh mục hàng đầu" />
-      <div class="flex justify-between flex-wrap gap-4">
+      <div class="flex justify-between flex-wrap gap-4 mb-15">
         <ModulesHomeCateCard
           v-for="room in rooms"
           :key="room.id"
+          :id="room.id"
           :image="room.full_image_url"
           :title="room.room_name"
-          :quantity="30"
+          @click="goToRoomProducts(room.id)"
         />
       </div>
       <ModulesHomeTitle title="Sản phẩm thịnh hành" />
@@ -27,10 +28,16 @@
           :price="Number(product.price).toLocaleString('vi-VN')"
           :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
           :stars="product.rating"
-          :badge="product.badge || 'Hot'"
+          :badge="product.badge"
+          :view="product.view"
+          :brand="product.brand"
+          :room_id="product.category_id"
+          :status="product.status"
+          :sku="product.sku"
+          :slug="product.slug"
         />
       </div>
-      <ModulesHomeBanner2 />
+      <ModulesHomeBanner2 class="mb-15" />
       <ModulesHomeTitle title="Sản phẩm nổi bật" />
       <div v-if="isLoadingProducts" class="text-center py-10">Đang tải...</div>
 
@@ -44,7 +51,13 @@
           :price="Number(product.price).toLocaleString('vi-VN')"
           :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
           :stars="product.rating"
-          :badge="product.badge || 'Nổi bật'"
+          :badge="product.badge"
+          :view="product.view"
+          :brand="product.brand"
+          :room_id="product.category_id"
+          :status="product.status"
+          :sku="product.sku"
+          :slug="product.slug"
         />
       </div>
       <div
@@ -290,6 +303,8 @@
               :price="Number(product.price).toLocaleString('vi-VN')"
               :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
               :stars="product.rating || 4"
+              :slug="product.slug"
+              :id="product.product_id"
             />
           </div>
         </div>
@@ -315,6 +330,8 @@
               :price="Number(product.price).toLocaleString('vi-VN')"
               :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
               :stars="product.rating"
+              :slug="product.slug"
+              :id="product.product_id"
             />
           </div>
         </div>
@@ -340,6 +357,8 @@
               :price="Number(product.price).toLocaleString('vi-VN')"
               :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
               :stars="product.rating || 5"
+              :id="product.product_id"
+              :slug="product.slug"
             />
           </div>
         </div>
@@ -589,4 +608,9 @@
     fetchProducts,
   } = useProducts();
 
+  const router = useRouter();
+
+  const goToRoomProducts = (roomId: number) => {
+    router.push({ path: "/ProductList", query: { room_id: roomId } });
+  };
 </script>

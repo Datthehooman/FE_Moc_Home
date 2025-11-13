@@ -17,7 +17,8 @@
       <UButton
         size="xl"
         variant="solid"
-        class="relative bg-info text-black rounded-4xl overflow-hidden group transition-all duration-500 hover:rounded-md ease-out"
+        class="relative bg-info text-black rounded-4xl overflow-hidden group transition-all duration-500 hover:rounded-md ease-out cursor-pointer"
+        @click="handleBuyNow(product)"
       >
         <span
           class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
@@ -32,3 +33,23 @@
     </div>
   </div>
 </template>
+<script setup lang="ts">
+  const product = {
+    product_id: 22,
+    product_name: "Ghế Bành Vải Xanh",
+    price: 2500000,
+    product_price: 2500000,
+    product_sale: 1900000,
+    quantity: 1,
+    thumbnail:
+      "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+  };
+
+  const router = useRouter();
+  const { setBuyNowItem } = useCheckout();
+
+  function handleBuyNow(item: Product) {
+    setBuyNowItem({ ...item, quantity: 1 });
+    router.push("/checkout");
+  }
+</script>

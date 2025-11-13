@@ -40,7 +40,9 @@
               viewBox="0 0 20 20"
               fill="currentColor"
               class="w-5 h-5"
-              :class="n <= (product.rating ?? 0) ? 'text-yellow-400' : 'text-gray-300'"
+              :class="
+                n <= (product.rating ?? 0) ? 'text-yellow-400' : 'text-gray-300'
+              "
             >
               <path
                 fill-rule="evenodd"
@@ -55,7 +57,10 @@
 
         <!-- Giá -->
         <div class="flex items-baseline space-x-2 my-4">
-          <p v-if="product.price_down" class="line-through text-gray-400 text-[16px]">
+          <p
+            v-if="product.price_down"
+            class="line-through text-gray-400 text-[16px]"
+          >
             {{ formatPrice(product.price) }}
           </p>
           <p class="text-3xl font-bold text-primary text-[24px]">
@@ -67,24 +72,36 @@
         <div class="space-y-2 text-base">
           <p>
             <span class="text-gray-500">Thương hiệu:</span>
-            <span class="font-semibold text-gray-700 ml-1">{{ product.brand || 'N/A' }}</span>
+            <span class="font-semibold text-gray-700 ml-1">{{
+              product.brand || "N/A"
+            }}</span>
           </p>
 
           <p>
             <span class="text-gray-500">Loại:</span>
-            <span class="font-bold text-gray-700 ml-1">{{ product.category?.category_name || product.category_id || 'N/A' }}</span>
+            <span class="font-bold text-gray-700 ml-1">{{
+              product.category?.category_name || product.category_id || "N/A"
+            }}</span>
           </p>
 
           <p>
             <span class="text-gray-500">Hàng có sẵn:</span>
-            <span :class="product.stock_quantity > 0 ? 'text-primary font-bold ml-1' : 'text-red-500 font-bold ml-1'">
-              {{ product.stock_quantity > 0 ? 'Có sẵn' : 'Hết hàng' }}
+            <span
+              :class="
+                product.stock_quantity > 0
+                  ? 'text-primary font-bold ml-1'
+                  : 'text-red-500 font-bold ml-1'
+              "
+            >
+              {{ product.stock_quantity > 0 ? "Có sẵn" : "Hết hàng" }}
             </span>
           </p>
 
           <p>
             <span class="text-gray-500">Mã số:</span>
-            <span class="font-semibold text-gray-700 ml-1">{{ product.sku || 'N/A' }}</span>
+            <span class="font-semibold text-gray-700 ml-1">{{
+              product.sku || "N/A"
+            }}</span>
           </p>
         </div>
 
@@ -100,7 +117,9 @@
             ></span>
           </span>
 
-          <span class="relative z-10 group-hover:text-white flex items-center justify-center space-x-2 text-[16px]">
+          <span
+            class="relative z-10 group-hover:text-white flex items-center justify-center space-x-2 text-[16px]"
+          >
             <span>Thêm giỏ hàng</span>
           </span>
         </button>
@@ -110,52 +129,57 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
-import { useCart } from '~/composables/useCart'
+  import { defineProps, defineEmits } from "vue";
+  import { useCart } from "~/composables/useCart";
 
-interface Product {
-  product_id: number
-  product_name: string
-  price: number
-  price_down?: number
-  rating?: number
-  brand?: string
-  sku?: string
-  stock_quantity: number
-  category?: { category_name: string }
-  category_id?: number
-  images?: { image_url: string }[]
-  thumbnail?: string
-}
-
-const props = defineProps<{ show: boolean; product: Product }>()
-const emit = defineEmits<{ (e: 'close'): void }>()
-
-const { addToCart } = useCart()
-
-const formatPrice = (price: number) => price.toLocaleString('vi-VN') + '₫'
-
-const getImageUrl = (product: Product) => {
-  const url = product.thumbnail || product.images?.[0]?.image_url
-  if (!url) return '/placeholder.png'
-  return url.startsWith('http') ? url : `http://127.0.0.1:8000/storage/${url}`
-}
-
-const handleAddToCart = async () => {
-  if (!props.product.product_id) {
-    alert('❌ Sản phẩm không hợp lệ')
-    return
+  interface Product {
+    product_id: number;
+    product_name: string;
+    price: number;
+    price_down?: number;
+    rating?: number;
+    brand?: string;
+    sku?: string;
+    stock_quantity: number;
+    category?: { category_name: string };
+    category_id?: number;
+    images?: { image_url: string }[];
+    thumbnail?: string;
   }
 
-  try {
-    const result = await addToCart(props.product.product_id, 1)
-    if (result) {
-      alert('✅ Đã thêm vào giỏ hàng!')
-    } else {
-      alert('❌ Thêm giỏ hàng thất bại!')
+  const props = defineProps<{ show: boolean; product: Product }>();
+  const emit = defineEmits<{ (e: "close"): void }>();
+
+  const { addToCart } = useCart();
+
+  const formatPrice = (price: number) => price.toLocaleString("vi-VN") + "₫";
+
+  const getImageUrl = (product: Product) => {
+    const url = product.thumbnail || product.images?.[0]?.image_url;
+    if (!url) return "/placeholder.png";
+    return url.startsWith("http")
+      ? url
+      : `https://api.mocfurni.shop/storage/${url}`;
+  };
+
+  const handleAddToCart = async () => {
+    if (!props.product.product_id) {
+      alert("❌ Sản phẩm không hợp lệ");
+      return;
     }
-  } catch (error: any) {
-    alert('❌ Lỗi khi thêm vào giỏ hàng: ' + (error?.message || 'Không rõ nguyên nhân'))
-  }
-}
+
+    try {
+      const result = await addToCart(props.product.product_id, 1);
+      if (result) {
+        alert("✅ Đã thêm vào giỏ hàng!");
+      } else {
+        alert("❌ Thêm giỏ hàng thất bại!");
+      }
+    } catch (error: any) {
+      alert(
+        "❌ Lỗi khi thêm vào giỏ hàng: " +
+          (error?.message || "Không rõ nguyên nhân")
+      );
+    }
+  };
 </script>
