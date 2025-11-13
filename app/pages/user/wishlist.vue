@@ -51,15 +51,14 @@
           </div>
 
           <!-- LIST -->
-        <!-- LIST -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 justify-center">
-<ModulesUserCartWishlist
-  v-for="item in paginatedWishlists"
-  :key="item.product_id"
-  :item="item"
-  :itemWidth="250"
-/>
-</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 justify-center">
+      <ModulesUserCartWishlist
+        v-for="item in paginatedWishlists"
+        :key="item.product_id"
+        :item="item"
+        :itemWidth="250"
+      />
+      </div>
 
 
           <!-- PHÂN TRANG -->

@@ -244,25 +244,87 @@ const shippingMethods = [
 const errors = reactive({})
 
 function validate() {
+  // Reset errors
   Object.keys(errors).forEach(key => errors[key] = '')
   let valid = true
 
+  // Guest info
   if (!isLoggedIn.value) {
-    if (!form.firstName) { errors.firstName = 'Họ không được để trống'; valid = false }
-    if (!form.lastName) { errors.lastName = 'Tên không được để trống'; valid = false }
-    if (!form.email) { errors.email = 'Email không được để trống'; valid = false }
-    if (!form.phone) { errors.phone = 'SĐT không được để trống'; valid = false }
+    // Họ
+    if (!form.firstName) {
+      errors.firstName = 'Họ không được để trống'
+      valid = false
+    } else if (/\d/.test(form.firstName)) {
+      errors.firstName = 'Họ không được chứa số'
+      valid = false
+    }
+
+    // Tên
+    if (!form.lastName) {
+      errors.lastName = 'Tên không được để trống'
+      valid = false
+    } else if (/\d/.test(form.lastName)) {
+      errors.lastName = 'Tên không được chứa số'
+      valid = false
+    }
+
+    // Email
+    if (!form.email) {
+      errors.email = 'Email không được để trống'
+      valid = false
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(form.email)) {
+        errors.email = 'Email không hợp lệ'
+        valid = false
+      }
+    }
+
+    // SĐT
+    if (!form.phone) {
+      errors.phone = 'SĐT không được để trống'
+      valid = false
+    } else {
+      const phoneRegex = /^(0|\+84)(\d{9,10})$/
+      if (!phoneRegex.test(form.phone)) {
+        errors.phone = 'SĐT không hợp lệ'
+        valid = false
+      }
+    }
   }
 
-  if (!selectedProvince.value) { errors.province = 'Chọn tỉnh/thành phố'; valid = false }
-  if (!selectedDistrict.value) { errors.district = 'Chọn quận/huyện'; valid = false }
-  if (!selectedWard.value) { errors.ward = 'Chọn xã/phường'; valid = false }
-  if (!form.addressDetail) { errors.addressDetail = 'Nhập địa chỉ cụ thể'; valid = false }
-  if (!selectedShipping.value) { errors.shipping = 'Chọn hình thức vận chuyển'; valid = false }
-  if (!paymentMethod.value) { errors.paymentMethod = 'Chọn phương thức thanh toán'; valid = false }
+  // Address
+  if (!selectedProvince.value) {
+    errors.province = 'Chọn tỉnh/thành phố'
+    valid = false
+  }
+  if (!selectedDistrict.value) {
+    errors.district = 'Chọn quận/huyện'
+    valid = false
+  }
+  if (!selectedWard.value) {
+    errors.ward = 'Chọn xã/phường'
+    valid = false
+  }
+  if (!form.addressDetail) {
+    errors.addressDetail = 'Nhập địa chỉ cụ thể'
+    valid = false
+  }
+
+  // Shipping & Payment
+  if (!selectedShipping.value) {
+    errors.shipping = 'Chọn hình thức vận chuyển'
+    valid = false
+  }
+  if (!paymentMethod.value) {
+    errors.paymentMethod = 'Chọn phương thức thanh toán'
+    valid = false
+  }
 
   return valid
 }
+
+
 
 const totalAmount = computed(() => {
   const items = checkoutItems.value.length ? checkoutItems.value : buyNowItem ? [buyNowItem] : []
