@@ -16,12 +16,9 @@ export const useCart = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const res: any = await $fetch(
-        "https://api.mocfurni.shop/api/client/cart",
-        {
-          headers: getAuthHeader(),
-        }
-      );
+      const res: any = await $fetch("http://127.0.0.1:8000/api/client/cart", {
+        headers: getAuthHeader(),
+      });
       cart.value = res.result.data.items;
       return res.result.data;
     } catch (err: any) {
@@ -41,7 +38,7 @@ export const useCart = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      await $fetch("https://api.mocfurni.shop/api/client/cart/add", {
+      await $fetch("http://127.0.0.1:8000/api/client/cart/add", {
         method: "POST",
         query: { product_id, quantity },
         headers: getAuthHeader(),
@@ -60,7 +57,7 @@ export const useCart = () => {
   const removeItem = async (cart_id: number) => {
     if (!tokenCookie.value) return false;
     try {
-      await $fetch(`https://api.mocfurni.shop/api/client/cart/remove-item`, {
+      await $fetch(`http://127.0.0.1:8000/api/client/cart/remove-item`, {
         method: "DELETE",
         query: { cart_id },
         headers: getAuthHeader(),
@@ -78,14 +75,11 @@ export const useCart = () => {
   const updateQuantity = async (product_id: number, quantity: number) => {
     if (!tokenCookie.value) return false;
     try {
-      await $fetch(
-        `https://api.mocfurni.shop/api/client/cart/update-quantity`,
-        {
-          method: "PUT",
-          query: { product_id, quantity },
-          headers: getAuthHeader(),
-        }
-      );
+      await $fetch(`http://127.0.0.1:8000/api/client/cart/update-quantity`, {
+        method: "PUT",
+        query: { product_id, quantity },
+        headers: getAuthHeader(),
+      });
       await getCart();
       return true;
     } catch (err: any) {

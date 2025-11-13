@@ -9,10 +9,11 @@ export function useWishlist() {
     error.value = null;
 
     try {
-      const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "https://api.mocfurni.shop/api/client/wishlists",
-        { method: "GET" }
-      );
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "http://127.0.0.1:8000/api/client/wishlists",
+          { method: "GET" }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
@@ -35,13 +36,14 @@ export function useWishlist() {
   // 🟡 Thêm sản phẩm vào wishlist
   const postWishlist = async (productId: number) => {
     try {
-      const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "https://api.mocfurni.shop/api/client/wishlists",
-        {
-          method: "POST",
-          body: { product_id: productId },
-        }
-      );
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "http://127.0.0.1:8000/api/client/wishlists",
+          {
+            method: "POST",
+            body: { product_id: productId },
+          }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
@@ -54,7 +56,12 @@ export function useWishlist() {
         const newItem = response?.result?.data?.[0];
 
         // ✅ Chỉ thêm nếu chưa tồn tại
-        if (newItem && !wishlists.value.find((item) => item.product_id === newItem.product_id)) {
+        if (
+          newItem &&
+          !wishlists.value.find(
+            (item) => item.product_id === newItem.product_id
+          )
+        ) {
           wishlists.value.unshift(newItem);
         }
 
@@ -72,10 +79,11 @@ export function useWishlist() {
   // 🔴 Xóa 1 sản phẩm khỏi wishlist
   const deleteWishlist = async (productId: number) => {
     try {
-      const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        `https://api.mocfurni.shop/api/client/wishlists/${productId}`,
-        { method: "DELETE" }
-      );
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          `http://127.0.0.1:8000/api/client/wishlists/${productId}`,
+          { method: "DELETE" }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
@@ -83,7 +91,9 @@ export function useWishlist() {
         return false;
       }
 
-      wishlists.value = wishlists.value.filter((item) => item.product_id !== productId);
+      wishlists.value = wishlists.value.filter(
+        (item) => item.product_id !== productId
+      );
       return true;
     } catch (err: any) {
       console.error("Error deleting wishlist:", err);
@@ -95,13 +105,14 @@ export function useWishlist() {
   // 🔵 Xóa nhiều sản phẩm khỏi wishlist
   const deleteMultipleWishlist = async (productIds: number[]) => {
     try {
-      const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "https://api.mocfurni.shop/api/client/wishlists/remove-multiple",
-        {
-          method: "DELETE",
-          body: { product_ids: productIds },
-        }
-      );
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "http://127.0.0.1:8000/api/client/wishlists/remove-multiple",
+          {
+            method: "DELETE",
+            body: { product_ids: productIds },
+          }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
@@ -123,10 +134,11 @@ export function useWishlist() {
   // ⚫ Xóa toàn bộ wishlist
   const deleteAllWishlist = async () => {
     try {
-      const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "https://api.mocfurni.shop/api/client/wishlists",
-        { method: "DELETE" }
-      );
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "http://127.0.0.1:8000/api/client/wishlists",
+          { method: "DELETE" }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
