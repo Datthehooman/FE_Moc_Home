@@ -14,12 +14,16 @@
       <div class="relative w-full flex justify-center mb-3">
         <!-- BADGE -->
         <span
-          v-if="item.product.badge && item.product.badge.trim() !== '' && item.product.badge !== 'Giảm 50%'"
+          v-if="
+            item.product.badge &&
+            item.product.badge.trim() !== '' &&
+            item.product.badge !== 'Giảm 50%'
+          "
           class="absolute top-1 right-2 w-[80px] h-[24px] flex justify-center items-center text-[14px] font-medium text-white rounded-full z-20"
           :class="{
             'bg-[#F05454]': item.product.badge === 'Mới',
             'bg-[#00BFFF]': item.product.badge === 'Hot',
-            'bg-[#6E4E37]': !['Mới','Hot'].includes(item.product.badge)
+            'bg-[#6E4E37]': !['Mới', 'Hot'].includes(item.product.badge),
           }"
         >
           {{ item.product.badge }}
@@ -40,7 +44,8 @@
         >
           <!-- 👁️ Xem sản phẩm -->
           <UTooltip text="Xem sản phẩm">
-            <button @click="goToDetail"
+            <button
+              @click="goToDetail"
               class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
             >
               <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
@@ -71,9 +76,17 @@
         <UIcon
           v-for="n in 5"
           :key="n"
-          :name="Number(item.product.rating ?? 0) >= n ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+          :name="
+            Number(item.product.rating ?? 0) >= n
+              ? 'i-heroicons-star-solid'
+              : 'i-heroicons-star'
+          "
           class="w-4 h-4"
-          :class="Number(item.product.rating ?? 0) >= n ? 'text-yellow-400' : 'text-gray-300'"
+          :class="
+            Number(item.product.rating ?? 0) >= n
+              ? 'text-yellow-400'
+              : 'text-gray-300'
+          "
         />
       </div>
 
@@ -91,7 +104,10 @@
             @click="addToCartHandler"
             class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
           >
-            <UIcon name="i-heroicons-shopping-bag-solid" class="w-5 h-5 text-white" />
+            <UIcon
+              name="i-heroicons-shopping-bag-solid"
+              class="w-5 h-5 text-white"
+            />
           </button>
         </UTooltip>
       </div>
@@ -116,39 +132,43 @@ const { deleteWishlist } = useWishlist()
 
 const errorImage = ref(false)
 
-const resolvedThumbnail = computed(() => {
-  if (errorImage.value) return '/placeholder.png'
-  const product = props.item.product
-  if (product.thumbnail?.startsWith('http')) return product.thumbnail
-  if (product.images?.length && product.images[0].image_url)
-    return `http://127.0.0.1:8000/storage/${product.images[0].image_url}`
-  return '/placeholder.png'
-})
+  const resolvedThumbnail = computed(() => {
+    if (errorImage.value) return "/placeholder.png";
+    const product = props.item.product;
+    if (product.thumbnail?.startsWith("http")) return product.thumbnail;
+    if (product.images?.length && product.images[0].image_url)
+      return `https://api.mocfurni.shop/storage/${product.images[0].image_url}`;
+    return "/placeholder.png";
+  });
 
-const onImageError = () => { errorImage.value = true }
+  const onImageError = () => {
+    errorImage.value = true;
+  };
 
-const formatPrice = (price: number | string | undefined) => {
-  if (!price) return ''
-  const numericPrice = typeof price === 'number' ? price : parseFloat(price)
-  return numericPrice.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) + '₫'
-}
+  const formatPrice = (price: number | string | undefined) => {
+    if (!price) return "";
+    const numericPrice = typeof price === "number" ? price : parseFloat(price);
+    return (
+      numericPrice.toLocaleString("vi-VN", { minimumFractionDigits: 0 }) + "₫"
+    );
+  };
 
-const goToDetail = () => {
-  router.push(`/san-pham/${props.item.product.slug}`)
-}
+  const goToDetail = () => {
+    router.push(`/san-pham/${props.item.product.slug}`);
+  };
 
-const addToCartHandler = async () => {
-  const productId = props.item.product.product_id
-  if (!productId) return alert('❌ Sản phẩm không hợp lệ')
+  const addToCartHandler = async () => {
+    const productId = props.item.product.product_id;
+    if (!productId) return alert("❌ Sản phẩm không hợp lệ");
 
-  try {
-    const res = await addToCart(productId, 1)
-    if (res) alert('✅ Đã thêm vào giỏ hàng!')
-    else alert('❌ Thêm giỏ hàng thất bại.')
-  } catch (e: any) {
-    alert('❌ Lỗi: ' + (e?.message || 'Không rõ'))
-  }
-}
+    try {
+      const res = await addToCart(productId, 1);
+      if (res) alert("✅ Đã thêm vào giỏ hàng!");
+      else alert("❌ Thêm giỏ hàng thất bại.");
+    } catch (e: any) {
+      alert("❌ Lỗi: " + (e?.message || "Không rõ"));
+    }
+  };
 
 
 

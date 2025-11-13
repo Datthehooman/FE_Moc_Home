@@ -9,10 +9,11 @@ export function useCategories() {
 
     try {
       const { data, error: fetchError } = await useCustomFetch(
-        "http://127.0.0.1:8000/api/client/category",
+        "https://api.mocfurni.shop/api/client/category",
         {
           method: "GET",
-        });
+        }
+      );
 
       if (fetchError.value) {
         console.log("Fetch error:", fetchError.value);

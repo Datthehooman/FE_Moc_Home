@@ -40,7 +40,8 @@
         >
           <!-- 👁️ Xem sản phẩm -->
           <UTooltip text="Xem sản phẩm">
-            <button @click="$emit('view', item)"
+            <button
+              @click="$emit('view', item)"
               class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
             >
               <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
@@ -71,9 +72,15 @@
         <UIcon
           v-for="n in 5"
           :key="n"
-          :name="Number(item.rating ?? 0) >= n ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+          :name="
+            Number(item.rating ?? 0) >= n
+              ? 'i-heroicons-star-solid'
+              : 'i-heroicons-star'
+          "
           class="w-4 h-4"
-          :class="Number(item.rating ?? 0) >= n ? 'text-yellow-400' : 'text-gray-300'"
+          :class="
+            Number(item.rating ?? 0) >= n ? 'text-yellow-400' : 'text-gray-300'
+          "
         />
       </div>
 
@@ -92,14 +99,17 @@
         </div>
 
         <!-- 🛒 GIỎ HÀNG -->
-       <UTooltip text="Thêm giỏ hàng">
-  <button
-    @click="handleAddToCart"
-    class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
-  >
-    <UIcon name="i-heroicons-shopping-bag-solid" class="w-5 h-5 text-white" />
-  </button>
-</UTooltip>
+        <UTooltip text="Thêm giỏ hàng">
+          <button
+            @click="handleAddToCart"
+            class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
+          >
+            <UIcon
+              name="i-heroicons-shopping-bag-solid"
+              class="w-5 h-5 text-white"
+            />
+          </button>
+        </UTooltip>
       </div>
     </div>
   </div>
@@ -111,19 +121,19 @@ import { useRouter } from 'vue-router'
 import { useCart } from '~/composables/useCart'
 import { useWishlist } from '~/composables/useWishlist' // Đảm bảo import useWishlist
 
-interface ProductItem {
-  product_id: number
-  product_name: string
-  price: number
-  price_down?: number
-  badge?: string | null
-  rating?: number | null
-  sku?: string
-  stock_quantity?: number
-  thumbnail?: string
-  images?: { image_url: string }[]
-  slug?: string
-}
+  interface ProductItem {
+    product_id: number;
+    product_name: string;
+    price: number;
+    price_down?: number;
+    badge?: string | null;
+    rating?: number | null;
+    sku?: string;
+    stock_quantity?: number;
+    thumbnail?: string;
+    images?: { image_url: string }[];
+    slug?: string;
+  }
 
 const props = defineProps<{
   item: ProductItem
@@ -136,17 +146,20 @@ const { addToCart } = useCart()
 const { postWishlist } = useWishlist() // Sử dụng postWishlist từ composable
 const errorImage = ref(false)
 
-const resolvedThumbnail = computed(() => {
-  if (errorImage.value) return 'https://via.placeholder.com/180?text=No+Image'
-  if (props.item.thumbnail?.startsWith('http')) return props.item.thumbnail
-  if (props.item.images?.length && props.item.images[0].image_url)
-    return `http://127.0.0.1:8000/storage/${props.item.images[0].image_url}`
-  return '/placeholder.png'
-})
+  const resolvedThumbnail = computed(() => {
+    if (errorImage.value)
+      return "https://via.placeholder.com/180?text=No+Image";
+    if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
+    if (props.item.images?.length && props.item.images[0].image_url)
+      return `https://api.mocfurni.shop/storage/${props.item.images[0].image_url}`;
+    return "/placeholder.png";
+  });
 
-const onImageError = () => { errorImage.value = true }
-const formatPrice = (price: number | undefined) =>
-  price ? price.toLocaleString('vi-VN') + '₫' : ''
+  const onImageError = () => {
+    errorImage.value = true;
+  };
+  const formatPrice = (price: number | undefined) =>
+    price ? price.toLocaleString("vi-VN") + "₫" : "";
 
 let hasViewed = false
 const goToDetail = () => {
@@ -154,14 +167,14 @@ const goToDetail = () => {
   router.push(`/san-pham/${props.item.slug}`)
 }
 
-const handleAddToCart = async () => {
-  if (!props.item.product_id) {
-    alert('❌ Sản phẩm không hợp lệ')
-    return
-  }
+  const handleAddToCart = async () => {
+    if (!props.item.product_id) {
+      alert("❌ Sản phẩm không hợp lệ");
+      return;
+    }
 
-  try {
-    const result = await addToCart(props.item.product_id, 1)
+    try {
+      const result = await addToCart(props.item.product_id, 1);
 
     if (result) {
       alert('✅ Đã thêm vào giỏ hàng!')

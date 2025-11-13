@@ -8,10 +8,11 @@ export function useWishlist() {
     error.value = null;
 
     try {
-      const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "http://127.0.0.1:8000/api/client/wishlists",
-        { method: "GET" }
-      );
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "https://api.mocfurni.shop/api/client/wishlists",
+          { method: "GET" }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
@@ -39,6 +40,7 @@ export function useWishlist() {
         { method: "POST", body: { product_id: productId } }
       );
 
+      if (fetchError.value) {
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
         error.value = fetchError.value;
@@ -118,6 +120,7 @@ export function useWishlist() {
         { method: "DELETE" }
       );
 
+      if (fetchError.value) {
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
         error.value = fetchError.value;
