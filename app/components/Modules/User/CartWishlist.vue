@@ -116,19 +116,21 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from "vue";
-  import { useRouter } from "vue-router";
-  import { useWishlist } from "~/composables/useWishlist";
-  import { useCart } from "~/composables/useCart";
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useWishlist } from '~/composables/useWishlist'
+import { useCart } from '~/composables/useCart'
 
-  const props = defineProps<{ item: any; itemWidth: number }>();
-  const emit = defineEmits([]);
+const props = defineProps<{ item: any; itemWidth: number }>()
+const emit = defineEmits<{
+  'wishlist-updated': []
+}>()
 
-  const router = useRouter();
-  const { addToCart } = useCart();
-  const { deleteWishlist } = useWishlist();
+const router = useRouter()
+const { addToCart } = useCart()
+const { deleteWishlist } = useWishlist()
 
-  const errorImage = ref(false);
+const errorImage = ref(false)
 
   const resolvedThumbnail = computed(() => {
     if (errorImage.value) return "/placeholder.png";
@@ -168,9 +170,20 @@
     }
   };
 
-  const removeFromWishlist = () => {
-    if (confirm("Bạn có chắc muốn xoá sản phẩm này khỏi yêu thích?")) {
-      deleteWishlist(props.item.product.product_id);
+
+
+const removeFromWishlist = async () => {
+  if (confirm('Bạn có chắc muốn xoá sản phẩm này khỏi yêu thích?')) {
+    try {
+      await deleteWishlist(props.item.product.product_id)
+      
+      // 🎯 EMIT EVENT để parent refresh
+      emit('wishlist-updated')
+      
+      alert('✅ Đã xóa sản phẩm khỏi yêu thích!')
+    } catch (error) {
+      alert('❌ Xóa thất bại!')
     }
-  };
+  }
+}
 </script>

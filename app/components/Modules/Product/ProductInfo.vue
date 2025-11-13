@@ -102,6 +102,16 @@
           </span>
           <span class="relative z-10 group-hover:text-white text-[16px] transition-colors duration-300">Mua ngay</span>
         </button>
+        <!-- 🎯 THÊM NÚT YÊU THÍCH -->
+        <button @click="handleAddToWishlist" class="relative overflow-hidden px-5 py-3 bg-[#F7EEE9] text-[#6E4E37] rounded-lg font-medium shadow flex justify-center items-center group transition-colors duration-500 border border-[#6E4E37]">
+          <span class="absolute inset-0 flex justify-center items-center">
+            <span class="w-1 h-1 bg-[#6E4E37] rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"></span>
+          </span>
+          <span class="relative z-10 group-hover:text-white text-[16px] transition-colors duration-300 flex items-center gap-2">
+            <UIcon name="i-heroicons-heart" class="w-5 h-5" />
+            Yêu thích
+          </span>
+        </button>
 
       </div>
     </div>
@@ -128,7 +138,9 @@ const slug = route.params.slug as string
 
 // API
 const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()
+const { postWishlist } = useWishlist()
 onMounted(() => fetchProductDetail(slug))
+
 
 // UI
 const quantity = ref(1)
@@ -170,6 +182,26 @@ const handleBuyNow = () => {
     color: selectedColor.value
   })
   router.push('/checkout')
+}
+
+// 🎯 HÀM THÊM VÀO YÊU THÍCH
+const handleAddToWishlist = async () => {
+  if (!productDetail.value) {
+    alert('❌ Sản phẩm không hợp lệ')
+    return
+  }
+
+  try {
+    const success = await postWishlist(productDetail.value.product_id)
+    
+    if (success) {
+      alert('✅ Đã thêm sản phẩm vào yêu thích!')
+    } else {
+      alert('❌ Không thể thêm vào yêu thích!')
+    }
+  } catch (error: any) {
+    alert('❌ Lỗi khi thêm vào yêu thích: ' + (error?.message || 'Không rõ nguyên nhân'))
+  }
 }
 </script>
 
