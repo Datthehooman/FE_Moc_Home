@@ -10,8 +10,8 @@ export interface Wishlist {
   size: number;
   color: string;
   weight: string;
-  price: string;
-  price_down: string;
+  price: Number;
+  price_down: Number;
   rating: number;
   badge: string | null;
   quantity: number;

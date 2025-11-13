@@ -159,3 +159,4 @@ const handleAddToCart = async () => {
   }
 }
 </script>
+ 
