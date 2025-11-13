@@ -35,6 +35,7 @@ export function useCheckout() {
     const body = { ...payload, user_id };
 
     return await $fetch("http://127.0.0.1:8000/api/client/buy-now", {
+    return await $fetch("http://127.0.0.1:8000/api/client/buy-now", {
       method: "POST",
       headers: { ...getAuthHeader(), "Content-Type": "application/json" },
       body,
@@ -54,7 +55,7 @@ export function useCheckout() {
   }) => {
     try {
       return await $fetch(
-        "http://127.0.0.1:8000/api/client/buy-now/guest",
+        "https://api.mocfurni.shop/api/client/buy-now/guest",
         {
           method: "POST",
           body: payload,

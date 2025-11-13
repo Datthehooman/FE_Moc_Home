@@ -199,8 +199,9 @@ const register = async () => {
     // Trường hợp lỗi chung
     if (res.message) alert(res.message)
 
-  } catch (err) {
-    alert('Đăng ký thất bại!')
+  }catch (err: any) {
+  console.error('❌ Lỗi đăng ký:', err)
+  alert(err?.data?.message || 'Đăng ký thất bại!')
   } finally {
     loading.value = false
   }

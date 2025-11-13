@@ -222,7 +222,7 @@
   // ----- Fetch danh mục -----
   const fetchCategories = async () => {
     try {
-      const res = await fetch("https://api.mocfurni.shop/api/client/category");
+      const res = await fetch("http://127.0.0.1:8000/api/client/category");
       const json = await res.json();
       categories.value = json?.result?.data || [];
     } catch (err) {

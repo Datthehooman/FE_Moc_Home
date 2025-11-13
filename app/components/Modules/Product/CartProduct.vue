@@ -116,10 +116,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCart } from '~/composables/useCart'
-import { useWishlist } from '~/composables/useWishlist' // Đảm bảo import useWishlist
+  import { computed, ref, nextTick } from "vue";
+  import { useRouter } from "vue-router";
+  import { useCart } from "~/composables/useCart";
+  import { useWishlist } from "~/composables/useWishlist"; // Đảm bảo import useWishlist
 
   interface ProductItem {
     product_id: number;
@@ -135,23 +135,23 @@ import { useWishlist } from '~/composables/useWishlist' // Đảm bảo import u
     slug?: string;
   }
 
-const props = defineProps<{
-  item: ProductItem
-  itemWidth: number
-}>()
+  const props = defineProps<{
+    item: ProductItem;
+    itemWidth: number;
+  }>();
 
-const emit = defineEmits(['view'])
-const router = useRouter()
-const { addToCart } = useCart()
-const { postWishlist } = useWishlist() // Sử dụng postWishlist từ composable
-const errorImage = ref(false)
+  const emit = defineEmits(["view"]);
+  const router = useRouter();
+  const { addToCart } = useCart();
+  const { postWishlist } = useWishlist(); // Sử dụng postWishlist từ composable
+  const errorImage = ref(false);
 
   const resolvedThumbnail = computed(() => {
     if (errorImage.value)
       return "https://via.placeholder.com/180?text=No+Image";
     if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
     if (props.item.images?.length && props.item.images[0].image_url)
-      return `https://api.mocfurni.shop/storage/${props.item.images[0].image_url}`;
+      return `http://127.0.0.1:8000/storage/${props.item.images[0].image_url}`;
     return "/placeholder.png";
   });
 
@@ -161,11 +161,11 @@ const errorImage = ref(false)
   const formatPrice = (price: number | undefined) =>
     price ? price.toLocaleString("vi-VN") + "₫" : "";
 
-let hasViewed = false
-const goToDetail = () => {
-  if (!hasViewed) hasViewed = true
-  router.push(`/san-pham/${props.item.slug}`)
-}
+  let hasViewed = false;
+  const goToDetail = () => {
+    if (!hasViewed) hasViewed = true;
+    router.push(`/san-pham/${props.item.slug}`);
+  };
 
   const handleAddToCart = async () => {
     if (!props.item.product_id) {
@@ -176,33 +176,39 @@ const goToDetail = () => {
     try {
       const result = await addToCart(props.item.product_id, 1);
 
-    if (result) {
-      alert('✅ Đã thêm vào giỏ hàng!')
-    } else {
-      alert('❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.')
+      if (result) {
+        alert("✅ Đã thêm vào giỏ hàng!");
+      } else {
+        alert("❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.");
+      }
+    } catch (error: any) {
+      alert(
+        "❌ Lỗi khi thêm vào giỏ hàng: " +
+          (error?.message || "Không rõ nguyên nhân")
+      );
     }
-  } catch (error: any) {
-    alert('❌ Lỗi khi thêm vào giỏ hàng: ' + (error?.message || 'Không rõ nguyên nhân'))
-  }
-}
+  };
 
-// 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI ALERT
-const handleAddToWishlist = async () => {
-  if (!props.item.product_id) {
-    alert('❌ Sản phẩm không hợp lệ')
-    return
-  }
-
-  try {
-    const success = await postWishlist(props.item.product_id)
-    
-    if (success) {
-      alert('✅ Đã thêm sản phẩm vào yêu thích!')
-    } else {
-      alert('❌ Không thể thêm vào yêu thích!')
+  // 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI ALERT
+  const handleAddToWishlist = async () => {
+    if (!props.item.product_id) {
+      alert("❌ Sản phẩm không hợp lệ");
+      return;
     }
-  } catch (error: any) {
-    alert('❌ Lỗi khi thêm vào yêu thích: ' + (error?.message || 'Không rõ nguyên nhân'))
-  }
-}
+
+    try {
+      const success = await postWishlist(props.item.product_id);
+
+      if (success) {
+        alert("✅ Đã thêm sản phẩm vào yêu thích!");
+      } else {
+        alert("❌ Không thể thêm vào yêu thích!");
+      }
+    } catch (error: any) {
+      alert(
+        "❌ Lỗi khi thêm vào yêu thích: " +
+          (error?.message || "Không rõ nguyên nhân")
+      );
+    }
+  };
 </script>

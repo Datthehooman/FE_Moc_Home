@@ -8,13 +8,10 @@ export const useAuth = () => {
 
   const login = async (data: { email: string; password_hash: string }) => {
     try {
-      const response = await $fetch(
-        "http://127.0.0.1:8000/api/client/login",
-        {
-          method: "POST",
-          body: data,
-        }
-      );
+      const response = await $fetch("http://127.0.0.1:8000/api/client/login", {
+        method: "POST",
+        body: data,
+      });
 
       if (response.success && response.data?.access_token) {
         tokenCookie.value = response.data.access_token; // lưu vào cookie

@@ -9,10 +9,11 @@ export function useWishlist() {
     error.value = null;
 
     try {
-      const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "http://127.0.0.1:8000/api/client/wishlists",
-        { method: "GET" }
-      );
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "http://127.0.0.1:8000/api/client/wishlists",
+          { method: "GET" }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
@@ -36,7 +37,7 @@ export function useWishlist() {
   const postWishlist = async (productId: number) => {
     try {
       const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "http://127.0.0.1:8000/api/client/wishlists",
+        "https://api.mocfurni.shop/api/client/wishlists",
         {
           method: "POST",
           body: { product_id: productId },
@@ -54,7 +55,12 @@ export function useWishlist() {
         const newItem = response?.result?.data?.[0];
 
         // ✅ Chỉ thêm nếu chưa tồn tại
-        if (newItem && !wishlists.value.find((item) => item.product_id === newItem.product_id)) {
+        if (
+          newItem &&
+          !wishlists.value.find(
+            (item) => item.product_id === newItem.product_id
+          )
+        ) {
           wishlists.value.unshift(newItem);
         }
 
@@ -73,7 +79,7 @@ export function useWishlist() {
   const deleteWishlist = async (productId: number) => {
     try {
       const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        `http://127.0.0.1:8000/api/client/wishlists/${productId}`,
+        `https://api.mocfurni.shop/api/client/wishlists/${productId}`,
         { method: "DELETE" }
       );
 
@@ -83,7 +89,9 @@ export function useWishlist() {
         return false;
       }
 
-      wishlists.value = wishlists.value.filter((item) => item.product_id !== productId);
+      wishlists.value = wishlists.value.filter(
+        (item) => item.product_id !== productId
+      );
       return true;
     } catch (err: any) {
       console.error("Error deleting wishlist:", err);
@@ -96,7 +104,7 @@ export function useWishlist() {
   const deleteMultipleWishlist = async (productIds: number[]) => {
     try {
       const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "http://127.0.0.1:8000/api/client/wishlists/remove-multiple",
+        "https://api.mocfurni.shop/api/client/wishlists/remove-multiple",
         {
           method: "DELETE",
           body: { product_ids: productIds },
@@ -124,7 +132,7 @@ export function useWishlist() {
   const deleteAllWishlist = async () => {
     try {
       const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "http://127.0.0.1:8000/api/client/wishlists",
+        "https://api.mocfurni.shop/api/client/wishlists",
         { method: "DELETE" }
       );
 
