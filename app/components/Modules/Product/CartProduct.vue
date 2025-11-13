@@ -48,14 +48,14 @@
           </UTooltip>
 
           <!-- ❤️ Yêu thích -->
-<UTooltip text="Thêm yêu thích">
-  <button
-    @click="postWishlist(item.product_id)"
-    class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
-  >
-    <UIcon name="i-heroicons-heart" class="w-5 h-5 text-white" />
-  </button>
-</UTooltip>
+          <UTooltip text="Thêm yêu thích">
+            <button
+              @click="handleAddToWishlist"
+              class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
+            >
+              <UIcon name="i-heroicons-heart" class="w-5 h-5 text-white" />
+            </button>
+          </UTooltip>
         </div>
       </div>
 
@@ -109,7 +109,7 @@
 import { computed, ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCart } from '~/composables/useCart'
-
+import { useWishlist } from '~/composables/useWishlist' // Đảm bảo import useWishlist
 
 interface ProductItem {
   product_id: number
@@ -133,7 +133,7 @@ const props = defineProps<{
 const emit = defineEmits(['view'])
 const router = useRouter()
 const { addToCart } = useCart()
-const { postWishlist } = useWishlist()
+const { postWishlist } = useWishlist() // Sử dụng postWishlist từ composable
 const errorImage = ref(false)
 
 const resolvedThumbnail = computed(() => {
@@ -154,7 +154,6 @@ const goToDetail = () => {
   router.push(`/san-pham/${props.item.slug}`)
 }
 
-
 const handleAddToCart = async () => {
   if (!props.item.product_id) {
     alert('❌ Sản phẩm không hợp lệ')
@@ -174,4 +173,23 @@ const handleAddToCart = async () => {
   }
 }
 
+// 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI ALERT
+const handleAddToWishlist = async () => {
+  if (!props.item.product_id) {
+    alert('❌ Sản phẩm không hợp lệ')
+    return
+  }
+
+  try {
+    const success = await postWishlist(props.item.product_id)
+    
+    if (success) {
+      alert('✅ Đã thêm sản phẩm vào yêu thích!')
+    } else {
+      alert('❌ Không thể thêm vào yêu thích!')
+    }
+  } catch (error: any) {
+    alert('❌ Lỗi khi thêm vào yêu thích: ' + (error?.message || 'Không rõ nguyên nhân'))
+  }
+}
 </script>

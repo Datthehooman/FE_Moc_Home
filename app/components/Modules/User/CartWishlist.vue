@@ -106,7 +106,9 @@ import { useWishlist } from '~/composables/useWishlist'
 import { useCart } from '~/composables/useCart'
 
 const props = defineProps<{ item: any; itemWidth: number }>()
-const emit = defineEmits([])
+const emit = defineEmits<{
+  'wishlist-updated': []
+}>()
 
 const router = useRouter()
 const { addToCart } = useCart()
@@ -148,9 +150,20 @@ const addToCartHandler = async () => {
   }
 }
 
-const removeFromWishlist = () => {
+
+
+const removeFromWishlist = async () => {
   if (confirm('Bạn có chắc muốn xoá sản phẩm này khỏi yêu thích?')) {
-    deleteWishlist(props.item.product.product_id)
+    try {
+      await deleteWishlist(props.item.product.product_id)
+      
+      // 🎯 EMIT EVENT để parent refresh
+      emit('wishlist-updated')
+      
+      alert('✅ Đã xóa sản phẩm khỏi yêu thích!')
+    } catch (error) {
+      alert('❌ Xóa thất bại!')
+    }
   }
 }
 </script>

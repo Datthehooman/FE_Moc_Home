@@ -42,7 +42,7 @@
       >
         <div
           class="bg-primary size-10 flex justify-center items-center rounded-full cursor-pointer translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
-          @click="postWishlist(id)"
+          @click="handleAddToWishlist(id)"
         >
           <UIcon class="size-[19px] text-white" name="i-heroicons-heart" />
         </div>
@@ -137,6 +137,16 @@
     badgeColor?: string;
     id: number;
   }>();
-  const {postWishlist , deleteWishlist } = useWishlist();
+
+  const { postWishlist } = useWishlist();
+  // Thêm hàm xử lý với alert
+  const handleAddToWishlist = async (productId: number) => {
+    try {
+      await postWishlist(productId);
+      alert('✅ Đã thêm sản phẩm vào yêu thích!');
+    } catch (error) {
+      alert('❌ Không thể thêm vào yêu thích!');
+    }
+  };
 
 </script>
