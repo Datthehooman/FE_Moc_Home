@@ -17,14 +17,15 @@
       >
         {{ title || "Phòng ngủ" }}
       </p>
-      <p class="text-sm text-dimmed">{{ quantity || 30 }} sản phẩm</p>
+      <p class="text-sm text-dimmed">{{ roomCount || 0 }} sản phẩm</p>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-  defineProps<{
+  const props = defineProps<{
+    id: number;
     image?: string;
     title?: string;
-    quantity?: number;
   }>();
+  const { roomCount } = useRoomCount(props.id);
 </script>

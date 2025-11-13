@@ -94,7 +94,8 @@
             <UButton
               size="xl"
               variant="solid"
-              class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit"
+              class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
+              @click="handleBuyNow(items[0])"
             >
               <span
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
@@ -109,7 +110,7 @@
             <UButton
               size="xl"
               variant="solid"
-              class="relative bg-white/20 text-white rounded-md overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit"
+              class="relative bg-white/20 text-white rounded-md overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
             >
               <span
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
@@ -117,7 +118,7 @@
               <span
                 class="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500"
               >
-                <span>Mua ngay</span>
+                <span>Tìm hiểu thêm</span>
                 <UIcon name="i-lucide-arrow-right"></UIcon>
               </span>
             </UButton>
@@ -133,8 +134,43 @@
 
 <script setup lang="ts">
   const items = [
-    { title: "Slide 1", description: "First slide content" },
-    { title: "Slide 2", description: "Second slide content" },
-    { title: "Slide 3", description: "Third slide content" },
+    {
+      product_id: 22,
+      product_name: "Ghế Bành Vải Xanh",
+      price: 2500000,
+      product_price: 2500000,
+      product_sale: 1900000,
+      quantity: 1,
+      thumbnail:
+        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+    },
+    {
+      product_id: 22,
+      product_name: "Ghế Bành Vải Xanh",
+      price: 2500000,
+      product_price: 2500000,
+      product_sale: 1900000,
+      quantity: 1,
+      thumbnail:
+        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+    },
+    {
+      product_id: 22,
+      product_name: "Ghế Bành Vải Xanh",
+      price: 2500000,
+      product_price: 2500000,
+      product_sale: 1900000,
+      quantity: 1,
+      thumbnail:
+        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+    },
   ];
+
+  const router = useRouter();
+  const { setBuyNowItem } = useCheckout();
+
+  function handleBuyNow(item: Product) {
+    setBuyNowItem({ ...item, quantity: 1 });
+    router.push("/checkout");
+  }
 </script>

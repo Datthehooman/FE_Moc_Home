@@ -7,12 +7,12 @@ export function useWishlist() {
     isLoading.value = true;
     error.value = null;
 
-
     try {
-      const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "http://127.0.0.1:8000/api/client/wishlists",
-        { method: "GET" }
-      );
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "https://api.mocfurni.shop/api/client/wishlists",
+          { method: "GET" }
+        );
 
       if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
@@ -43,16 +43,17 @@ export function useWishlist() {
     }
   };
 
-
-const   postWishlist = async (productId:number) => {
+  const postWishlist = async (productId: number) => {
     isLoading.value = true;
     error.value = null;
     try {
-        const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "http://127.0.0.1:8000/api/client/wishlists",
-        { method: "POST", body: { product_id: productId } });
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "https://api.mocfurni.shop/api/client/wishlists",
+          { method: "POST", body: { product_id: productId } }
+        );
 
-        if (fetchError.value) {
+      if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
         if (fetchError.value.statusCode === 404) {
           wishlists.value = [];
@@ -67,30 +68,31 @@ const   postWishlist = async (productId:number) => {
         wishlists.value = response?.result.data || [];
         error.value = null;
       }
-
     } catch (err: any) {
-        console.error("Error fetching wishlists:", err);
+      console.error("Error fetching wishlists:", err);
       if (err?.statusCode === 404) {
         wishlists.value = [];
         error.value = null;
       } else {
         error.value = err;
       }
-    }   finally {
-        isLoading.value = false;
+    } finally {
+      isLoading.value = false;
     }
-};
+  };
 
-const deleteWishlist = async (productId:number) => {
+  const deleteWishlist = async (productId: number) => {
     isLoading.value = true;
     error.value = null;
 
     try {
-        const { data, error: fetchError } = await useCustomFetch<WishlistApiResponse>(
-        "http://127.0.0.1:8000/api/client/wishlists",
-        { method: "DELETE", body: { product_id: productId } });
+      const { data, error: fetchError } =
+        await useCustomFetch<WishlistApiResponse>(
+          "https://api.mocfurni.shop/api/client/wishlists",
+          { method: "DELETE", body: { product_id: productId } }
+        );
 
-        if (fetchError.value) {
+      if (fetchError.value) {
         console.error("Fetch error:", fetchError.value);
         if (fetchError.value.statusCode === 404) {
           wishlists.value = [];
@@ -105,20 +107,19 @@ const deleteWishlist = async (productId:number) => {
         wishlists.value = response?.result.data || [];
         error.value = null;
       }
-
     } catch (err: any) {
-        console.error("Error fetching wishlists:", err);
+      console.error("Error fetching wishlists:", err);
       if (err?.statusCode === 404) {
         wishlists.value = [];
         error.value = null;
       } else {
         error.value = err;
       }
-    }   finally {
-        isLoading.value = false;
+    } finally {
+      isLoading.value = false;
     }
-};
-fetchWislist();
+  };
+  fetchWislist();
   return {
     wishlists,
     isLoading,

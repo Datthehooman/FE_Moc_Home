@@ -40,7 +40,8 @@
         >
           <!-- 👁️ Xem sản phẩm -->
           <UTooltip text="Xem sản phẩm">
-            <button @click="$emit('view', item)"
+            <button
+              @click="$emit('view', item)"
               class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
             >
               <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
@@ -48,14 +49,14 @@
           </UTooltip>
 
           <!-- ❤️ Yêu thích -->
-<UTooltip text="Thêm yêu thích">
-  <button
-    @click="postWishlist(item.product_id)"
-    class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
-  >
-    <UIcon name="i-heroicons-heart" class="w-5 h-5 text-white" />
-  </button>
-</UTooltip>
+          <UTooltip text="Thêm yêu thích">
+            <button
+              @click="postWishlist(item.product_id)"
+              class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
+            >
+              <UIcon name="i-heroicons-heart" class="w-5 h-5 text-white" />
+            </button>
+          </UTooltip>
         </div>
       </div>
 
@@ -71,9 +72,15 @@
         <UIcon
           v-for="n in 5"
           :key="n"
-          :name="Number(item.rating ?? 0) >= n ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+          :name="
+            Number(item.rating ?? 0) >= n
+              ? 'i-heroicons-star-solid'
+              : 'i-heroicons-star'
+          "
           class="w-4 h-4"
-          :class="Number(item.rating ?? 0) >= n ? 'text-yellow-400' : 'text-gray-300'"
+          :class="
+            Number(item.rating ?? 0) >= n ? 'text-yellow-400' : 'text-gray-300'
+          "
         />
       </div>
 
@@ -92,86 +99,92 @@
         </div>
 
         <!-- 🛒 GIỎ HÀNG -->
-       <UTooltip text="Thêm giỏ hàng">
-  <button
-    @click="handleAddToCart"
-    class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
-  >
-    <UIcon name="i-heroicons-shopping-bag-solid" class="w-5 h-5 text-white" />
-  </button>
-</UTooltip>
+        <UTooltip text="Thêm giỏ hàng">
+          <button
+            @click="handleAddToCart"
+            class="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-[#6E4E37] text-white shadow-md hover:bg-[#8b644a] transition"
+          >
+            <UIcon
+              name="i-heroicons-shopping-bag-solid"
+              class="w-5 h-5 text-white"
+            />
+          </button>
+        </UTooltip>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCart } from '~/composables/useCart'
+  import { computed, ref, nextTick } from "vue";
+  import { useRouter } from "vue-router";
+  import { useCart } from "~/composables/useCart";
 
-
-interface ProductItem {
-  product_id: number
-  product_name: string
-  price: number
-  price_down?: number
-  badge?: string | null
-  rating?: number | null
-  sku?: string
-  stock_quantity?: number
-  thumbnail?: string
-  images?: { image_url: string }[]
-  slug?: string
-}
-
-const props = defineProps<{
-  item: ProductItem
-  itemWidth: number
-}>()
-
-const emit = defineEmits(['view'])
-const router = useRouter()
-const { addToCart } = useCart()
-const { postWishlist } = useWishlist()
-const errorImage = ref(false)
-
-const resolvedThumbnail = computed(() => {
-  if (errorImage.value) return 'https://via.placeholder.com/180?text=No+Image'
-  if (props.item.thumbnail?.startsWith('http')) return props.item.thumbnail
-  if (props.item.images?.length && props.item.images[0].image_url)
-    return `http://127.0.0.1:8000/storage/${props.item.images[0].image_url}`
-  return '/placeholder.png'
-})
-
-const onImageError = () => { errorImage.value = true }
-const formatPrice = (price: number | undefined) =>
-  price ? price.toLocaleString('vi-VN') + '₫' : ''
-
-let hasViewed = false
-const goToDetail = () => {
-  if (!hasViewed) hasViewed = true
-  router.push(`/san-pham/${props.item.slug}`)
-}
-
-
-const handleAddToCart = async () => {
-  if (!props.item.product_id) {
-    alert('❌ Sản phẩm không hợp lệ')
-    return
+  interface ProductItem {
+    product_id: number;
+    product_name: string;
+    price: number;
+    price_down?: number;
+    badge?: string | null;
+    rating?: number | null;
+    sku?: string;
+    stock_quantity?: number;
+    thumbnail?: string;
+    images?: { image_url: string }[];
+    slug?: string;
   }
 
-  try {
-    const result = await addToCart(props.item.product_id, 1)
+  const props = defineProps<{
+    item: ProductItem;
+    itemWidth: number;
+  }>();
 
-    if (result) {
-      alert('✅ Đã thêm vào giỏ hàng!')
-    } else {
-      alert('❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.')
+  const emit = defineEmits(["view"]);
+  const router = useRouter();
+  const { addToCart } = useCart();
+  const { postWishlist } = useWishlist();
+  const errorImage = ref(false);
+
+  const resolvedThumbnail = computed(() => {
+    if (errorImage.value)
+      return "https://via.placeholder.com/180?text=No+Image";
+    if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
+    if (props.item.images?.length && props.item.images[0].image_url)
+      return `https://api.mocfurni.shop/storage/${props.item.images[0].image_url}`;
+    return "/placeholder.png";
+  });
+
+  const onImageError = () => {
+    errorImage.value = true;
+  };
+  const formatPrice = (price: number | undefined) =>
+    price ? price.toLocaleString("vi-VN") + "₫" : "";
+
+  let hasViewed = false;
+  const goToDetail = () => {
+    if (!hasViewed) hasViewed = true;
+    router.push(`/san-pham/${props.item.slug}`);
+  };
+
+  const handleAddToCart = async () => {
+    if (!props.item.product_id) {
+      alert("❌ Sản phẩm không hợp lệ");
+      return;
     }
-  } catch (error: any) {
-    alert('❌ Lỗi khi thêm vào giỏ hàng: ' + (error?.message || 'Không rõ nguyên nhân'))
-  }
-}
 
+    try {
+      const result = await addToCart(props.item.product_id, 1);
+
+      if (result) {
+        alert("✅ Đã thêm vào giỏ hàng!");
+      } else {
+        alert("❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.");
+      }
+    } catch (error: any) {
+      alert(
+        "❌ Lỗi khi thêm vào giỏ hàng: " +
+          (error?.message || "Không rõ nguyên nhân")
+      );
+    }
+  };
 </script>

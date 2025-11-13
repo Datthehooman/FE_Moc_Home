@@ -25,37 +25,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+  import { ref, onMounted } from "vue";
 
-const products = ref<any[]>([])
-const loading = ref(true)
-const error = ref('')
+  const products = ref<any[]>([]);
+  const loading = ref(true);
+  const error = ref("");
 
-const onImageError = (e: Event) => {
-  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/120?text=No+Image'
-}
+  const onImageError = (e: Event) => {
+    (e.target as HTMLImageElement).src =
+      "https://via.placeholder.com/120?text=No+Image";
+  };
 
-onMounted(async () => {
-  try {
-    const res = await fetch('http://127.0.0.1:8000/api/client/products')
-    if (!res.ok) throw new Error(`Lỗi khi gọi API: ${res.status}`)
-    const data = await res.json()
+  onMounted(async () => {
+    try {
+      const res = await fetch("https://api.mocfurni.shop/api/client/products");
+      if (!res.ok) throw new Error(`Lỗi khi gọi API: ${res.status}`);
+      const data = await res.json();
 
-    console.log('🔍 API response:', data)
+      console.log("🔍 API response:", data);
 
-    // ✅ Dựa theo cấu trúc thực tế của API
-    products.value = data?.result?.data || data?.data || []
-  } catch (err: any) {
-    error.value = err.message
-    console.error('❌ Lỗi:', err)
-  } finally {
-    loading.value = false
-  }
-})
+      // ✅ Dựa theo cấu trúc thực tế của API
+      products.value = data?.result?.data || data?.data || [];
+    } catch (err: any) {
+      error.value = err.message;
+      console.error("❌ Lỗi:", err);
+    } finally {
+      loading.value = false;
+    }
+  });
 </script>
 
 <style scoped>
-body {
-  font-family: sans-serif;
-}
+  body {
+    font-family: sans-serif;
+  }
 </style>
