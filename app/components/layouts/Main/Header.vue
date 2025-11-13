@@ -278,8 +278,8 @@
   const fetchCategoriesAndProducts = async () => {
     try {
       const [catRes, prodRes] = await Promise.all([
-        fetch("https://api.mocfurni.shop/api/client/category"),
-        fetch("https://api.mocfurni.shop/api/client/products"),
+        fetch("http://127.0.0.1:8000/api/client/category"),
+        fetch("http://127.0.0.1:8000/api/client/products"),
       ]);
       const catJson = await catRes.json();
       const prodJson = await prodRes.json();
