@@ -10,7 +10,7 @@ export function useRoomCount(room_id = 1) {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<RoomCountApiResponse>(
-          "https://api.mocfurni.shop/api/client/products/room/count",
+          "http://127.0.0.1:8000/api/client/products/room/count",
           { method: "GET", params: { room_id } }
         );
 
