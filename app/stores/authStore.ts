@@ -1,97 +1,167 @@
 export const useAuthStore = defineStore("auth-store", {
-  state: () => ({
-    authUser: {} as AuthUser,
-    isLogged: false,
-    isSubmitting: false,
-  }),
+  state: () => {
+    return {
+      authUser: {} as AuthUser,
+      isLogged: false,
+      isSubmitting: false,
+    };
+  },
 
   persist: true,
-
   actions: {
-    async register(body: any) {
-      this.isSubmitting = true;
-      const { data, error, execute } = useCustomFetch<ApiAuthResponse>(
-        "/api/client/register",
-        { method: "POST", body }
-      );
-      await execute();
-      this.isSubmitting = false;
-
-      if (error.value) return { error: error.value, data: null };
-
-      this.authUser = data.value!.data;
-      this.isLogged = true;
-      return { error: null, data: data.value };
-    },
-
     async login(body: any) {
       this.isSubmitting = true;
-      const { data, error, execute } = useCustomFetch<ApiAuthResponse>(
-        "/api/client/login",
-        { method: "POST", body }
-      );
+      const { data, error, execute } = useCustomFetch("/v1/auth/login", {
+        method: "POST",
+        body: body,
+      });
       await execute();
       this.isSubmitting = false;
 
-      if (error.value) return { error: error.value, data: null };
+      if (error.value) {
+        return { error: error.value, data: null };
+      }
 
-      this.authUser = data.value!.data;
+      const payload = data.value as Data;
+      this.authUser = payload.data;
       this.isLogged = true;
-      return { error: null, data: data.value };
+      return { error: null, data: payload };
+    },
+
+    async register(body: any) {
+      this.isSubmitting = true;
+      const { data, error, execute } = useCustomFetch("/v1/auth/register", {
+        method: "POST",
+        body: body,
+      });
+      await execute();
+      this.isSubmitting = false;
+      return { error: error.value || null, data: data.value || null };
+    },
+
+    async loginWithGoogle(token: string) {
+      this.isSubmitting = true;
+      const { data, error, execute } = useCustomFetch("/v1/auth/login/google", {
+        method: "POST",
+        body: { accessToken: token },
+      });
+      await execute();
+      this.isSubmitting = false;
+
+      if (error.value) {
+        return { error: error.value, data: null };
+      }
+
+      const payload = data.value as Data;
+      this.authUser = payload.data;
+      this.isLogged = true;
+      return { error: null, data: payload };
+    },
+
+    async refreshToken() {
+      const { data, error, execute } = useCustomFetch("/v1/auth/refresh", {
+        method: "POST",
+        body: { refreshToken: this.authUser.token?.refreshToken?.token },
+      });
+      await execute();
+
+      const payload = data.value as Data;
+
+      if (this.authUser.token) {
+        this.authUser.token.accessToken = payload.data.accessToken;
+      }
+
+      return { error: error.value || null, data: data.value || null };
     },
 
     async logout() {
-      try {
-        if (this.isLogged && this.authUser.access_token) {
-          await useCustomFetch("/api/client/logout", { method: "POST" });
-        }
-      } catch (error) {
-        console.error("Logout error:", error);
-      }
-
       this.authUser = {};
       this.isLogged = false;
       navigateTo("/");
     },
 
+    async getProfile() {
+      const { data, error, execute } = useCustomFetch(
+        "/v1/account/get-profile"
+      );
+      await execute();
+
+      const payload = data.value as Data;
+
+      this.authUser.user = payload.data.user;
+
+      return { error: error.value || null, data: data.value || null };
+    },
+
+    async updateProfile(body: any) {
+      this.isSubmitting = true;
+      const { data, error, execute } = useCustomFetch(
+        "/v1/account/update-profile",
+        {
+          method: "PUT",
+          body,
+        }
+      );
+      await execute();
+      this.isSubmitting = false;
+
+      const payload = data.value as Data;
+
+      this.authUser.user = payload.data.user;
+
+      return { error: error.value || null, data: data.value || null };
+    },
+
+    async resendOtp(body: any) {
+      this.isSubmitting = true;
+      const { data, error, execute } = useCustomFetch("/v1/email/resend", {
+        method: "POST",
+        body,
+      });
+      await execute();
+      this.isSubmitting = false;
+
+      return { error: error.value || null, data: data.value || null };
+    },
+
+    async verifyOTP(body: any) {
+      this.isSubmitting = true;
+      const { data, error, execute } = useCustomFetch("/v1/email/verify", {
+        method: "POST",
+        body,
+      });
+      await execute();
+      this.isSubmitting = false;
+
+      return { error: error.value || null, data: data.value || null };
+    },
+
     async forgotPassword(body: any) {
       this.isSubmitting = true;
-      const { data, error, execute } = useCustomFetch(
-        "/api/client/forgot-password",
-        { method: "POST", body }
-      );
+      const { data, error, execute } = useCustomFetch("/v1/auth/forgot", {
+        method: "POST",
+        body,
+      });
       await execute();
       this.isSubmitting = false;
+
       return { error: error.value || null, data: data.value || null };
     },
 
-    async resetPassword(params: any) {
+    async resetPassword(body: any, token: string) {
       this.isSubmitting = true;
       const { data, error, execute } = useCustomFetch(
-        `/api/client/reset-password?${new URLSearchParams(params)}`,
-        { method: "POST" }
+        `/v1/user/resetPassword/${token}`,
+        {
+          method: "PATCH",
+          body,
+        }
       );
       await execute();
+      this.authUser = {};
+      this.isLogged = false;
       this.isSubmitting = false;
-      return { error: error.value || null, data: data.value || null };
-    },
 
-    async sendOtp(email: string) {
-      const { data, error, execute } = useCustomFetch(
-        `/api/client/sendOtp-password-v1?email=${email}`,
-        { method: "POST" }
-      );
-      await execute();
-      return { error: error.value || null, data: data.value || null };
-    },
-
-    async resetPasswordWithOtp(params: any) {
-      const query = new URLSearchParams(params).toString();
-      const { data, error, execute } = useCustomFetch(
-        `/api/client/reset-password-v1?${query}`,
-        { method: "POST" }
-      );
-      await execute();
       return { error: error.value || null, data: data.value || null };
     },
   },
