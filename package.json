@@ -16,6 +16,7 @@
     "@nuxt/image": "^1.11.0",
     "@nuxt/ui": "^4.0.1",
     "@pinia/nuxt": "^0.11.2",
+    "md-editor-v3": "^6.1.1",
     "nuxt": "latest",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.5.0",
@@ -25,6 +26,8 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@iconify-json/tabler": "^1.2.23",
+    "@iconify-json/uil": "^1.2.3",
     "@types/node": "^24.5.2"
   }
 }

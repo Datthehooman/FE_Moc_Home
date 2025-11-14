@@ -1,5 +1,5 @@
 # Nuxt dev/build outputs
-.output
+# .output
 .data
 .nuxt
 .nitro
@@ -16,9 +16,10 @@ logs
 # Misc
 .DS_Store
 
-# Local env files
-.env
-.env.*
-!.env.example
+# # Local env files
+# .env
+# .env.*
+# !.env.example
 
 .vercel
+

@@ -9,13 +9,13 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
-  --breakpoint-2xl: 1536px;
+  --breakpoint-2xl: 1440px;
 
   --container-sm: 640px;
   --container-md: 768px;
   --container-lg: 1024px;
   --container-xl: 1280px;
-  --container-2xl: 1536px;
+  --container-2xl: 1440px;
 
   --animate-infinite-scroll: infinite-scroll 40s linear infinite;
 
@@ -32,8 +32,16 @@
 :root {
   --ui-primary: #6e4e37;
   --ui-secondary: #a77a5d;
-  --ui-accent: #edb173;
+  --ui-info: #edb173;
   --ui-neutral: #ffd8ad;
+  --ui-bg-base: #fffbf8;
+  --ui-text: #000;
+  --ui-success: #fed8b3;
+  --ui-text-dimmed: #6e6e6e;
+  --ui-text-muted: #757f95;
+  --ui-text-toned: #f05454;
+  --ui-bg-toned: #f05454;
+  --ui-bg-accented: #fff4e8;
 }
 
 .dark {
