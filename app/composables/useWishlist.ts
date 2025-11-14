@@ -11,7 +11,7 @@ export function useWishlist() {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<WishlistApiResponse>(
-          "http://127.0.0.1:8000/api/client/wishlists",
+          "https://api.mocfurni.shop/api/client/wishlists",
           { method: "GET" }
         );
 
@@ -38,7 +38,7 @@ export function useWishlist() {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<WishlistApiResponse>(
-          "http://127.0.0.1:8000/api/client/wishlists",
+          "https://api.mocfurni.shop/api/client/wishlists",
           {
             method: "POST",
             body: { product_id: productId },
@@ -81,7 +81,7 @@ export function useWishlist() {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<WishlistApiResponse>(
-          `http://127.0.0.1:8000/api/client/wishlists/${productId}`,
+          `https://api.mocfurni.shop/api/client/wishlists/${productId}`,
           { method: "DELETE" }
         );
 
@@ -107,7 +107,7 @@ export function useWishlist() {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<WishlistApiResponse>(
-          "http://127.0.0.1:8000/api/client/wishlists/remove-multiple",
+          "https://api.mocfurni.shop/api/client/wishlists/remove-multiple",
           {
             method: "DELETE",
             body: { product_ids: productIds },
@@ -136,7 +136,7 @@ export function useWishlist() {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<WishlistApiResponse>(
-          "http://127.0.0.1:8000/api/client/wishlists",
+          "https://api.mocfurni.shop/api/client/wishlists",
           { method: "DELETE" }
         );
 

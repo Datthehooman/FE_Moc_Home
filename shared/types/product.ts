@@ -33,7 +33,7 @@ export interface Product {
   thumbnail: string;
   discount_percentage: number;
   images: ProductImage[];
-  rating: number;
+  rating: string;
   badge: string;
 }
 

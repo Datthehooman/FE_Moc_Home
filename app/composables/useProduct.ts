@@ -43,7 +43,7 @@ export const useProduct = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/client/category");
+      const res = await fetch("https://api.mocfurni.shop/api/client/category");
       const json = await res.json();
       categories.value = json?.result?.data || [];
     } catch (err) {
@@ -57,7 +57,7 @@ export const useProduct = () => {
     try {
       await fetchCategories();
 
-      const res = await fetch("http://127.0.0.1:8000/api/client/products");
+      const res = await fetch("https://api.mocfurni.shop/api/client/products");
       if (!res.ok) throw new Error("Lỗi khi load sản phẩm");
       const json = await res.json();
       const apiProducts = json?.result?.data || [];
@@ -106,7 +106,7 @@ export const useProduct = () => {
       if (!categories.value.length) await fetchCategories();
 
       const res = await fetch(
-        `http://127.0.0.1:8000/api/client/product/${slug}`
+        `https://api.mocfurni.shop/api/client/product/${slug}`
       );
       if (!res.ok) throw new Error("Lỗi khi load chi tiết sản phẩm");
       const json = await res.json();

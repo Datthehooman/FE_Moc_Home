@@ -137,7 +137,7 @@
     const product = props.item.product;
     if (product.thumbnail?.startsWith("http")) return product.thumbnail;
     if (product.images?.length && product.images[0].image_url)
-      return `http://127.0.0.1:8000/storage/${product.images[0].image_url}`;
+      return `https://api.mocfurni.shop/storage/${product.images[0].image_url}`;
     return "/placeholder.png";
   });
 

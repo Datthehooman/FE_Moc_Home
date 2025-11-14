@@ -217,10 +217,6 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watchEffect, onMounted, onUnmounted } from "vue";
-  import { useRouter } from "vue-router";
-  import { useAuth } from "~/composables/useAuth";
-
   const auth = useAuth();
   const router = useRouter();
 
@@ -278,30 +274,38 @@
   const fetchCategoriesAndProducts = async () => {
     try {
       const [catRes, prodRes] = await Promise.all([
-        fetch("http://127.0.0.1:8000/api/client/category"),
-        fetch("http://127.0.0.1:8000/api/client/products"),
+        fetch("https://api.mocfurni.shop/api/client/category"),
+        fetch("https://api.mocfurni.shop/api/client/products"),
       ]);
+
       const catJson = await catRes.json();
       const prodJson = await prodRes.json();
 
-      const cats = catJson?.result?.data || [];
-      const prods = prodJson?.result?.data || [];
+      const categoriesData = catJson?.result?.data || [];
+      const productsData = prodJson?.result?.data || [];
 
-      categories.value = cats
+      categories.value = categoriesData
         .map((cat) => {
-          const items = prods
-            .filter((p) => p.category_id === cat.id)
+          const items = productsData
+            .filter((p) => Number(p.category_id) === cat.id)
             .slice(0, 4)
-            .map((p) => ({ id: p.id, name: p.product_name, slug: p.slug }));
-          return { title: cat.category_name, items };
+            .map((p) => ({
+              id: p.product_id,
+              name: p.product_name,
+              slug: p.slug,
+            }));
+
+          return {
+            title: cat.category_name,
+            items,
+          };
         })
-        .filter((cat) => cat.items.length > 0)
-        .slice(0, 3);
-    } catch (err) {
-      console.error("❌ Lỗi fetch categories/products:", err);
+        .filter((c) => c.items.length > 0) // remove empty categories
+        .slice(0, 3); // limit to 3 categories
+    } catch (error) {
+      console.error("❌ Error fetching categories/products:", error);
     }
   };
-
   // Search
   const searchQuery = ref("");
   const goSearch = () => {

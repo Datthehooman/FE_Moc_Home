@@ -16,14 +16,19 @@
           class="flex items-center gap-2"
         >
           <input
+            :id="'cat-' + cat.id"
             type="checkbox"
             :value="cat.id"
             :checked="selectedCategories.includes(String(cat.id))"
             @change="toggleCategory(String(cat.id))"
           />
-          <span class="flex-1 cursor-pointer hover:text-primary">
+
+          <label
+            :for="'cat-' + cat.id"
+            class="flex-1 cursor-pointer hover:text-primary"
+          >
             {{ cat.category_name }}
-          </span>
+          </label>
         </li>
         <li
           class="mt-2 cursor-pointer text-sm text-gray-500 hover:text-primary"
@@ -44,14 +49,20 @@
           class="flex items-center gap-2"
         >
           <input
+            :id="'brand-' + brand.name"
             type="checkbox"
             :value="brand.name"
             :checked="selectedBrands.includes(brand.name)"
             @change="toggleBrand(brand.name)"
           />
-          <span class="flex-1 cursor-pointer hover:text-primary">
+
+          <label
+            :for="'brand-' + brand.name"
+            class="flex-1 cursor-pointer hover:text-primary"
+          >
             {{ brand.name }}
-          </span>
+          </label>
+
           <span class="text-gray-400">({{ brand.count }})</span>
         </li>
         <li
@@ -222,7 +233,7 @@
   // ----- Fetch danh mục -----
   const fetchCategories = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/client/category");
+      const res = await fetch("https://api.mocfurni.shop/api/client/category");
       const json = await res.json();
       categories.value = json?.result?.data || [];
     } catch (err) {

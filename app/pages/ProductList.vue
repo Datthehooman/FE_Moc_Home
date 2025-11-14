@@ -169,7 +169,7 @@
         currentPage.value = 1;
         loading.value = true;
         try {
-          let url = "http://127.0.0.1:8000/api/client/products";
+          let url = "https://api.mocfurni.shop/api/client/products";
           if (keyword) {
             url = `http://api.mocfurni.shop/api/client/product-search?keyword=${encodeURIComponent(
               keyword
@@ -186,7 +186,7 @@
             thumbnail:
               p.thumbnail ??
               (p.images?.[0]?.image_url
-                ? `http://127.0.0.1:8000/storage/${p.images[0].image_url}`
+                ? `https://api.mocfurni.shop/storage/${p.images[0].image_url}`
                 : "/placeholder.png"),
           }));
         } catch (err) {
