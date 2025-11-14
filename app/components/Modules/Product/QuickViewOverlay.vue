@@ -159,7 +159,7 @@
     if (!url) return "/placeholder.png";
     return url.startsWith("http")
       ? url
-      : `http://127.0.0.1:8000/storage/${url}`;
+      : `https://api.mocfurni.shop/storage/${url}`;
   };
 
   const handleAddToCart = async () => {

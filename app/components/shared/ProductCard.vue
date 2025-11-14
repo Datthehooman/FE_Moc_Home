@@ -90,11 +90,14 @@
       <div class="flex items-center gap-1 my-[9px]">
         <template v-for="star in 5" :key="star">
           <UIcon
-            v-if="star <= Math.floor(stars || 0)"
+            v-if="star <= Math.floor(Number(stars) || 0)"
             name="i-heroicons-star-solid"
             class="size-4 text-yellow-400"
           />
-          <div v-else-if="star - 0.5 <= (stars || 0)" class="relative size-4">
+          <div
+            v-else-if="star - 0.5 <= (Number(stars) || 0)"
+            class="relative size-4"
+          >
             <UIcon
               name="i-heroicons-star"
               class="size-4 text-yellow-400 absolute"
@@ -163,12 +166,12 @@
             <div class="flex items-center gap-1">
               <template v-for="star in 5" :key="star">
                 <UIcon
-                  v-if="star <= Math.floor(stars || 0)"
+                  v-if="star <= Math.floor(Number(stars) || 0)"
                   name="i-heroicons-star-solid"
                   class="size-5 text-yellow-400"
                 />
                 <div
-                  v-else-if="star - 0.5 <= (stars || 0)"
+                  v-else-if="star - 0.5 <= (Number(stars) || 0)"
                   class="relative size-5"
                 >
                   <UIcon
@@ -247,7 +250,7 @@
     title?: string;
     image?: string;
     badge?: string;
-    stars?: number;
+    stars?: string;
     price?: string;
     salePrice?: string;
     badgeColor?: string;
@@ -260,15 +263,47 @@
     slug: string;
   }>();
 
-  const { postWishlist } = useWishlist();
-  // Thêm hàm xử lý với alert
-  const handleAddToWishlist = async (productId: number) => {
+  const { postWishlist, deleteWishlist } = useWishlist();
+  const { addToCart } = useCart();
+  const toast = useToast();
+  const router = useRouter();
+
+  const goToDetail = (slug: string) => {
+    router.push(`/san-pham/${slug}`);
+  };
+
+  // Modal state
+  const isModalOpen = ref(false);
+
+  const handleAddToCart = async () => {
+    if (!props.id) {
+      toast.add({ title: "Sản phẩm không hợp lệ", color: "error" });
+      return;
+    }
+
     try {
-      await postWishlist(productId);
-      alert('✅ Đã thêm sản phẩm vào yêu thích!');
-    } catch (error) {
-      alert('❌ Không thể thêm vào yêu thích!');
+      const result = await addToCart(props.id, 1);
+      if (result) {
+        toast.add({ title: "Đã thêm vào giỏ hàng!", color: "success" });
+      } else {
+        toast.add({ title: "Thêm giỏ hàng thất bại!", color: "error" });
+      }
+    } catch (error: any) {
+      toast.add({
+        title:
+          "Lỗi khi thêm vào giỏ hàng: " +
+          (error?.message || "Không rõ nguyên nhân"),
+        color: "error",
+      });
     }
   };
 
+  const handleAddToWishlist = async (productId: number) => {
+    try {
+      await postWishlist(productId);
+      alert("✅ Đã thêm sản phẩm vào yêu thích!");
+    } catch (error) {
+      alert("❌ Không thể thêm vào yêu thích!");
+    }
+  };
 </script>

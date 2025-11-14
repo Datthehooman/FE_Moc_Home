@@ -11,7 +11,7 @@ export function useProducts() {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<ProductApiResponse>(
-          `http://127.0.0.1:8000/api/client/products`,
+          `https://api.mocfurni.shop/api/client/products`,
           {
             method: "GET",
           }
