@@ -7,7 +7,6 @@
       <!-- Main Content -->
       <main class="flex-1 p-6">
         <section class="bg-white rounded-xl p-5 shadow mb-6">
-
           <div class="flex justify-between items-center mb-2">
             <h3 class="font-semibold text-gray-700 text-[20px]">
               Danh sách sản phẩm yêu thích
@@ -16,27 +15,37 @@
             <div class="flex items-center gap-3">
               <!-- XÓA TẤT CẢ -->
               <button
-                v-if="wishlists.length > 0"
+                v-if="wishlists.length > 0 && !isSelecting"
                 @click="removeAllWishlist"
                 class="px-4 py-2 bg-orange-500 text-white rounded-lg shadow hover:bg-orange-600 transition"
               >
                 Xóa tất cả
               </button>
-              <!-- XÓA -->
+              
+              <!-- XÓA NHIỀU -->
               <button
-                v-if="isSelecting && selectedList.length"
+                v-if="isSelecting && selectedProductIds.length"
                 @click="removeSelected"
                 class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
               >
-                Xóa khỏi yêu thích
+                Xóa đã chọn ({{ selectedProductIds.length }})
               </button>
 
-              <!-- CHỌN -->
+              <!-- CHỌN / HỦY CHỌN -->
               <button
                 class="px-5 py-2 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow transition"
                 @click="toggleSelectMode"
               >
                 {{ isSelecting ? 'Hủy chọn' : 'Chọn sản phẩm' }}
+              </button>
+
+              <!-- CHỌN TẤT CẢ TRANG NÀY -->
+              <button
+                v-if="isSelecting"
+                @click="toggleSelectAllPage"
+                class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
+              >
+                {{ isAllPageSelected ? 'Bỏ chọn trang' : 'Chọn trang này' }}
               </button>
             </div>
           </div>
@@ -62,11 +71,10 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 justify-center">
             <ModulesUserCartWishlist
               v-for="item in paginatedWishlists"
-              :key="item.product_id"
+              :key="item.product.product_id"
               :item="item"
               :itemWidth="250"
-              @wishlist-updated="handleWishlistUpdated"
-              @view="handleViewProduct"
+              @removed="handleItemRemoved"
             />
           </div>
 
@@ -90,14 +98,20 @@
 definePageMeta({ middleware: 'auth' })
 
 import { ref, computed, onMounted, watch } from 'vue'
-import type { Wishlist } from '~/types/wishlist'
 
 // Composables
-const { wishlists, isLoading, error, fetchWishlist, deleteMultipleWishlist, deleteAllWishlist } = useWishlist()
+const { 
+  wishlists, 
+  isLoading, 
+  error, 
+  fetchWishlist, 
+  deleteMultipleWishlist, 
+  deleteAllWishlist 
+} = useWishlist()
 
-// Lấy danh sách từ API - CHỈ GỌI 1 LẦN
-onMounted(() => {
-  fetchWishlist()
+// Lấy danh sách từ API
+onMounted(async () => {
+  await fetchWishlist()
 })
 
 // PAGINATION
@@ -107,11 +121,6 @@ const totalPages = computed(() => Math.ceil(wishlists.value.length / perPage))
 const paginatedWishlists = computed(() =>
   wishlists.value.slice((currentPage.value - 1) * perPage, currentPage.value * perPage)
 )
-const pagesAround = computed(() => {
-  const p = currentPage.value
-  const t = totalPages.value
-  return Array.from({ length: 3 }, (_, i) => p - 1 + i).filter((x) => x > 1 && x < t)
-})
 
 const nextPage = () => { 
   if (currentPage.value < totalPages.value) currentPage.value++ 
@@ -122,28 +131,69 @@ const prevPage = () => {
 
 // CHỌN SẢN PHẨM
 const isSelecting = ref(false)
-const selectedList = ref<Wishlist[]>([])
+const selectedProductIds = ref<number[]>([])
+
+// KIỂM TRA XEM TẤT CẢ SẢN PHẨM TRONG TRANG ĐÃ ĐƯỢC CHỌN CHƯA
+const isAllPageSelected = computed(() => {
+  if (paginatedWishlists.value.length === 0) return false
+  return paginatedWishlists.value.every(item => 
+    selectedProductIds.value.includes(item.product.product_id)
+  )
+})
 
 const toggleSelectMode = () => {
   isSelecting.value = !isSelecting.value
-  if (!isSelecting.value) selectedList.value = []
+  if (!isSelecting.value) selectedProductIds.value = []
 }
 
-// XÓA SẢN PHẨM
-const removeSelected = async () => {
-  if (selectedList.value.length === 0) return
+// CHỌN/BỎ CHỌN TẤT CẢ TRONG TRANG HIỆN TẠI
+const toggleSelectAllPage = () => {
+  const pageProductIds = paginatedWishlists.value.map(item => item.product.product_id)
   
-  if (confirm(`Bạn có chắc muốn xóa ${selectedList.value.length} sản phẩm khỏi yêu thích?`)) {
-    const productIds = selectedList.value.map(item => item.product_id)
-    
-    const success = await deleteMultipleWishlist(productIds)
-    if (success) {
-      selectedList.value = []
-      isSelecting.value = false
-      alert(`✅ Đã xóa ${productIds.length} sản phẩm khỏi yêu thích!`)
+  if (isAllPageSelected.value) {
+    // Bỏ chọn tất cả trong trang
+    selectedProductIds.value = selectedProductIds.value.filter(
+      id => !pageProductIds.includes(id)
+    )
+  } else {
+    // Chọn tất cả trong trang (chỉ thêm những cái chưa có)
+    pageProductIds.forEach(id => {
+      if (!selectedProductIds.value.includes(id)) {
+        selectedProductIds.value.push(id)
+      }
+    })
+  }
+}
+
+// CHỌN/BỎ CHỌN TỪNG SẢN PHẨM
+const toggleSelectProduct = (productId: number, isSelected: boolean) => {
+  if (isSelected) {
+    if (!selectedProductIds.value.includes(productId)) {
+      selectedProductIds.value.push(productId)
+    }
+  } else {
+    const index = selectedProductIds.value.indexOf(productId)
+    if (index > -1) {
+      selectedProductIds.value.splice(index, 1)
     }
   }
 }
+
+// XÓA SẢN PHẨM ĐÃ CHỌN
+const removeSelected = async () => {
+  if (selectedProductIds.value.length === 0) return
+  
+  if (confirm(`Bạn có chắc muốn xóa ${selectedProductIds.value.length} sản phẩm khỏi yêu thích?`)) {
+    const success = await deleteMultipleWishlist(selectedProductIds.value)
+    if (success) {
+      selectedProductIds.value = []
+      isSelecting.value = false
+    } else {
+      alert('❌ Xóa thất bại!')
+    }
+  }
+}
+
 
 // XÓA TẤT CẢ
 const removeAllWishlist = async () => {
@@ -151,27 +201,31 @@ const removeAllWishlist = async () => {
   
   if (confirm('Bạn có chắc muốn xóa TẤT CẢ sản phẩm khỏi yêu thích?')) {
     const success = await deleteAllWishlist()
-    if (success) {
-      alert('✅ Đã xóa tất cả sản phẩm khỏi yêu thích!')
+    if (!success) {
+      alert('❌ Xóa thất bại!')
     }
+    // ✅ KHÔNG gọi fetchWishlist() - đã xử lý trong composable
   }
 }
 
-// 🎯 EVENT HANDLERS - Chỉ fetch lại khi cần thiết
-const handleWishlistUpdated = () => {
-  // Không cần làm gì vì state đã được cập nhật tự động
-  console.log('Wishlist updated')
+// 🎯 EVENT HANDLER - CHỈ XỬ LÝ PAGINATION
+const handleItemRemoved = (productId: number) => {
+  console.log('✅ Item removed in parent, current page items:', paginatedWishlists.value.length)
+  
+  // Reset về trang trước nếu trang hiện tại không còn item nào
+  if (paginatedWishlists.value.length === 0 && currentPage.value > 1) {
+    currentPage.value = currentPage.value - 1
+  }
 }
 
-// 🎯 WATCHERS - Reset pagination khi cần
+// 🎯 THEO DÕI THAY ĐỔI CỦA WISHLISTS
 watch(
   () => wishlists.value.length,
   (newLength, oldLength) => {
+    console.log(`🔄 Wishlist count changed: ${oldLength} → ${newLength}`)
     if (paginatedWishlists.value.length === 0 && currentPage.value > 1) {
-      currentPage.value = 1
+      currentPage.value = Math.max(1, currentPage.value - 1)
     }
   }
 )
-
-
 </script>

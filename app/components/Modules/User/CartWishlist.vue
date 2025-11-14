@@ -11,6 +11,16 @@
 
     <!-- NỘI DUNG -->
     <div class="relative z-10 p-4 flex flex-col">
+      <div v-if="isSelecting" class="absolute top-2 left-2 z-30">
+        <input
+          type="checkbox"
+          :checked="isSelected"
+          @change="toggleSelect"
+          class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+        />
+      
+
+      </div>
       <div class="relative w-full flex justify-center mb-3">
         <!-- BADGE -->
         <span
@@ -121,11 +131,12 @@ import { useRouter } from 'vue-router'
 import { useWishlist } from '~/composables/useWishlist'
 import { useCart } from '~/composables/useCart'
 
+
 const props = defineProps<{ item: any; itemWidth: number }>()
 const emit = defineEmits<{
-  'wishlist-updated': []
+  removed: [productId: number]
+  toggle: [productId: number, isSelected: boolean]
 }>()
-
 const router = useRouter()
 const { addToCart } = useCart()
 const { deleteWishlist } = useWishlist()
@@ -137,7 +148,7 @@ const errorImage = ref(false)
     const product = props.item.product;
     if (product.thumbnail?.startsWith("http")) return product.thumbnail;
     if (product.images?.length && product.images[0].image_url)
-      return `https://api.mocfurni.shop/storage/${product.images[0].image_url}`;
+      return `http://127.0.0.1:8000/storage/${product.images[0].image_url}`;
     return "/placeholder.png";
   });
 
@@ -173,17 +184,51 @@ const errorImage = ref(false)
 
 
 const removeFromWishlist = async () => {
-  if (confirm('Bạn có chắc muốn xoá sản phẩm này khỏi yêu thích?')) {
-    try {
-      await deleteWishlist(props.item.product.product_id)
-      
-      // 🎯 EMIT EVENT để parent refresh
-      emit('wishlist-updated')
-      
-      alert('✅ Đã xóa sản phẩm khỏi yêu thích!')
-    } catch (error) {
-      alert('❌ Xóa thất bại!')
-    }
+  if (!confirm('Bạn có chắc muốn xoá sản phẩm này khỏi yêu thích?')) {
+    return;
   }
-}
+
+  const productId = props.item.product.product_id;
+  
+  try {
+    console.log('🗑️ Attempting to remove product:', productId);
+    
+    const ok = await deleteWishlist(productId);
+    
+    if (ok) {
+      // 🟢 Phát emit để thông báo cho component cha
+      emit('removed', productId);
+      
+      // ✅ Hiển thị thông báo thành công
+      alert('✅ Đã xóa sản phẩm khỏi yêu thích!');
+      
+      console.log('✅ Successfully removed product from wishlist');
+    } else {
+      // ❌ Xử lý khi xóa thất bại
+      const errorMsg = 'Không thể xóa sản phẩm. Vui lòng thử lại.';
+      alert(`❌ ${errorMsg}`);
+      console.error('❌ Failed to remove product from wishlist');
+    }
+  } catch (error: any) {
+    // 🚨 Xử lý lỗi
+    console.error('🚨 Error in removeFromWishlist:', error);
+    
+    let errorMessage = '❌ Lỗi khi xóa sản phẩm!';
+    
+    if (error?.status === 401) {
+      errorMessage = '❌ Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+      // Có thể redirect đến login page
+      router.push('/login');
+    } else if (error?.message) {
+      errorMessage = `❌ Lỗi: ${error.message}`;
+    }
+    
+    alert(errorMessage);
+  }
+};
+// THÊM HÀM XỬ LÝ CHỌN SẢN PHẨM
+const toggleSelect = () => {
+  const productId = props.item.product.product_id;
+  emit('toggle', productId, !props.isSelected);
+};
 </script>

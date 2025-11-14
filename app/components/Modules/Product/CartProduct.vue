@@ -151,7 +151,7 @@ const errorImage = ref(false)
       return "https://via.placeholder.com/180?text=No+Image";
     if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
     if (props.item.images?.length && props.item.images[0].image_url)
-      return `https://api.mocfurni.shop/storage/${props.item.images[0].image_url}`;
+      return `http://127.0.0.1:8000/storage/${props.item.images[0].image_url}`;
     return "/placeholder.png";
   });
 

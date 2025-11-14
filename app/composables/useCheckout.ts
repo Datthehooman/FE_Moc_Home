@@ -34,7 +34,7 @@ export function useCheckout() {
     const user_id = checkoutStore.user?.id || null;
     const body = { ...payload, user_id };
 
-    return await $fetch("https://api.mocfurni.shop/api/client/buy-now", {
+    return await $fetch("http://127.0.0.1:8000/api/client/buy-now", {
       method: "POST",
       headers: { ...getAuthHeader(), "Content-Type": "application/json" },
       body,
@@ -54,7 +54,7 @@ export function useCheckout() {
   }) => {
     try {
       return await $fetch(
-        "https://api.mocfurni.shop/api/client/buy-now/guest",
+        "http://127.0.0.1:8000/api/client/buy-now/guest",
         {
           method: "POST",
           body: payload,
@@ -86,7 +86,7 @@ export function useCheckout() {
     };
 
     if (tokenCookie.value) {
-      return await $fetch("https://api.mocfurni.shop/api/client/buy-now/cart", {
+      return await $fetch("http://127.0.0.1:8000/api/client/buy-now/cart", {
         method: "POST",
         headers: { ...getAuthHeader(), "Content-Type": "application/json" },
         body: payload,
@@ -103,7 +103,7 @@ export function useCheckout() {
         payment_method_id,
       };
       return await $fetch(
-        "https://api.mocfurni.shop/api/client/buy-now/guest-cart",
+        "http://127.0.0.1:8000/api/client/buy-now/guest-cart",
         {
           method: "POST",
           body: guestPayload,
@@ -128,7 +128,7 @@ export function useCheckout() {
       });
 
       const res: any = await $fetch(
-        "https://api.mocfurni.shop/api/client/vnpay-payment",
+        "http://127.0.0.1:8000/api/client/vnpay-payment",
         {
           method: "POST",
           body: { amount, order_info: orderInfo, order_type: orderType },

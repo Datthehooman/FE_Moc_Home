@@ -9,7 +9,7 @@ export const useAuth = () => {
   const login = async (data: { email: string; password_hash: string }) => {
     try {
       const response = await $fetch(
-        "https://api.mocfurni.shop/api/client/login",
+        "http://127.0.0.1:8000/api/client/login",
         {
           method: "POST",
           body: data,
@@ -43,7 +43,7 @@ export const useAuth = () => {
   ): Promise<{ success: boolean; message?: string; errors?: any }> => {
     try {
       const response = await $fetch(
-        "https://api.mocfurni.shop/api/client/register",
+        "http://127.0.0.1:8000/api/client/register",
         {
           method: "POST",
           body: data,
@@ -73,7 +73,7 @@ export const useAuth = () => {
   const sendResetPasswordOtp = async (email: string): Promise<ApiResponse> => {
     try {
       const response = await $fetch<ApiResponse>(
-        "https://api.mocfurni.shop/api/client/sendOtp-password-v1",
+        "http://127.0.0.1:8000/api/client/sendOtp-password-v1",
         {
           method: "POST",
           body: { email },

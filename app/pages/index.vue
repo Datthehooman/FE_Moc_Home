@@ -45,6 +45,7 @@
         <SharedProductCard
           v-for="product in products.slice(5, 8)"
           :key="product.product_id"
+          :id ="product.product_id"
           :big="true"
           :title="product.product_name"
           :image="product.thumbnail"

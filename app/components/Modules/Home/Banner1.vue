@@ -142,7 +142,7 @@
       product_sale: 1900000,
       quantity: 1,
       thumbnail:
-        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+        "http://127.0.0.1:8000/storage/clientsite/products/images/GB-VX-001_main.png",
     },
     {
       product_id: 22,
@@ -152,7 +152,7 @@
       product_sale: 1900000,
       quantity: 1,
       thumbnail:
-        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+        "http://127.0.0.1:8000/storage/clientsite/products/images/GB-VX-001_main.png",
     },
     {
       product_id: 22,
@@ -162,7 +162,7 @@
       product_sale: 1900000,
       quantity: 1,
       thumbnail:
-        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+        "http://127.0.0.1:8000/storage/clientsite/products/images/GB-VX-001_main.png",
     },
   ];
 
