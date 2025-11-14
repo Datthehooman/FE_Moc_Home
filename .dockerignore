@@ -1,7 +1,0 @@
-node_modules
-.output
-.nuxt
-.vercel
-.vscode
-*.log
-.DS_Store
