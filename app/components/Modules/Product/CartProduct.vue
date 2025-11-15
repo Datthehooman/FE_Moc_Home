@@ -149,9 +149,14 @@
   const resolvedThumbnail = computed(() => {
     if (errorImage.value)
       return "https://via.placeholder.com/180?text=No+Image";
+
     if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
-    if (props.item.images?.length && props.item.images[0].image_url)
-      return `https://api.mocfurni.shop/storage/${props.item.images[0].image_url}`;
+
+    if (props.item.images?.length && props.item.images[0].image_url) {
+      const path = props.item.images[0].image_url.replace(/^\/+/, ""); // remove leading slashes
+      return `https://api.mocfurni.shop/storage/${path}`;
+    }
+
     return "/placeholder.png";
   });
 
