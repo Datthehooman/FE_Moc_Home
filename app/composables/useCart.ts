@@ -76,7 +76,7 @@ export const useCart = () => {
     if (!tokenCookie.value) return false;
     try {
       await $fetch(
-        `https://api.mocfurni.shop/api/client/cart/update-quantity`,
+        `http://127.0.0.1:8000/api/client/cart/update-quantity`,
         {
           method: "PUT",
           query: { product_id, quantity },

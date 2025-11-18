@@ -285,11 +285,12 @@ function validate() {
       errors.phone = 'SĐT không được để trống'
       valid = false
     } else {
-      const phoneRegex = /^(0|\+84)(\d{9,10})$/
-      if (!phoneRegex.test(form.phone)) {
-        errors.phone = 'SĐT không hợp lệ'
-        valid = false
-      }
+    const phone = form.phone.replace(/\s+/g, '') // loại bỏ khoảng trắng
+const phoneRegex = /^(0\d{9}|(\+84)\d{9})$/
+if (!phoneRegex.test(phone)) {
+  errors.phone = 'SĐT không hợp lệ'
+  valid = false
+}
     }
   }
 

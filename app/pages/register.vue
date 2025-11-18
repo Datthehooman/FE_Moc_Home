@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-[#FFFBF8] flex flex-col">
     <div class="flex-grow flex items-center justify-center p-4 mt-[50px]">
       <div class="w-full max-w-[540px] bg-white rounded-xl shadow-lg p-8 space-y-6">
-        
+
         <!-- Logo -->
         <div class="text-center">
           <div class="text-2xl font-bold text-[#6E4E37] mb-1 flex justify-center items-center space-x-2">
@@ -49,6 +49,7 @@
               type="email"
               v-model="email"
               placeholder="Email"
+              @blur="checkEmail"
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
               :class="{ 'border-red-500': errors.email }"
             />
@@ -124,10 +125,12 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 
-const { register: registerApi } = useAuth()
+// Giả sử useAuth có 2 API: register và checkEmailAvailable
+const { register: registerApi, checkEmailAvailable } = useAuth() 
 
 const fullName = ref('')
 const phone = ref('')
@@ -144,31 +147,46 @@ const errors = reactive({
   confirmPassword: ''
 })
 
+// Kiểm tra email khi blur
+const checkEmail = async () => {
+  errors.email = '' // reset
+  if (!email.value) return
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email.value)) {
+    errors.email = 'Email không đúng định dạng'
+    return
+  }
+
+  try {
+    const res = await checkEmailAvailable(email.value)
+    if (!res.available) errors.email = 'Email đã được sử dụng'
+  } catch (err: any) {
+    console.error(err)
+    errors.email = 'Không thể kiểm tra email'
+  }
+}
+
 const register = async () => {
   // Reset lỗi
   Object.keys(errors).forEach(key => (errors[key] = ''))
 
-  // Validate họ tên
+  // Validate frontend
   if (!fullName.value) errors.fullName = 'Tên không được để trống'
   else if (/\d/.test(fullName.value)) errors.fullName = 'Tên không được chứa số'
 
-  // Validate số điện thoại
   if (!phone.value) errors.phone = 'Số điện thoại không được để trống'
-  else if (!/^(0|\+84)\d{9}$/.test(phone.value)) errors.phone = 'Số điện thoại không hợp lệ'
+  else if (!/^0\d{9}$/.test(phone.value)) errors.phone = 'Số điện thoại không hợp lệ (bắt đầu 0, 10 số)'
+  else if (phone.value.length > 20) errors.phone = 'Số điện thoại quá dài'
 
-  // Validate email
   if (!email.value) errors.email = 'Email không được để trống'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errors.email = 'Email không đúng định dạng'
 
-  // Validate mật khẩu
   if (!password.value) errors.password = 'Mật khẩu không được để trống'
   else if (password.value.length < 8) errors.password = 'Mật khẩu phải có ít nhất 8 ký tự'
 
-  // Validate nhập lại mật khẩu
   if (!confirmPassword.value) errors.confirmPassword = 'Vui lòng nhập lại mật khẩu'
   else if (password.value !== confirmPassword.value) errors.confirmPassword = 'Xác nhận mật khẩu không khớp'
 
-  // Nếu có lỗi thì dừng
   if (Object.values(errors).some(e => e)) return
 
   loading.value = true
@@ -181,27 +199,26 @@ const register = async () => {
       password_hash_confirmation: confirmPassword.value
     })
 
-    // ✅ Thành công
+    // Xử lý backend validation
+    if (res.errors) {
+      if (res.errors.full_name) errors.fullName = res.errors.full_name[0]
+      if (res.errors.email) errors.email = res.errors.email[0] // Email trùng
+      if (res.errors.password_hash) errors.password = res.errors.password_hash[0]
+      if (res.errors.phone) errors.phone = res.errors.phone[0] // Phone trùng
+      return
+    }
+
     if (res.success) {
       alert('✅ Đăng ký thành công!')
       navigateTo('/login')
       return
     }
 
-    // ❌ Thất bại từ validation backend
-    if (res.errors) {
-      if (res.errors.full_name) errors.fullName = res.errors.full_name[0]
-      if (res.errors.email) errors.email = res.errors.email[0]   // ← EMAIL ĐÃ ĐĂNG KÝ
-      if (res.errors.password_hash) errors.password = res.errors.password_hash[0]
-      return
-    }
-
-    // Trường hợp lỗi chung
     if (res.message) alert(res.message)
 
-  }catch (err: any) {
-  console.error('❌ Lỗi đăng ký:', err)
-  alert(err?.data?.message || 'Đăng ký thất bại!')
+  } catch (err: any) {
+    console.error('❌ Lỗi đăng ký:', err)
+    alert('Có lỗi xảy ra, vui lòng thử lại!')
   } finally {
     loading.value = false
   }

@@ -1,5 +1,5 @@
 <template>
-  <aside class="w-64 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6">
+  <aside class="w-70 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6">
 
     <!-- Avatar -->
     <div class="flex flex-col items-center mb-4 relative">
@@ -61,7 +61,7 @@ const navigate = async (path: string) => {
 const menuItems = [
   { name: 'Thống kê', path: '/user/dashboard', icon: 'heroicons:chart-bar' },
   { name: 'Hồ sơ của tôi', path: '/user/profile', icon: 'heroicons:user' },
-  { name: 'Danh sách đơn hàng', path: '/user/orders', icon: 'heroicons:list-bullet' },
+  { name: 'Danh sách đơn hàng', path: '/user/orders/list', icon: 'heroicons:list-bullet' },
   { name: 'Danh sách yêu thích', path: '/user/wishlist', icon: 'heroicons:heart' },
   { name: 'Danh sách địa chỉ', path: '/user/address', icon: 'heroicons:map-pin' },
   { name: 'Hỗ trợ', path: '/user/support', icon: 'heroicons:lifebuoy' },
