@@ -15,6 +15,7 @@
     >
       <div
         class="absolute bg-primary size-10 flex justify-center items-center rounded-full cursor-pointer -bottom-0.5 -right-0.5 border-4 border-white z-30"
+        @click="handleAddToCart()"
       >
         <UIcon
           class="size-[19px] text-white"
@@ -26,6 +27,7 @@
       <NuxtImg
         :src="image || '/image 10.png'"
         class="w-full max-h-[207px] object-contain mb-[13px] mx-auto transition-transform duration-300 group-hover:scale-110"
+        @click="goToDetail(slug)"
       />
     </div>
     <div>
@@ -35,11 +37,14 @@
       <div class="flex items-center gap-1 my-[9px]">
         <template v-for="star in 5" :key="star">
           <UIcon
-            v-if="star <= Math.floor(stars || 0)"
+            v-if="star <= Math.floor(Number(stars) || 0)"
             name="i-heroicons-star-solid"
             class="size-4 text-yellow-400"
           />
-          <div v-else-if="star - 0.5 <= (stars || 0)" class="relative size-4">
+          <div
+            v-else-if="star - 0.5 <= (Number(stars) || 0)"
+            class="relative size-4"
+          >
             <UIcon
               name="i-heroicons-star"
               class="size-4 text-yellow-400 absolute"
@@ -77,9 +82,42 @@
     title?: string;
     image?: string;
     badge?: string;
-    stars?: number;
+    stars?: string;
     price?: string;
     salePrice?: string;
     badgeColor?: string;
+    slug: string;
+    id: number;
   }>();
+
+  const { addToCart } = useCart();
+  const toast = useToast();
+  const router = useRouter();
+
+  const goToDetail = (slug: string) => {
+    router.push(`/san-pham/${slug}`);
+  };
+
+  const handleAddToCart = async () => {
+    if (!props.id) {
+      toast.add({ title: "Sản phẩm không hợp lệ", color: "error" });
+      return;
+    }
+
+    try {
+      const result = await addToCart(props.id, 1);
+      if (result) {
+        toast.add({ title: "Đã thêm vào giỏ hàng!", color: "success" });
+      } else {
+        toast.add({ title: "Thêm giỏ hàng thất bại!", color: "error" });
+      }
+    } catch (error: any) {
+      toast.add({
+        title:
+          "Lỗi khi thêm vào giỏ hàng: " +
+          (error?.message || "Không rõ nguyên nhân"),
+        color: "error",
+      });
+    }
+  };
 </script>

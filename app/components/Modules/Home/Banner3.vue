@@ -77,7 +77,8 @@
             <UButton
               size="xl"
               variant="solid"
-              class="relative bg-secondary text-white rounded-md overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit"
+              class="relative bg-secondary text-white rounded-md overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
+              @click="handleBuyNow(product)"
             >
               <span
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
@@ -124,6 +125,25 @@
     minutes.value = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     seconds.value = Math.floor((distance % (1000 * 60)) / 1000);
   };
+
+  const product = {
+    product_id: 22,
+    product_name: "Ghế Bành Vải Xanh",
+    price: 2500000,
+    product_price: 2500000,
+    product_sale: 1900000,
+    quantity: 1,
+    thumbnail:
+      "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+  };
+
+  const router = useRouter();
+  const { setBuyNowItem } = useCheckout();
+
+  function handleBuyNow(item: Product) {
+    setBuyNowItem({ ...item, quantity: 1 });
+    router.push("/checkout");
+  }
 
   // Update countdown every second
   onMounted(() => {

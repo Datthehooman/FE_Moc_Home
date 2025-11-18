@@ -1,8 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: false,
+  image: {
+    provider: "none", // Disable IPX image optimization
+  },
+  nitro: { preset: "static" },
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   app: {
+    baseURL: "/",
+    buildAssetsDir: "/_nuxt/",
     pageTransition: { name: "page", mode: "out-in" },
     head: {
       link: [{ rel: "icon", type: "image/png", href: "/favicon.png" }],
@@ -36,7 +43,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiUrl: process.env.NUXT_APP_API_URL,
+      apiUrl: "https://api.mocfurni.shop",
     },
   },
 });

@@ -41,9 +41,7 @@
               fill="currentColor"
               class="w-5 h-5"
               :class="
-                n <= (product.rating ?? 0)
-                  ? 'text-yellow-400'
-                  : 'text-gray-300'
+                n <= (product.rating ?? 0) ? 'text-yellow-400' : 'text-gray-300'
               "
             >
               <path
@@ -75,19 +73,15 @@
           <p>
             <span class="text-gray-500">Thương hiệu:</span>
             <span class="font-semibold text-gray-700 ml-1">{{
-              product.brand || 'N/A'
+              product.brand || "N/A"
             }}</span>
           </p>
 
           <p>
             <span class="text-gray-500">Loại:</span>
-            <span class="font-bold text-gray-700 ml-1">
-              {{
-                product.category?.category_name ||
-                product.category_id ||
-                'N/A'
-              }}
-            </span>
+            <span class="font-bold text-gray-700 ml-1">{{
+              product.category?.category_name || product.category_id || "N/A"
+            }}</span>
           </p>
 
           <p>
@@ -99,83 +93,93 @@
                   : 'text-red-500 font-bold ml-1'
               "
             >
-              {{ product.stock_quantity > 0 ? 'Có sẵn' : 'Hết hàng' }}
+              {{ product.stock_quantity > 0 ? "Có sẵn" : "Hết hàng" }}
             </span>
           </p>
 
           <p>
             <span class="text-gray-500">Mã số:</span>
             <span class="font-semibold text-gray-700 ml-1">{{
-              product.sku || 'N/A'
+              product.sku || "N/A"
             }}</span>
           </p>
         </div>
 
         <!-- Nút Thêm giỏ hàng -->
-        <!-- Nút Thêm giỏ hàng -->
-<button
-  type="button"
-  class="relative overflow-hidden px-6 py-3 bg-[#edb173] text-black font-semibold rounded-lg shadow-md group"
->
-  <!-- Hiệu ứng tỏa sáng lan rộng -->
-  <span class="absolute inset-0 flex justify-center items-center">
-    <span
-      class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"
-    ></span>
-  </span>
+        <button
+          type="button"
+          @click="handleAddToCart"
+          class="relative overflow-hidden px-6 py-3 bg-[#edb173] text-black font-semibold rounded-lg shadow-md group mt-4"
+        >
+          <span class="absolute inset-0 flex justify-center items-center">
+            <span
+              class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"
+            ></span>
+          </span>
 
-  <!-- Chữ hiển thị -->
-  <span
-    class="relative z-10 group-hover:text-white flex items-center justify-center space-x-2 text-[16px]"
-  >
-    <span>Thêm giỏ hàng</span>
-  </span>
-</button>
-
+          <span
+            class="relative z-10 group-hover:text-white flex items-center justify-center space-x-2 text-[16px]"
+          >
+            <span>Thêm giỏ hàng</span>
+          </span>
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
+  import { defineProps, defineEmits } from "vue";
+  import { useCart } from "~/composables/useCart";
 
-interface Product {
-  product_name: string
-  price: number
-  price_down?: number
-  rating?: number
-  brand?: string
-  sku?: string
-  stock_quantity: number
-  category?: { category_name: string }
-  category_id?: number
-  images?: { image_url: string }[]
-  thumbnail?: string // 🔹 Thêm thumbnail vào interface
-}
+  interface Product {
+    product_id: number;
+    product_name: string;
+    price: number;
+    price_down?: number;
+    rating?: number;
+    brand?: string;
+    sku?: string;
+    stock_quantity: number;
+    category?: { category_name: string };
+    category_id?: number;
+    images?: { image_url: string }[];
+    thumbnail?: string;
+  }
 
-const props = defineProps<{
-  show: boolean
-  product: Product
-}>()
+  const props = defineProps<{ show: boolean; product: Product }>();
+  const emit = defineEmits<{ (e: "close"): void }>();
 
-const emit = defineEmits<{
-  (e: 'close'): void
-}>()
+  const { addToCart } = useCart();
 
-const formatPrice = (price: number) => price.toLocaleString('vi-VN') + '₫'
+  const formatPrice = (price: number) => price.toLocaleString("vi-VN") + "₫";
 
-// 🔹 Ưu tiên thumbnail trước, fallback sang ảnh đầu tiên
-const getImageUrl = (product: Product) => {
-  let url = product.thumbnail || product.images?.[0]?.image_url
+  const getImageUrl = (product: Product) => {
+    const url = product.thumbnail || product.images?.[0]?.image_url;
+    if (!url) return "/placeholder.png";
+    return url.startsWith("http")
+      ? url
+      : `https://api.mocfurni.shop/storage/${url}`;
+  };
 
-  if (!url) return '/placeholder.png'
+  const handleAddToCart = async () => {
+    if (!props.product.product_id) {
+      alert("❌ Sản phẩm không hợp lệ");
+      return;
+    }
 
-  // ✅ Nếu là link đầy đủ (đã có http/https) thì trả luôn
-  if (url.startsWith('http')) return url
-
-  // ✅ Nếu là đường dẫn trong storage thì thêm domain vào
-  return `http://127.0.0.1:8000/storage/${url}`
-}
-
+    try {
+      const result = await addToCart(props.product.product_id, 1);
+      if (result) {
+        alert("✅ Đã thêm vào giỏ hàng!");
+      } else {
+        alert("❌ Thêm giỏ hàng thất bại!");
+      }
+    } catch (error: any) {
+      alert(
+        "❌ Lỗi khi thêm vào giỏ hàng: " +
+          (error?.message || "Không rõ nguyên nhân")
+      );
+    }
+  };
 </script>

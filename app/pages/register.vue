@@ -124,9 +124,8 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, reactive } from 'vue'
 
 const { register: registerApi } = useAuth()
 
@@ -146,53 +145,64 @@ const errors = reactive({
 })
 
 const register = async () => {
-  Object.keys(errors).forEach(k => (errors[k] = ''))
+  // Reset lỗi
+  Object.keys(errors).forEach(key => (errors[key] = ''))
 
-  // ✅ FRONT-END VALIDATION KHỚP BACKEND
+  // Validate họ tên
   if (!fullName.value) errors.fullName = 'Tên không được để trống'
+  else if (/\d/.test(fullName.value)) errors.fullName = 'Tên không được chứa số'
 
+  // Validate số điện thoại
+  if (!phone.value) errors.phone = 'Số điện thoại không được để trống'
+  else if (!/^(0|\+84)\d{9}$/.test(phone.value)) errors.phone = 'Số điện thoại không hợp lệ'
+
+  // Validate email
   if (!email.value) errors.email = 'Email không được để trống'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errors.email = 'Email không đúng định dạng'
 
-  if (!password.value) errors.password = 'Mật khẩu không được để trốngc'
+  // Validate mật khẩu
+  if (!password.value) errors.password = 'Mật khẩu không được để trống'
   else if (password.value.length < 8) errors.password = 'Mật khẩu phải có ít nhất 8 ký tự'
 
+  // Validate nhập lại mật khẩu
   if (!confirmPassword.value) errors.confirmPassword = 'Vui lòng nhập lại mật khẩu'
   else if (password.value !== confirmPassword.value) errors.confirmPassword = 'Xác nhận mật khẩu không khớp'
 
-  // phone optional
-  if (phone.value && !/^(0|\+84)[0-9]{9}$/.test(phone.value)) errors.phone = 'Số điện thoại không hợp lệ'
+  // Nếu có lỗi thì dừng
+  if (Object.values(errors).some(e => e)) return
 
-  if (!Object.values(errors).some(e => e)) {
-    loading.value = true
-    try {
-      const res = await registerApi({
-        full_name: fullName.value,
-        phone: phone.value || null,
-        email: email.value,
-        password_hash: password.value,
-        password_hash_confirmation: confirmPassword.value
-      })
+  loading.value = true
+  try {
+    const res = await registerApi({
+      full_name: fullName.value,
+      phone: phone.value,
+      email: email.value,
+      password_hash: password.value,
+      password_hash_confirmation: confirmPassword.value
+    })
 
-      if (res?.status === 200 || res?.success) {
-        alert('✅ Đăng ký thành công!')
-        navigateTo('/login')
-      } else {
-        alert(res?.message || 'Đăng ký thất bại!')
-      }
-    } catch (err: any) {
-      // ✅ MAP LỖI BACKEND
-      if (err?.response?._data?.errors) {
-        const backendErrors = err.response._data.errors
-        if (backendErrors.full_name) errors.fullName = backendErrors.full_name[0]
-        if (backendErrors.email) errors.email = backendErrors.email[0]
-        if (backendErrors.password_hash) errors.password = backendErrors.password_hash[0]
-      } else {
-        alert(err?.response?._data?.message || 'Đăng ký thất bại!')
-      }
-    } finally {
-      loading.value = false
+    // ✅ Thành công
+    if (res.success) {
+      alert('✅ Đăng ký thành công!')
+      navigateTo('/login')
+      return
     }
+
+    // ❌ Thất bại từ validation backend
+    if (res.errors) {
+      if (res.errors.full_name) errors.fullName = res.errors.full_name[0]
+      if (res.errors.email) errors.email = res.errors.email[0]   // ← EMAIL ĐÃ ĐĂNG KÝ
+      if (res.errors.password_hash) errors.password = res.errors.password_hash[0]
+      return
+    }
+
+    // Trường hợp lỗi chung
+    if (res.message) alert(res.message)
+
+  } catch (err) {
+    alert('Đăng ký thất bại!')
+  } finally {
+    loading.value = false
   }
 }
 </script>

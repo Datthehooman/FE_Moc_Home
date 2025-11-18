@@ -16,3 +16,8 @@ export interface RoomApiResponse {
   message: string;
   result: { data: Room[] };
 }
+export interface RoomCountApiResponse {
+  status: boolean;
+  message: string;
+  result: { data: Number[] };
+}

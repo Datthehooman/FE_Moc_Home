@@ -1,5 +1,15 @@
+---
 deployment:
   tasks:
-    - export NODE_ENV=production
-    - npm install --production
-    - npm run build
+    # Define paths
+    - export REPOPATH=/home/eal236bnt9pe/repositories/FE_Moc_Home/
+    - export DEPLOYPATH=/home/eal236bnt9pe/public_html/
+
+    # Remove old files from public_html
+    - /bin/rm -rf $DEPLOYPATH/*
+
+    # Copy Nuxt static build output
+    - /bin/cp -R $REPOPATH/.output/public/* $DEPLOYPATH/
+
+    # Set correct permissions
+    - /bin/chmod -R 755 $DEPLOYPATH

@@ -3,7 +3,7 @@
     <!-- TÌM KIẾM -->
     <ModulesProductSearchBox
       :model-value="searchQuery"
-      @update:model-value="val => emit('update:searchQuery', val)"
+      @update:model-value="(val) => emit('update:searchQuery', val)"
     />
 
     <!-- DANH MỤC -->
@@ -16,14 +16,19 @@
           class="flex items-center gap-2"
         >
           <input
+            :id="'cat-' + cat.id"
             type="checkbox"
-           :value="cat.id"
-:checked="selectedCategories.includes(String(cat.id))"
-@change="toggleCategory(String(cat.id))"
+            :value="cat.id"
+            :checked="selectedCategories.includes(String(cat.id))"
+            @change="toggleCategory(String(cat.id))"
           />
-          <span class="flex-1 cursor-pointer hover:text-primary">
+
+          <label
+            :for="'cat-' + cat.id"
+            class="flex-1 cursor-pointer hover:text-primary"
+          >
             {{ cat.category_name }}
-          </span>
+          </label>
         </li>
         <li
           class="mt-2 cursor-pointer text-sm text-gray-500 hover:text-primary"
@@ -44,14 +49,20 @@
           class="flex items-center gap-2"
         >
           <input
+            :id="'brand-' + brand.name"
             type="checkbox"
             :value="brand.name"
             :checked="selectedBrands.includes(brand.name)"
             @change="toggleBrand(brand.name)"
           />
-          <span class="flex-1 cursor-pointer hover:text-primary">
+
+          <label
+            :for="'brand-' + brand.name"
+            class="flex-1 cursor-pointer hover:text-primary"
+          >
             {{ brand.name }}
-          </span>
+          </label>
+
           <span class="text-gray-400">({{ brand.count }})</span>
         </li>
         <li
@@ -104,8 +115,8 @@
       </div>
     </div>
 
-   <!-- MÀU SẮC -->
-   <div class="bg-white p-4 rounded-lg shadow-sm">
+    <!-- MÀU SẮC -->
+    <div class="bg-white p-4 rounded-lg shadow-sm">
       <h3 class="text-lg font-semibold mb-3">Màu sắc</h3>
       <div class="flex space-x-3">
         <label
@@ -126,12 +137,16 @@
               stroke="white"
               class="w-3.5 h-3.5 opacity-0 peer-checked:opacity-100 transition"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4.5 12.75l6 6 9-13.5"
+              />
             </svg>
           </span>
         </label>
       </div>
-   </div>
+    </div>
 
     <!-- KÍCH CỠ -->
     <div class="bg-white p-4 rounded-lg shadow-sm">
@@ -155,7 +170,9 @@
         alt="banner"
         class="w-full h-full object-cover rounded-lg"
       />
-      <div class="absolute inset-0 bg-black/30 flex flex-col justify-center items-center text-white text-center uppercase">
+      <div
+        class="absolute inset-0 bg-black/30 flex flex-col justify-center items-center text-white text-center uppercase"
+      >
         <div class="flex items-center gap-4 mb-2">
           <span class="h-[2px] w-10 bg-white"></span>
           <p class="text-[18px] font-semibold tracking-wide">GIẢM GIÁ 35%</p>
@@ -164,67 +181,67 @@
         <h3 class="text-[28px] font-bold">BỘ SƯU TẬP NỘI THẤT MỚI</h3>
       </div>
     </div>
-</aside>
+  </aside>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+  import { ref, onMounted } from "vue";
 
-const props = defineProps<{
-  searchQuery: string
-  selectedCategories: string[]
-  selectedBrands: string[]
-}>()
+  const props = defineProps<{
+    searchQuery: string;
+    selectedCategories: string[];
+    selectedBrands: string[];
+  }>();
 
-const emit = defineEmits([
-  'update:searchQuery',
-  'update:selectedCategories',
-  'update:selectedBrands',
-])
+  const emit = defineEmits([
+    "update:searchQuery",
+    "update:selectedCategories",
+    "update:selectedBrands",
+  ]);
 
-const toggleCategory = (id: string) => {
-  const newCats = props.selectedCategories.includes(id)
-    ? props.selectedCategories.filter(c => c !== id)
-    : [...props.selectedCategories, id]
-  emit('update:selectedCategories', newCats)
-}
+  const toggleCategory = (id: string) => {
+    const newCats = props.selectedCategories.includes(id)
+      ? props.selectedCategories.filter((c) => c !== id)
+      : [...props.selectedCategories, id];
+    emit("update:selectedCategories", newCats);
+  };
 
-const toggleBrand = (brand: string) => {
-  const newBrands = props.selectedBrands.includes(brand)
-    ? props.selectedBrands.filter((b) => b !== brand)
-    : [...props.selectedBrands, brand]
-  emit('update:selectedBrands', newBrands)
-}
+  const toggleBrand = (brand: string) => {
+    const newBrands = props.selectedBrands.includes(brand)
+      ? props.selectedBrands.filter((b) => b !== brand)
+      : [...props.selectedBrands, brand];
+    emit("update:selectedBrands", newBrands);
+  };
 
-// ----- Dữ liệu động + tĩnh -----
-const categories = ref<{ category_name: string; id: number }[]>([])
-const brands = ref([
-  { name: 'Tovol', count: 15 },
-  { name: 'Sundoy', count: 23 },
-  { name: 'Sahoo Home', count: 35 },
-  { name: 'Casterly', count: 46 },
-  { name: 'Mainden Home', count: 39 },
-  { name: 'Knroll Furniture', count: 79 },
-  { name: 'Modern Enternity', count: 28 },
-  { name: 'Charisha', count: 17 },
-  { name: 'Audou', count: 12 },
-])
-const colors = ['#3B82F6', '#22C55E', '#FACC15', '#F87171', '#EF4444']
-const sizes = ['Cực nhỏ', 'Nhỏ', 'Vừa', 'Lớn', 'Cực lớn']
-const sales = ['Đang giảm giá', 'Còn hàng', 'Hết hàng', 'Giảm giá']
+  // ----- Dữ liệu động + tĩnh -----
+  const categories = ref<{ category_name: string; id: number }[]>([]);
+  const brands = ref([
+    { name: "Tovol", count: 15 },
+    { name: "Sundoy", count: 23 },
+    { name: "Sahoo Home", count: 35 },
+    { name: "Casterly", count: 46 },
+    { name: "Mainden Home", count: 39 },
+    { name: "Knroll Furniture", count: 79 },
+    { name: "Modern Enternity", count: 28 },
+    { name: "Charisha", count: 17 },
+    { name: "Audou", count: 12 },
+  ]);
+  const colors = ["#3B82F6", "#22C55E", "#FACC15", "#F87171", "#EF4444"];
+  const sizes = ["Cực nhỏ", "Nhỏ", "Vừa", "Lớn", "Cực lớn"];
+  const sales = ["Đang giảm giá", "Còn hàng", "Hết hàng", "Giảm giá"];
 
-// ----- Fetch danh mục -----
-const fetchCategories = async () => {
-  try {
-    const res = await fetch('http://127.0.0.1:8000/api/client/category')
-    const json = await res.json()
-    categories.value = json?.result?.data || []
-  } catch (err) {
-    console.error('❌ Lỗi fetch category:', err)
-  }
-}
+  // ----- Fetch danh mục -----
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("https://api.mocfurni.shop/api/client/category");
+      const json = await res.json();
+      categories.value = json?.result?.data || [];
+    } catch (err) {
+      console.error("❌ Lỗi fetch category:", err);
+    }
+  };
 
-onMounted(() => {
-  fetchCategories()
-})
+  onMounted(() => {
+    fetchCategories();
+  });
 </script>
