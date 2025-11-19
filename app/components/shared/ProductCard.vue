@@ -245,65 +245,77 @@
 </template>
 
 <script lang="ts" setup>
-  const props = defineProps<{
-    big?: boolean;
-    title?: string;
-    image?: string;
-    badge?: string;
-    stars?: string;
-    price?: string;
-    salePrice?: string;
-    badgeColor?: string;
-    id: number;
-    view: number;
-    brand: string;
-    sku: string;
-    room_id: number;
-    status: number;
-    slug: string;
-  }>();
+const props = defineProps<{
+  big?: boolean;
+  title?: string;
+  image?: string;
+  badge?: string;
+  stars?: string;
+  price?: string;
+  salePrice?: string;
+  badgeColor?: string;
+  id: number;
+  view: number;
+  brand: string;
+  sku: string;
+  room_id: number;
+  status: number;
+  slug: string;
+}>();
 
-  const { postWishlist, deleteWishlist } = useWishlist();
-  const { addToCart } = useCart();
-  const toast = useToast();
-  const router = useRouter();
+// 🟢 SỬA: Dùng hàm mới từ useWishlist
+const { addToWishlist, isInWishlist } = useWishlist();
+const { addToCart } = useCart();
+const toast = useToast();
+const router = useRouter();
 
-  const goToDetail = (slug: string) => {
-    router.push(`/san-pham/${slug}`);
-  };
+const goToDetail = (slug: string) => {
+  router.push(`/san-pham/${slug}`);
+};
 
-  // Modal state
-  const isModalOpen = ref(false);
+// Modal state
+const isModalOpen = ref(false);
 
-  const handleAddToCart = async () => {
-    if (!props.id) {
-      toast.add({ title: "Sản phẩm không hợp lệ", color: "error" });
+const handleAddToCart = async () => {
+  if (!props.id) {
+    toast.add({ title: "Sản phẩm không hợp lệ", color: "error" });
+    return;
+  }
+
+  try {
+    const result = await addToCart(props.id, 1);
+    if (result) {
+      toast.add({ title: "Đã thêm vào giỏ hàng!", color: "success" });
+    } else {
+      toast.add({ title: "Thêm giỏ hàng thất bại!", color: "error" });
+    }
+  } catch (error: any) {
+    toast.add({
+      title:
+        "Lỗi khi thêm vào giỏ hàng: " +
+        (error?.message || "Không rõ nguyên nhân"),
+      color: "error",
+    });
+  }
+};
+
+// 🟢 SỬA: Dùng hàm mới addToWishlist
+const handleAddToWishlist = async (productId: number) => {
+  try {
+    // 🟢 KIỂM TRA NẾU ĐÃ CÓ TRONG WISHLIST
+    if (isInWishlist(productId)) {
+      toast.add({ title: "✅ Sản phẩm đã có trong yêu thích!", color: "info" });
       return;
     }
 
-    try {
-      const result = await addToCart(props.id, 1);
-      if (result) {
-        toast.add({ title: "Đã thêm vào giỏ hàng!", color: "success" });
-      } else {
-        toast.add({ title: "Thêm giỏ hàng thất bại!", color: "error" });
-      }
-    } catch (error: any) {
-      toast.add({
-        title:
-          "Lỗi khi thêm vào giỏ hàng: " +
-          (error?.message || "Không rõ nguyên nhân"),
-        color: "error",
-      });
+    const success = await addToWishlist(productId);
+    if (success) {
+      toast.add({ title: "✅ Đã thêm sản phẩm vào yêu thích!", color: "success" });
+    } else {
+      toast.add({ title: "❌ Không thể thêm vào yêu thích!", color: "error" });
     }
-  };
-
-  const handleAddToWishlist = async (productId: number) => {
-    try {
-      await postWishlist(productId);
-      alert("✅ Đã thêm sản phẩm vào yêu thích!");
-    } catch (error) {
-      alert("❌ Không thể thêm vào yêu thích!");
-    }
-  };
+  } catch (error) {
+    toast.add({ title: "❌ Lỗi khi thêm vào yêu thích!", color: "error" });
+  }
+};
 </script>
