@@ -32,10 +32,11 @@
           <!-- Số điện thoại -->
           <div>
             <label class="block text-sm text-gray-700 mb-1">Số điện thoại</label>
-            <input
+           <input
               type="tel"
               v-model="phone"
               placeholder="Nhập số điện thoại"
+              @blur="checkPhone"
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
               :class="{ 'border-red-500': errors.phone }"
             />
@@ -125,12 +126,15 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 
-// Giả sử useAuth có 2 API: register và checkEmailAvailable
-const { register: registerApi, checkEmailAvailable } = useAuth() 
+// IMPORT ĐỦ 3 HÀM TỪ useAuth
+const { 
+  register: registerApi, 
+  checkEmailAvailable,
+  checkPhoneAvailable
+} = useAuth()
 
 const fullName = ref('')
 const phone = ref('')
@@ -147,10 +151,31 @@ const errors = reactive({
   confirmPassword: ''
 })
 
-// Kiểm tra email khi blur
+// ================= CHECK PHONE =================
+const checkPhone = async () => {
+  errors.phone = ''
+
+  if (!phone.value) return
+  if (!/^0\d{9}$/.test(phone.value)) {
+    errors.phone = 'Số điện thoại không hợp lệ (bắt đầu 0, 10 số)'
+    return
+  }
+
+  try {
+    const res = await checkPhoneAvailable(phone.value)
+    if (!res.available) errors.phone = 'Số điện thoại đã tồn tại'
+  } catch (err) {
+    console.error(err)
+    errors.phone = 'Không thể kiểm tra số điện thoại'
+  }
+}
+
+// ================= CHECK EMAIL =================
 const checkEmail = async () => {
-  errors.email = '' // reset
+  errors.email = ''
+
   if (!email.value) return
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email.value)) {
     errors.email = 'Email không đúng định dạng'
@@ -160,12 +185,12 @@ const checkEmail = async () => {
   try {
     const res = await checkEmailAvailable(email.value)
     if (!res.available) errors.email = 'Email đã được sử dụng'
-  } catch (err: any) {
-    console.error(err)
+  } catch (e) {
     errors.email = 'Không thể kiểm tra email'
   }
 }
 
+// ================= REGISTER =================
 const register = async () => {
   // Reset lỗi
   Object.keys(errors).forEach(key => (errors[key] = ''))
@@ -190,6 +215,7 @@ const register = async () => {
   if (Object.values(errors).some(e => e)) return
 
   loading.value = true
+
   try {
     const res = await registerApi({
       full_name: fullName.value,
@@ -199,24 +225,20 @@ const register = async () => {
       password_hash_confirmation: confirmPassword.value
     })
 
-    // Xử lý backend validation
     if (res.errors) {
       if (res.errors.full_name) errors.fullName = res.errors.full_name[0]
-      if (res.errors.email) errors.email = res.errors.email[0] // Email trùng
+      if (res.errors.email) errors.email = res.errors.email[0]
       if (res.errors.password_hash) errors.password = res.errors.password_hash[0]
-      if (res.errors.phone) errors.phone = res.errors.phone[0] // Phone trùng
+      if (res.errors.phone) errors.phone = res.errors.phone[0]
       return
     }
 
     if (res.success) {
-      alert('✅ Đăng ký thành công!')
+      alert('Đăng ký thành công!')
       navigateTo('/login')
-      return
     }
 
-    if (res.message) alert(res.message)
-
-  } catch (err: any) {
+  } catch (err) {
     console.error('❌ Lỗi đăng ký:', err)
     alert('Có lỗi xảy ra, vui lòng thử lại!')
   } finally {

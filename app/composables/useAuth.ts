@@ -6,6 +6,7 @@ export const useAuth = () => {
   const tokenCookie = useCookie("token", { path: "/", maxAge: 60 * 60 * 24 });
   const isLogged = computed(() => !!tokenCookie.value);
 
+  // ===================== LOGIN =====================
   const login = async (data: { email: string; password_hash: string }) => {
     try {
       const response = await $fetch("http://127.0.0.1:8000/api/client/login", {
@@ -14,7 +15,7 @@ export const useAuth = () => {
       });
 
       if (response.success && response.data?.access_token) {
-        tokenCookie.value = response.data.access_token; // lưu vào cookie
+        tokenCookie.value = response.data.access_token;
       }
 
       return {
@@ -35,9 +36,9 @@ export const useAuth = () => {
       };
     }
   };
-  const register = async (
-    data: RegisterData
-  ): Promise<{ success: boolean; message?: string; errors?: any }> => {
+
+  // ===================== REGISTER =====================
+  const register = async (data: RegisterData) => {
     try {
       const response = await $fetch(
         "http://127.0.0.1:8000/api/client/register",
@@ -64,9 +65,35 @@ export const useAuth = () => {
     }
   };
 
-  const logout = () => {
-    tokenCookie.value = null;
+  // ===================== CHECK EMAIL =====================
+  const checkEmailAvailable = async (email: string) => {
+    try {
+      const res = await $fetch("http://127.0.0.1:8000/api/client/check-email", {
+        method: "POST",
+        body: { email },
+      });
+
+      return res; // { available: true/false }
+    } catch (error: any) {
+      return { available: false };
+    }
   };
+
+  // ===================== CHECK PHONE =====================
+  const checkPhoneAvailable = async (phone: string) => {
+    try {
+      const res = await $fetch("http://127.0.0.1:8000/api/client/check-phone", {
+        method: "POST",
+        body: { phone },
+      });
+
+      return res; // { available: true/false }
+    } catch (error: any) {
+      return { available: false };
+    }
+  };
+
+  // ===================== SEND RESET PASSWORD =====================
   const sendResetPasswordOtp = async (email: string): Promise<ApiResponse> => {
     try {
       const response = await $fetch<ApiResponse>(
@@ -82,15 +109,24 @@ export const useAuth = () => {
       const msg = error?.data?.errors
         ? Object.values(error.data.errors)[0][0]
         : error?.data?.message || "Không thể gửi mã OTP";
+
       alert(msg);
       throw error.data || { message: "Không thể gửi mã OTP" };
     }
   };
+
+  // ===================== LOGOUT =====================
+  const logout = () => {
+    tokenCookie.value = null;
+  };
+
   return {
     login,
     logout,
     sendResetPasswordOtp,
     register,
+    checkEmailAvailable,
+    checkPhoneAvailable,
     tokenCookie,
     isLogged,
   };
