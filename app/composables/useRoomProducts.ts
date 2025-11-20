@@ -12,7 +12,7 @@ export function useRoomProducts(roomId: number) {
     try {
       const { data, error: fetchError } =
         await useCustomFetch<RoomProductApiResponse>(
-          `http://127.0.0.1:8000/api/client/products/room?room_id=${roomId}`,
+          `https://api.mocfurni.shop/api/client/products/room?room_id=${roomId}`,
           {
             method: "GET",
           }

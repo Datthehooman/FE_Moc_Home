@@ -37,11 +37,14 @@
       <div class="flex items-center gap-1 my-[9px]">
         <template v-for="star in 5" :key="star">
           <UIcon
-            v-if="star <= Math.floor(stars || 0)"
+            v-if="star <= Math.floor(Number(stars) || 0)"
             name="i-heroicons-star-solid"
             class="size-4 text-yellow-400"
           />
-          <div v-else-if="star - 0.5 <= (stars || 0)" class="relative size-4">
+          <div
+            v-else-if="star - 0.5 <= (Number(stars) || 0)"
+            class="relative size-4"
+          >
             <UIcon
               name="i-heroicons-star"
               class="size-4 text-yellow-400 absolute"
@@ -79,7 +82,7 @@
     title?: string;
     image?: string;
     badge?: string;
-    stars?: number;
+    stars?: string;
     price?: string;
     salePrice?: string;
     badgeColor?: string;

@@ -5,7 +5,10 @@ export const useCart = () => {
   const cart = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  const tokenCookie = useCookie("token"); // token = string
+  const tokenCookie = useCookie("token", {
+    path: "/",
+    domain: ".mocfurni.shop",
+  }); // token = string
 
   const getAuthHeader = () => ({
     Authorization: `Bearer ${tokenCookie.value}`,
@@ -16,9 +19,12 @@ export const useCart = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const res: any = await $fetch("http://127.0.0.1:8000/api/client/cart", {
-        headers: getAuthHeader(),
-      });
+      const res: any = await $fetch(
+        "https://api.mocfurni.shop/api/client/cart",
+        {
+          headers: getAuthHeader(),
+        }
+      );
       cart.value = res.result.data.items;
       return res.result.data;
     } catch (err: any) {
@@ -38,7 +44,7 @@ export const useCart = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      await $fetch("http://127.0.0.1:8000/api/client/cart/add", {
+      await $fetch("https://api.mocfurni.shop/api/client/cart/add", {
         method: "POST",
         query: { product_id, quantity },
         headers: getAuthHeader(),
@@ -57,7 +63,7 @@ export const useCart = () => {
   const removeItem = async (cart_id: number) => {
     if (!tokenCookie.value) return false;
     try {
-      await $fetch(`http://127.0.0.1:8000/api/client/cart/remove-item`, {
+      await $fetch(`https://api.mocfurni.shop/api/client/cart/remove-item`, {
         method: "DELETE",
         query: { cart_id },
         headers: getAuthHeader(),
@@ -76,12 +82,15 @@ export const useCart = () => {
     if (!tokenCookie.value) return false;
     try {
       await $fetch(
-        `http://127.0.0.1:8000/api/client/cart/update-quantity`,
+        
+        `https://api.mocfurni.shop/api/client/cart/update-quantity`,
+       
         {
-          method: "PUT",
-          query: { product_id, quantity },
-          headers: getAuthHeader(),
-        }
+            method: "PUT",
+            query: { product_id, quantity },
+            headers: getAuthHeader(),
+          }
+      
       );
       await getCart();
       return true;

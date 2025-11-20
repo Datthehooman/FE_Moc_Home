@@ -1,10 +1,15 @@
 <template>
-  <aside class="w-70 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6">
-
+  <aside
+    class="w-64 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6"
+  >
     <!-- Avatar -->
     <div class="flex flex-col items-center mb-4 relative">
       <div class="relative">
-        <img src="https://live.themewild.com/fameo/assets/img/account/02.jpg" alt="Avatar" class="w-20 h-20 rounded-full border-2 border-gray-200" />
+        <img
+          src="https://live.themewild.com/fameo/assets/img/account/02.jpg"
+          alt="Avatar"
+          class="w-20 h-20 rounded-full border-2 border-gray-200"
+        />
       </div>
       <h2 class="mt-2 font-semibold text-gray-800">Lê Phùng Tiến Quân</h2>
       <p class="text-sm text-gray-400">quanlptps39861@gmail.com</p>
@@ -15,22 +20,22 @@
     <!-- Menu -->
     <nav class="flex-1">
       <ul class="space-y-2">
-        <li 
-          v-for="(item, index) in menuItems" 
+        <li
+          v-for="(item, index) in menuItems"
           :key="index"
           @click="navigate(item.path)"
           class="rounded-[10px] cursor-pointer"
         >
-          <div 
+          <div
             class="flex items-center gap-3 px-3 py-2 rounded-[10px] transition-colors duration-200"
-            :class="route.path === item.path 
-              ? 'bg-[#6E4E37] text-white' 
-              : 'bg-white text-gray-700 hover:bg-[#6E4E37] hover:text-white'"
+            :class="
+              route.path === item.path
+                ? 'bg-[#6E4E37] text-white'
+                : 'bg-white text-gray-700 hover:bg-[#6E4E37] hover:text-white'
+            "
           >
-            
             <!-- ICON -->
-           <UIcon :name="item.icon" class="w-5 h-5" />
-
+            <UIcon :name="item.icon" class="w-5 h-5" />
 
             <!-- NAME -->
             <span>{{ item.name }}</span>
@@ -38,15 +43,22 @@
         </li>
       </ul>
     </nav>
-
   </aside>
-</template><script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
-import { useAuth } from '~/composables/useAuth'
+</template>
+<script setup lang="ts">
+  const router = useRouter();
+  const route = useRoute();
+  const authStore = useAuthStore(); // <-- use store instance
 
-const router = useRouter()
-const route = useRoute()
-const auth = useAuth()
+  const navigate = async (path: string) => {
+    if (path === "/logout") {
+      await authStore.logout(); // call store logout
+      router.push("/"); // redirect after logout
+      alert("Đăng xuất thành công 🎉");
+    } else {
+      router.push(path);
+    }
+  };
 
 const navigate = async (path: string) => {
   if (path === '/logout') {

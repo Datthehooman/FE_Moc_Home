@@ -3,19 +3,28 @@ import { useCookie } from "#app";
 import { computed } from "vue";
 
 export const useAuth = () => {
-  const tokenCookie = useCookie("token", { path: "/", maxAge: 60 * 60 * 24 });
+  const user = ref({});
+  const tokenCookie = useCookie("token", {
+    path: "/",
+    maxAge: 60 * 60 * 24,
+    domain: ".mocfurni.shop",
+    sameSite: "lax",
+  });
   const isLogged = computed(() => !!tokenCookie.value);
 
   // ===================== LOGIN =====================
   const login = async (data: { email: string; password_hash: string }) => {
     try {
-      const response = await $fetch("http://127.0.0.1:8000/api/client/login", {
-        method: "POST",
-        body: data,
-      });
+      const response = await $fetch(
+        "https://api.mocfurni.shop/api/client/login",
+        {
+          method: "POST",
+          body: data,
+        }
+      );
 
       if (response.success && response.data?.access_token) {
-        tokenCookie.value = response.data.access_token;
+        tokenCookie.value = response.data.access_token; // lưu vào cookie
       }
 
       return {
@@ -41,7 +50,7 @@ export const useAuth = () => {
   const register = async (data: RegisterData) => {
     try {
       const response = await $fetch(
-        "http://127.0.0.1:8000/api/client/register",
+        "https://api.mocfurni.shop/api/client/register",
         {
           method: "POST",
           body: data,
@@ -97,7 +106,7 @@ export const useAuth = () => {
   const sendResetPasswordOtp = async (email: string): Promise<ApiResponse> => {
     try {
       const response = await $fetch<ApiResponse>(
-        "http://127.0.0.1:8000/api/client/sendOtp-password-v1",
+        "https://api.mocfurni.shop/api/client/sendOtp-password-v1",
         {
           method: "POST",
           body: { email },
@@ -129,5 +138,6 @@ export const useAuth = () => {
     checkPhoneAvailable,
     tokenCookie,
     isLogged,
+    user,
   };
 };

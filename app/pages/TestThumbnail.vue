@@ -38,7 +38,7 @@
 
   onMounted(async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/client/products");
+      const res = await fetch("https://api.mocfurni.shop/api/client/products");
       if (!res.ok) throw new Error(`Lỗi khi gọi API: ${res.status}`);
       const data = await res.json();
 

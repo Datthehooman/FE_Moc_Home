@@ -111,6 +111,7 @@
               size="xl"
               variant="solid"
               class="relative bg-white/20 text-white rounded-md overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
+              @click="handleDetail(items[0]?.slug)"
             >
               <span
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
@@ -137,32 +138,35 @@
     {
       product_id: 22,
       product_name: "Ghế Bành Vải Xanh",
+      slug: "ghe-banh-vai-xanh",
       price: 2500000,
       product_price: 2500000,
       product_sale: 1900000,
       quantity: 1,
       thumbnail:
-        "http://127.0.0.1:8000/storage/clientsite/products/images/GB-VX-001_main.png",
+        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
     },
     {
       product_id: 22,
       product_name: "Ghế Bành Vải Xanh",
+      slug: "ghe-banh-vai-xanh",
       price: 2500000,
       product_price: 2500000,
       product_sale: 1900000,
       quantity: 1,
       thumbnail:
-        "http://127.0.0.1:8000/storage/clientsite/products/images/GB-VX-001_main.png",
+        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
     },
     {
       product_id: 22,
       product_name: "Ghế Bành Vải Xanh",
+      slug: "ghe-banh-vai-xanh",
       price: 2500000,
       product_price: 2500000,
       product_sale: 1900000,
       quantity: 1,
       thumbnail:
-        "http://127.0.0.1:8000/storage/clientsite/products/images/GB-VX-001_main.png",
+        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
     },
   ];
 
@@ -172,5 +176,8 @@
   function handleBuyNow(item: Product) {
     setBuyNowItem({ ...item, quantity: 1 });
     router.push("/checkout");
+  }
+  function handleDetail(slug: string) {
+    router.push(`/san-pham/${slug}`);
   }
 </script>
