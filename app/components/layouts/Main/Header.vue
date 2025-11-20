@@ -184,6 +184,13 @@
                 >
                   Tài khoản của tôi
                 </NuxtLink>
+                <a
+                  v-if="auth.user.value.role"
+                  href="https://admin.mocfurni.shop"
+                  class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
+                >
+                  Đi đến trang admin
+                </a>
 
                 <button
                   @click="logout"
@@ -221,10 +228,7 @@
   const router = useRouter();
 
   // Reactive isLogged
-  const isLogged = ref(auth.isLogged.value);
-  watchEffect(() => {
-    isLogged.value = auth.isLogged.value;
-  });
+  const isLogged = auth.isLogged;
 
   // Scroll header
   const isScrolled = ref(false);

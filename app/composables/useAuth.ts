@@ -3,7 +3,13 @@ import { useCookie } from "#app";
 import { computed } from "vue";
 
 export const useAuth = () => {
-  const tokenCookie = useCookie("token", { path: "/", maxAge: 60 * 60 * 24 });
+  const user = ref({});
+  const tokenCookie = useCookie("token", {
+    path: "/",
+    maxAge: 60 * 60 * 24,
+    domain: ".mocfurni.shop",
+    sameSite: "lax",
+  });
   const isLogged = computed(() => !!tokenCookie.value);
 
   const login = async (data: { email: string; password_hash: string }) => {
@@ -18,6 +24,8 @@ export const useAuth = () => {
 
       if (response.success && response.data?.access_token) {
         tokenCookie.value = response.data.access_token; // lưu vào cookie
+        user.value = response.data.user;
+        console.log(isLogged.value);
       }
 
       return {
@@ -96,5 +104,6 @@ export const useAuth = () => {
     register,
     tokenCookie,
     isLogged,
+    user,
   };
 };

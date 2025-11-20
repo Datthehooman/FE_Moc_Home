@@ -5,7 +5,10 @@ export const useCart = () => {
   const cart = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  const tokenCookie = useCookie("token"); // token = string
+  const tokenCookie = useCookie("token", {
+    path: "/",
+    domain: ".mocfurni.shop",
+  }); // token = string
 
   const getAuthHeader = () => ({
     Authorization: `Bearer ${tokenCookie.value}`,

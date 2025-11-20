@@ -3,7 +3,10 @@ import { useCookie } from "#app";
 
 export function useCheckout() {
   const checkoutStore = useCheckoutStore();
-  const tokenCookie = useCookie("token"); // token từ cookie
+  const tokenCookie = useCookie("token", {
+    path: "/",
+    domain: ".mocfurni.shop",
+  }); // token từ cookie
 
   const getAuthHeader = () => ({
     Authorization: `Bearer ${tokenCookie.value}`,
