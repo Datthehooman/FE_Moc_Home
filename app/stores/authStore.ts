@@ -22,9 +22,9 @@ export const useAuthStore = defineStore("auth", {
     user: {},
     token: useCookie("token", {
       path: "/",
-      maxAge: 60 * 60 * 24,
-      domain: ".mocfurni.shop",
-      sameSite: "lax",
+      domain: ".mocfurni.shop", // allow admin.mocfurni.shop to read
+      sameSite: "none", // required for cross-site cookies
+      secure: true, // required when sameSite=none
     }).value,
     isLogged: false,
     isSubmitting: false,
