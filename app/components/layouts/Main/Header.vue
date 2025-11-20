@@ -185,7 +185,7 @@
                   Tài khoản của tôi
                 </NuxtLink>
                 <a
-                  v-if="auth.user.value.role"
+                  v-if="auth.user.role === '1'"
                   href="https://admin.mocfurni.shop"
                   class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
                 >
