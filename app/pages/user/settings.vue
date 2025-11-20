@@ -81,6 +81,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: 'auth'
+})
 import { ref } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 

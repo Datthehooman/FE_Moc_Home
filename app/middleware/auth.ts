@@ -1,4 +1,7 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-  const token = useCookie('token')?.value
-  if (!token) return navigateTo('/error') 
-})
+  const token = useCookie("token", {
+    path: "/",
+    domain: ".mocfurni.shop",
+  })?.value;
+  if (!token) return navigateTo("/error");
+});

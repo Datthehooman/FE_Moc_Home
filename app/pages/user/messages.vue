@@ -117,6 +117,9 @@
   </div>
 </template>
 <script setup>
+definePageMeta({
+  middleware: 'auth'
+})
 import { ref, watch, nextTick } from "vue";
 
 const chats = ref([

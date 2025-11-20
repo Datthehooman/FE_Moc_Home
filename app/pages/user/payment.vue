@@ -101,6 +101,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: 'auth'
+})
 import { ref, computed } from 'vue'
 
 const methods = ref([

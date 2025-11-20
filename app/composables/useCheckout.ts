@@ -3,7 +3,10 @@ import { useCookie } from "#app";
 
 export function useCheckout() {
   const checkoutStore = useCheckoutStore();
-  const tokenCookie = useCookie("token"); // token từ cookie
+  const tokenCookie = useCookie("token", {
+    path: "/",
+    domain: ".mocfurni.shop",
+  }); // token từ cookie
 
   const getAuthHeader = () => ({
     Authorization: `Bearer ${tokenCookie.value}`,
@@ -54,11 +57,14 @@ export function useCheckout() {
   }) => {
     try {
       return await $fetch(
+        
         "https://api.mocfurni.shop/api/client/buy-now/guest",
+       
         {
-          method: "POST",
-          body: payload,
-        }
+            method: "POST",
+            body: payload,
+          }
+      
       );
     } catch (error: any) {
       console.error("❌ Lỗi server guest:", error.data || error);

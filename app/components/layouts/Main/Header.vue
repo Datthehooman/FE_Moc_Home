@@ -177,13 +177,20 @@
           >
             <div class="p-4">
               <!-- Nếu đã đăng nhập -->
-              <template v-if="isLogged">
+              <template v-if="authStore.isLogged">
                 <NuxtLink
                   to="/user/dashboard"
                   class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
                 >
                   Tài khoản của tôi
                 </NuxtLink>
+                <a
+                  v-if="authStore.user.role === '1'"
+                  href="https://admin.mocfurni.shop"
+                  class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
+                >
+                  Đi đến trang admin
+                </a>
 
                 <button
                   @click="logout"
@@ -217,14 +224,8 @@
 </template>
 
 <script setup lang="ts">
-  const auth = useAuth();
+  const authStore = useAuthStore();
   const router = useRouter();
-
-  // Reactive isLogged
-  const isLogged = ref(auth.isLogged.value);
-  watchEffect(() => {
-    isLogged.value = auth.isLogged.value;
-  });
 
   // Scroll header
   const isScrolled = ref(false);
@@ -242,13 +243,13 @@
     isUserDropdownOpen.value = false;
   };
   const logout = async () => {
-    await auth.logout();
+    await authStore.logout();
     closeUserDropdown();
     alert("Đăng xuất thành công 🎉");
     router.push("/");
   };
   const goWishlist = () => {
-    if (!isLogged.value) {
+    if (!authStore.isLogged) {
       alert("Vui lòng đăng nhập để xem danh sách yêu thích 🎯");
       router.push("/login");
     } else {
