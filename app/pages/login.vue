@@ -19,17 +19,18 @@
         </div>
 
         <!-- Form -->
-     <form @submit.prevent="handleLogin" novalidate class="space-y-4">
-
+        <form @submit.prevent="handleLogin" novalidate class="space-y-4">
           <div>
-            <label class="block text-sm text-gray-700 mb-1">Địa chỉ Email</label>
+            <label class="block text-sm text-gray-700 mb-1"
+              >Địa chỉ Email</label
+            >
             <input
               type="email"
               v-model="email"
               placeholder="Email"
               :class="[
                 'w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400',
-                errors.email ? 'border-red-500' : 'border-gray-300'
+                errors.email ? 'border-red-500' : 'border-gray-300',
               ]"
             />
             <p v-if="errors.email" class="text-red-500 text-sm mt-1">
@@ -45,7 +46,7 @@
               placeholder="Nhập mật khẩu"
               :class="[
                 'w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400',
-                errors.password ? 'border-red-500' : 'border-gray-300'
+                errors.password ? 'border-red-500' : 'border-gray-300',
               ]"
             />
             <p v-if="errors.password" class="text-red-500 text-sm mt-1">
@@ -139,45 +140,48 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import { useAuth } from '~/composables/useAuth'
-import { navigateTo } from '#imports'
+  const auth = useAuthStore();
 
-const { login, tokenCookie } = useAuth()
+  const email = ref("");
+  const password = ref("");
+  const remember = ref(false);
+  const errors = reactive({ email: "", password: "" });
+  const isSubmitting = ref(false);
 
-const email = ref('')
-const password = ref('')
-const remember = ref(false)
-const errors = reactive({ email: '', password: '' })
+  const handleLogin = async () => {
+    // reset errors
+    errors.email = "";
+    errors.password = "";
 
-// reactive token để debug hoặc show UI
-const tokenValue = ref(tokenCookie.value)
-watch(tokenCookie, (newVal) => { tokenValue.value = newVal })
+    if (!email.value) errors.email = "Vui lòng nhập email";
+    if (!password.value) errors.password = "Vui lòng nhập mật khẩu";
 
-const handleLogin = async () => {
-  errors.email = ''
-  errors.password = ''
+    if (errors.email || errors.password) return;
 
-  if (!email.value) errors.email = 'Vui lòng nhập email'
-  if (!password.value) errors.password = 'Vui lòng nhập mật khẩu'
+    isSubmitting.value = true;
 
-  if (!errors.email && !errors.password) {
-    const { data, token, error } = await login({ email: email.value, password_hash: password.value })
+    const { error, data } = await auth.login({
+      email: email.value,
+      password_hash: password.value,
+      remember: remember.value,
+    });
+
+    isSubmitting.value = false;
 
     if (error) {
       if (error.statusCode === 422) {
-        errors.email = error.data?.errors?.email?.[0] || ''
-        errors.password = error.data?.errors?.password_hash?.[0] || ''
+        errors.email = error.data?.errors?.email?.[0] || "";
+        errors.password = error.data?.errors?.password_hash?.[0] || "";
       } else if (error.statusCode === 401) {
-        errors.email = 'Email hoặc mật khẩu không đúng'
-        errors.password = 'Email hoặc mật khẩu không đúng'
+        errors.email = "Email hoặc mật khẩu không đúng";
+        errors.password = "Email hoặc mật khẩu không đúng";
+      } else {
+        alert(error.message || "Lỗi không xác định");
       }
     } else {
-      alert('Đăng nhập thành công!')
-      console.log('Token:', token)
-      console.log('User info:', data)
-      navigateTo('/') // redirect về trang chủ
+      alert("Đăng nhập thành công!");
+      console.log("User info:", auth.user);
+      navigateTo("/"); // redirect về trang chủ
     }
-  }
-}
+  };
 </script>

@@ -9,7 +9,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     onRequest({ options }) {
       (options.headers as any).set("Accept", "application/json");
 
-      const token = userAuth.authUser?.access_token;
+      const token = userAuth.token;
       if (userAuth.isLogged && token) {
         (options.headers as any).set("Authorization", `Bearer ${token}`);
       }
