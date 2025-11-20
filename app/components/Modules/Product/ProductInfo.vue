@@ -59,7 +59,7 @@
           </div>
         </div>
 
-        <div v-if="productDetail.color">
+        <!-- <div v-if="productDetail.color">
           <label class="block text-sm mb-1 text-[15px] text-gray-700">Màu sắc</label>
           <div class="flex space-x-2">
             <div v-for="(color, i) in colors" :key="i"
@@ -71,7 +71,7 @@
               </svg>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <!-- Thông tin nhỏ -->

@@ -235,7 +235,7 @@ const fetchCategories = async () => {
 // ----- Fetch sản phẩm và tạo danh sách thương hiệu -----
 const fetchBrandsFromProducts = async () => {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/client/products");
+    const res = await fetch("https://api.mocfurni.shop/api/client/products");
     const json = await res.json();
     const products = json?.result?.data || [];
 

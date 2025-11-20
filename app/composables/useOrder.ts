@@ -18,7 +18,7 @@ const fetchOrders = async () => {
   error.value = null;
 
   try {
-    const res: any = await $fetch("http://127.0.0.1:8000/api/client/orders", {
+    const res: any = await $fetch("https://api.mocfurni.shop/api/client/orders", {
       headers: getAuthHeader(),
     });
 

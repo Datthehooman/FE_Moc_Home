@@ -77,7 +77,7 @@ export const useAuth = () => {
   // ===================== CHECK EMAIL =====================
   const checkEmailAvailable = async (email: string) => {
     try {
-      const res = await $fetch("http://127.0.0.1:8000/api/client/check-email", {
+      const res = await $fetch("https://api.mocfurni.shop/api/client/check-email", {
         method: "POST",
         body: { email },
       });
@@ -91,7 +91,7 @@ export const useAuth = () => {
   // ===================== CHECK PHONE =====================
   const checkPhoneAvailable = async (phone: string) => {
     try {
-      const res = await $fetch("http://127.0.0.1:8000/api/client/check-phone", {
+      const res = await $fetch("https://api.mocfurni.shop/api/client/check-phone", {
         method: "POST",
         body: { phone },
       });

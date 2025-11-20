@@ -64,11 +64,12 @@
                 >
                   <UTooltip text="Xem sản phẩm">
                     <button
-                      @click="$emit('view', item)"
-                      class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
-                    >
-                      <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
-                    </button>
+  @click="viewProduct(item)"
+  class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
+>
+  <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
+</button>
+
                   </UTooltip>
 
                   <UTooltip text="Thêm yêu thích">
@@ -213,7 +214,7 @@ const viewProduct = (product: ProductItem) => {
 const resolveThumbnail = (item: ProductItem) => {
   if (item.thumbnail?.startsWith('http')) return item.thumbnail
   if (item.images?.length && item.images[0].image_url)
-    return `http://127.0.0.1:8000/storage/${item.images[0].image_url}`
+    return `https://api.mocfurni.shop/storage/${item.images[0].image_url}`
   return '/placeholder.png'
 }
 const formatPrice = (price: number | undefined) => (price ? price.toLocaleString('vi-VN') + '₫' : '')
@@ -247,23 +248,34 @@ const handleAddToWishlist = async (item: ProductItem) => {
 }
 
 // Fetch sản phẩm liên quan
+const { categories } = useCategories()
+
 const fetchRelatedProducts = async () => {
   if (!productDetail.value?.category?.slug) return
   try {
-    const res = await fetch(`http://127.0.0.1:8000/api/client/category-by-product?slug=${productDetail.value.category.slug}`)
+    const res = await fetch(`https://api.mocfurni.shop/api/client/category-by-product?slug=${productDetail.value.category.slug}`)
     const json = await res.json()
-    products.value = (json?.result?.data || []).map((p: any) => ({
-      product_id: p.product_id,
-      product_name: p.product_name,
-      slug: p.slug,
-      thumbnail: p.thumbnail || (p.images?.[0]?.image_url ? `http://127.0.0.1:8000/storage/${p.images[0].image_url}` : '/placeholder.png'),
-      images: p.images,
-      price: Number(p.price),
-      price_down: Number(p.price_down || p.price),
-      badge: p.badge,
-      rating: Number(p.rating || 0),
-      category: p.category
-    }))
+
+    products.value = (json?.result?.data || []).map((p: any) => {
+      // Lấy category_name từ useCategories
+     const category = categories.value.find(c => c.id === p.category_id)
+      return {
+        product_id: p.product_id,
+        product_name: p.product_name,
+        slug: p.slug,
+        thumbnail: p.thumbnail,
+        images: p.images,
+        price: Number(p.price),
+        price_down: Number(p.price_down || p.price),
+        badge: p.badge,
+        rating: Number(p.rating || 0),
+        brand: p.brand,
+        sku: p.sku,
+        stock_quantity: p.stock_quantity,
+        category: { category_name: category?.category_name || 'N/A' }
+      }
+    })
+
     relatedIndex.value = 0
     await nextTick()
     updateItemWidth()

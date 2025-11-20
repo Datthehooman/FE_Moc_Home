@@ -18,7 +18,7 @@ loading.value = true;
 error.value = null;
 
 try {
-  const res: any = await $fetch(`http://127.0.0.1:8000/api/client/orders/${id}`, {
+  const res: any = await $fetch(`https://api.mocfurni.shop/api/client/orders/${id}`, {
     headers: getAuthHeader(),
   });
 
@@ -77,7 +77,7 @@ canceling.value = true;
 
 try {
   await $fetch(
-    `http://127.0.0.1:8000/api/client/orders/${order.value.id}/cancel`,
+    `https://api.mocfurni.shop/api/client/orders/${order.value.id}/cancel`,
     {
       method: "POST",
       headers: getAuthHeader(),

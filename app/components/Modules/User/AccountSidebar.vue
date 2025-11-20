@@ -60,15 +60,15 @@
     }
   };
 
-const navigate = async (path: string) => {
-  if (path === '/logout') {
-    auth.logout()              // xóa token
-    router.push('/')           // chuyển về trang chủ hoặc login
-    alert('Đăng xuất thành công 🎉')
-  } else {
-    router.push(path)
-  }
-}
+// const navigate = async (path: string) => {
+//   if (path === '/logout') {
+//     auth.logout()              // xóa token
+//     router.push('/')           // chuyển về trang chủ hoặc login
+//     alert('Đăng xuất thành công 🎉')
+//   } else {
+//     router.push(path)
+//   }
+// }
 
 const menuItems = [
   { name: 'Thống kê', path: '/user/dashboard', icon: 'heroicons:chart-bar' },
