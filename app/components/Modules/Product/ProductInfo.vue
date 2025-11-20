@@ -138,7 +138,7 @@ const slug = route.params.slug as string
 
 // API
 const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()
-const { postWishlist } = useWishlist()
+const { addToWishlist } = useWishlist()
 onMounted(() => fetchProductDetail(slug))
 
 
@@ -192,7 +192,7 @@ const handleAddToWishlist = async () => {
   }
 
   try {
-    const success = await postWishlist(productDetail.value.product_id)
+    const success = await addToWishlist(productDetail.value.product_id)
     
     if (success) {
       alert('✅ Đã thêm sản phẩm vào yêu thích!')
