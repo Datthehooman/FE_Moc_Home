@@ -143,7 +143,7 @@
   const emit = defineEmits(["view"]);
   const router = useRouter();
   const { addToCart } = useCart();
-  const { postWishlist } = useWishlist(); // Sử dụng postWishlist từ composable
+  const { addToWishlist, isInWishlist } = useWishlist();
   const errorImage = ref(false);
 
   const resolvedThumbnail = computed(() => {
@@ -197,7 +197,7 @@
     }
 
     try {
-      const success = await postWishlist(props.item.product_id);
+      const success = await addToWishlist(props.item.product_id);
 
       if (success) {
         alert("✅ Đã thêm sản phẩm vào yêu thích!");

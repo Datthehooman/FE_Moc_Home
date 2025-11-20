@@ -10,7 +10,7 @@
 
           <div class="flex justify-between items-center mb-2">
             <h3 class="font-semibold text-gray-700 text-[20px]">
-              Danh sách sản phẩm yêu thích
+              Danh sách sản phẩm yêu thích ({{ wishlistCount }})
             </h3>
 
             <div class="flex items-center gap-3">
@@ -19,22 +19,25 @@
                 v-if="wishlists.length > 0"
                 @click="removeAllWishlist"
                 class="px-4 py-2 bg-orange-500 text-white rounded-lg shadow hover:bg-orange-600 transition"
+                :disabled="isLoading"
               >
                 Xóa tất cả
               </button>
-              <!-- XÓA -->
+              <!-- XÓA ĐÃ CHỌN -->
               <button
-                v-if="isSelecting && selectedList.length"
+                v-if="isSelecting && selectedList.length > 0"
                 @click="removeSelected"
                 class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
+                :disabled="isLoading"
               >
-                Xóa khỏi yêu thích
+                Xóa {{ selectedList.length }} sản phẩm đã chọn
               </button>
 
               <!-- CHỌN -->
               <button
                 class="px-5 py-2 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow transition"
                 @click="toggleSelectMode"
+                :disabled="isLoading"
               >
                 {{ isSelecting ? 'Hủy chọn' : 'Chọn sản phẩm' }}
               </button>
@@ -43,36 +46,90 @@
 
           <hr class="border-t border-gray-200 mb-4" />
 
+          <!-- THÔNG BÁO KHI ĐANG CHỌN -->
+          <div v-if="isSelecting && selectedList.length > 0" class="mb-4 p-3 bg-blue-50 rounded-lg">
+            <p class="text-blue-700 text-sm">
+              Đã chọn <strong>{{ selectedList.length }}</strong> sản phẩm
+            </p>
+          </div>
+
           <!-- LOADING -->
           <div v-if="isLoading" class="text-center text-gray-500 py-10">
+            <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin mx-auto mb-2" />
             Đang tải danh sách yêu thích...
           </div>
 
           <!-- ERROR -->
           <div v-else-if="error" class="text-center text-red-500 py-10">
+            <UIcon name="i-heroicons-exclamation-triangle" class="w-8 h-8 mx-auto mb-2" />
             {{ error.message || 'Không thể tải dữ liệu' }}
+            <UButton 
+              @click="fetchWishlist" 
+              color="red" 
+              variant="ghost"
+              class="mt-2"
+            >
+              Thử lại
+            </UButton>
           </div>
 
           <!-- EMPTY -->
           <div v-else-if="!wishlists.length" class="text-center text-gray-500 py-10">
-            Chưa có sản phẩm yêu thích nào 😢
+            <div class="flex flex-col items-center justify-center">
+              <UIcon name="i-heroicons-heart" class="w-16 h-16 text-gray-300 mb-4" />
+              <p class="text-lg mb-2">Chưa có sản phẩm yêu thích nào</p>
+              <p class="text-sm text-gray-500 mb-4">Hãy thêm sản phẩm bạn yêu thích vào đây!</p>
+              <UButton 
+                to="/ProductList" 
+                color="primary" 
+                variant="solid"
+              >
+                Khám phá sản phẩm
+              </UButton>
+            </div>
           </div>
 
           <!-- LIST -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 justify-center">
-            <ModulesUserCartWishlist
-              v-for="item in paginatedWishlists"
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center">
+            <div 
+              v-for="item in paginatedWishlists" 
               :key="item.product_id"
-              :item="item"
-              :itemWidth="250"
-              @wishlist-updated="handleWishlistUpdated"
-              @view="handleViewProduct"
-            />
+              class="relative"
+            >
+              <!-- CHECKBOX KHI CHẾ ĐỘ CHỌN -->
+              <div v-if="isSelecting" class="absolute top-3 left-3 z-30">
+                <input
+                  type="checkbox"
+                  :checked="selectedList.includes(item)"
+                  @change="toggleSelectItem(item)"
+                  class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+              </div>
+              
+              <ModulesUserCartWishlist
+                :item="item"
+                :itemWidth="250"
+                @wishlist-updated="handleWishlistUpdated"
+              />
+            </div>
+          </div>
+
+          <!-- THÔNG BÁO TRANG TRỐNG -->
+          <div v-if="paginatedWishlists.length === 0 && wishlists.length > 0" class="text-center text-gray-500 py-10">
+            <p>Không có sản phẩm nào trên trang này</p>
+            <UButton 
+              @click="currentPage = 1" 
+              color="primary" 
+              variant="ghost"
+              class="mt-2"
+            >
+              Về trang đầu
+            </UButton>
           </div>
 
           <!-- PHÂN TRANG -->
           <ModulesUserPagination
-            v-if="totalPages > 1"
+            v-if="totalPages > 1 && paginatedWishlists.length > 0"
             :current-page="currentPage"
             :total-pages="totalPages"
             :pages-around="pagesAround"
@@ -93,11 +150,20 @@ definePageMeta({ middleware: 'auth' })
 import { ref, computed, onMounted, watch } from 'vue'
 import type { Wishlist } from '~/types/wishlist'
 
-// Composables
-const { wishlists, isLoading, error, fetchWishlist, deleteMultipleWishlist, deleteAllWishlist } = useWishlist()
+// 🟢 SỬA: Dùng composable mới với hàm đã đổi tên
+const { 
+  wishlists, 
+  isLoading, 
+  error, 
+  fetchWishlist, 
+  removeMultipleFromWishlist, 
+  clearWishlist, 
+  getWishlistCount 
+} = useWishlist()
 
-// Lấy danh sách từ API - CHỈ GỌI 1 LẦN
+// 🟢 FETCH DỮ LIỆU KHI MOUNT
 onMounted(() => {
+  console.log('🟢 Wishlist page mounted, fetching data...')
   fetchWishlist()
 })
 
@@ -108,11 +174,6 @@ const totalPages = computed(() => Math.ceil(wishlists.value.length / perPage))
 const paginatedWishlists = computed(() =>
   wishlists.value.slice((currentPage.value - 1) * perPage, currentPage.value * perPage)
 )
-const pagesAround = computed(() => {
-  const p = currentPage.value
-  const t = totalPages.value
-  return Array.from({ length: 3 }, (_, i) => p - 1 + i).filter((x) => x > 1 && x < t)
-})
 
 const nextPage = () => { 
   if (currentPage.value < totalPages.value) currentPage.value++ 
@@ -130,49 +191,76 @@ const toggleSelectMode = () => {
   if (!isSelecting.value) selectedList.value = []
 }
 
-// XÓA SẢN PHẨM
+const toggleSelectItem = (item: Wishlist) => {
+  const index = selectedList.value.findIndex(selected => selected.product_id === item.product_id)
+  if (index > -1) {
+    selectedList.value.splice(index, 1)
+  } else {
+    selectedList.value.push(item)
+  }
+}
+
+
+const handleWishlistUpdated = async () => {
+  console.log('🟢 Received wishlist-updated event, refetching data...')
+  await fetchWishlist()
+}
+
+
+// 🟢 SỬA: Dùng hàm mới removeMultipleFromWishlist
 const removeSelected = async () => {
   if (selectedList.value.length === 0) return
   
   if (confirm(`Bạn có chắc muốn xóa ${selectedList.value.length} sản phẩm khỏi yêu thích?`)) {
     const productIds = selectedList.value.map(item => item.product_id)
     
-    const success = await deleteMultipleWishlist(productIds)
+    const success = await removeMultipleFromWishlist(productIds)
     if (success) {
       selectedList.value = []
       isSelecting.value = false
-      alert(`✅ Đã xóa ${productIds.length} sản phẩm khỏi yêu thích!`)
+      console.log('🟢 Multiple products removed successfully')
+      
+      // 🟢 HIỂN THỊ THÔNG BÁO
+      const toast = useToast()
+      toast.add({ title: `✅ Đã xóa ${productIds.length} sản phẩm khỏi yêu thích!`, color: "success" })
+    } else {
+      const toast = useToast()
+      toast.add({ title: '❌ Xóa sản phẩm thất bại!', color: "error" })
     }
   }
 }
 
-// XÓA TẤT CẢ
+// 🟢 SỬA: Dùng hàm mới clearWishlist
 const removeAllWishlist = async () => {
   if (wishlists.value.length === 0) return
   
   if (confirm('Bạn có chắc muốn xóa TẤT CẢ sản phẩm khỏi yêu thích?')) {
-    const success = await deleteAllWishlist()
+    const success = await clearWishlist()
     if (success) {
-      alert('✅ Đã xóa tất cả sản phẩm khỏi yêu thích!')
+      console.log('🟢 All products removed successfully')
+      
+      // 🟢 HIỂN THỊ THÔNG BÁO
+      const toast = useToast()
+      toast.add({ title: '✅ Đã xóa tất cả sản phẩm khỏi yêu thích!', color: "success" })
+    } else {
+      const toast = useToast()
+      toast.add({ title: '❌ Xóa tất cả sản phẩm thất bại!', color: "error" })
     }
   }
 }
 
-// 🎯 EVENT HANDLERS - Chỉ fetch lại khi cần thiết
-const handleWishlistUpdated = () => {
-  // Không cần làm gì vì state đã được cập nhật tự động
-  console.log('Wishlist updated')
-}
-
-// 🎯 WATCHERS - Reset pagination khi cần
+// 🟢 THEO DÕI THAY ĐỔI CỦA WISHLISTS ĐỂ ĐIỀU CHỈNH PAGINATION
 watch(
   () => wishlists.value.length,
   (newLength, oldLength) => {
+    console.log('🟢 Wishlist length changed:', oldLength, '->', newLength)
     if (paginatedWishlists.value.length === 0 && currentPage.value > 1) {
-      currentPage.value = 1
+      currentPage.value = Math.max(1, currentPage.value - 1)
     }
-  }
+  },
+  { deep: true }
 )
 
-
+// 🟢 COMPUTED CHO SỐ LƯỢNG WISHLIST
+const wishlistCount = computed(() => getWishlistCount())
 </script>
