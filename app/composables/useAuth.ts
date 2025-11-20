@@ -25,7 +25,7 @@ export const useAuth = () => {
       if (response.success && response.data?.access_token) {
         tokenCookie.value = response.data.access_token; // lưu vào cookie
         user.value = response.data.user;
-        console.log(isLogged.value);
+        console.log(user.value);
       }
 
       return {
