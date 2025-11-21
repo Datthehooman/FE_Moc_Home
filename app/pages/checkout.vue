@@ -539,7 +539,7 @@
 
       alert("Thanh toán thành công! 🎉");
       checkoutStore.clearCheckout();
-      router.push("/"); // ✅ chuyển về trang chủ
+      router.push("/thanks"); // ✅ chuyển về trang chủ
     } catch (err: any) {
       console.error("❌ Lỗi khi gọi API:", err);
       alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");

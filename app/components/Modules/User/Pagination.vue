@@ -11,38 +11,15 @@
       ‹
     </button>
 
-    <!-- Page 1 -->
+    <!-- Loop all pages -->
     <button
-      @click="$emit('go', 1)"
+      v-for="page in pages"
+      :key="page"
+      @click="$emit('go', page)"
       class="w-[40px] h-[40px] flex justify-center items-center rounded-[10px] text-white transition"
-      :class="currentPage === 1 ? 'bg-[#6E4E37]' : 'bg-black hover:bg-[#6E4E37]'"
+      :class="currentPage === page ? 'bg-[#6E4E37]' : 'bg-black hover:bg-[#6E4E37]'"
     >
-      1
-    </button>
-
-    <span v-if="currentPage > 3" class="text-gray-500">...</span>
-
-    <!-- Pages around -->
-    <button
-      v-for="p in pagesAround"
-      :key="p"
-      @click="$emit('go', p)"
-      class="w-[40px] h-[40px] flex justify-center items-center rounded-[10px] text-white transition"
-      :class="currentPage === p ? 'bg-[#6E4E37]' : 'bg-black hover:bg-[#6E4E37]'"
-    >
-      {{ p }}
-    </button>
-
-    <span v-if="currentPage < totalPages - 2" class="text-gray-500">...</span>
-
-    <!-- Last page -->
-    <button
-      v-if="totalPages > 1"
-      @click="$emit('go', totalPages)"
-      class="w-[40px] h-[40px] flex justify-center items-center rounded-[10px] text-white transition"
-      :class="currentPage === totalPages ? 'bg-[#6E4E37]' : 'bg-black hover:bg-[#6E4E37]'"
-    >
-      {{ totalPages }}
+      {{ page }}
     </button>
 
     <!-- Next -->
@@ -59,9 +36,25 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
   currentPage: Number,
   totalPages: Number,
-  pagesAround: Array
+  pagesAround: { type: Number, default: 2 }
+})
+
+// Tạo list số trang hiển thị
+const pages = computed(() => {
+  const arr = []
+
+  const start = Math.max(1, props.currentPage - props.pagesAround)
+  const end = Math.min(props.totalPages, props.currentPage + props.pagesAround)
+
+  for (let p = start; p <= end; p++) {
+    arr.push(p)
+  }
+
+  return arr
 })
 </script>
