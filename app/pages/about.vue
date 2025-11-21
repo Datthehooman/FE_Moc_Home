@@ -131,7 +131,7 @@
                 <div class="bg-white p-6 rounded-xl shadow-xl relative transform transition duration-300 hover:shadow-2xl">
                     <div class="absolute inset-0 bg-gradient-to-r from-[#F5E7D5] to-transparent transform translate-x-1 translate-y-1 rounded-xl -z-10"></div>
                     <div class="flex items-center mb-5">
-                        <img src="https://i.imgur.com/8Q5F9Xj.png" alt="Ảnh khách hàng 1" class="w-14 h-14 rounded-full object-cover mr-4 border-2 border-[#E8C59A]">
+                        <img src="/avatar.png" alt="Ảnh khách hàng 1" class="w-14 h-14 rounded-full object-cover mr-4 border-2 border-[#E8C59A]">
                         <div>
                             <p class="font-bold text-lg text-amber-900">Lê Phùng Tiến Quân</p>
                             <p class="text-sm text-gray-500">Khách hàng</p>
@@ -148,7 +148,7 @@
                 <div class="bg-white p-6 rounded-xl shadow-xl relative transform transition duration-300 hover:shadow-2xl">
                     <div class="absolute inset-0 bg-gradient-to-r from-[#F5E7D5] to-transparent transform translate-x-1 translate-y-1 rounded-xl -z-10"></div>
                     <div class="flex items-center mb-5">
-                        <img src="https://i.imgur.com/G9C01s2.png" alt="Ảnh khách hàng 2" class="w-14 h-14 rounded-full object-cover mr-4 border-2 border-[#E8C59A]">
+                        <img src="/avatar.png" alt="Ảnh khách hàng 2" class="w-14 h-14 rounded-full object-cover mr-4 border-2 border-[#E8C59A]">
                         <div>
                             <p class="font-bold text-lg text-amber-900">Lê Phùng Tiến Quân</p>
                             <p class="text-sm text-gray-500">Khách hàng</p>
@@ -165,7 +165,7 @@
                 <div class="bg-white p-6 rounded-xl shadow-xl relative transform transition duration-300 hover:shadow-2xl">
                     <div class="absolute inset-0 bg-gradient-to-r from-[#F5E7D5] to-transparent transform translate-x-1 translate-y-1 rounded-xl -z-10"></div>
                     <div class="flex items-center mb-5">
-                        <img src="https://i.imgur.com/vH9l2rN.png" alt="Ảnh khách hàng 3" class="w-14 h-14 rounded-full object-cover mr-4 border-2 border-[#E8C59A]">
+                        <img src="/avatar.png" alt="Ảnh khách hàng 3" class="w-14 h-14 rounded-full object-cover mr-4 border-2 border-[#E8C59A]">
                         <div>
                             <p class="font-bold text-lg text-amber-900">Lê Phùng Tiến Quân</p>
                             <p class="text-sm text-gray-500">Khách hàng</p>
@@ -182,7 +182,7 @@
                 <div class="bg-white p-6 rounded-xl shadow-xl relative transform transition duration-300 hover:shadow-2xl">
                     <div class="absolute inset-0 bg-gradient-to-r from-[#F5E7D5] to-transparent transform translate-x-1 translate-y-1 rounded-xl -z-10"></div>
                     <div class="flex items-center mb-5">
-                        <img src="https://i.imgur.com/2sR9c0r.png" alt="Ảnh khách hàng 4" class="w-14 h-14 rounded-full object-cover mr-4 border-2 border-[#E8C59A]">
+                        <img src="/avatar.png" alt="Ảnh khách hàng 4" class="w-14 h-14 rounded-full object-cover mr-4 border-2 border-[#E8C59A]">
                         <div>
                             <p class="font-bold text-lg text-amber-900">Lê Phùng Tiến Quân</p>
                             <p class="text-sm text-gray-500">Khách hàng</p>
@@ -217,7 +217,7 @@
                 
                 <div class="bg-white p-4 pt-0 rounded-xl shadow-lg border-t-8 border-transparent transition duration-300 hover:shadow-xl hover:border-amber-900/50">
                     <div class="mb-4 bg-[#EED7C8] rounded-t-xl overflow-hidden">
-                        <img src="https://i.imgur.com/r6wT9y0.png" alt="Ảnh thành viên 1" class="w-full h-80 object-cover object-top rounded-t-lg">
+                        <img src="/member1.jpg" alt="Ảnh thành viên 1" class="w-full h-80 object-cover object-top rounded-t-lg">
                     </div>
                     
                     <div class="text-center">
@@ -243,7 +243,7 @@
 
                 <div class="bg-white p-4 pt-0 rounded-xl shadow-lg border-t-8 border-transparent transition duration-300 hover:shadow-xl hover:border-amber-900/50">
                     <div class="mb-4 bg-[#EADCCB] rounded-t-xl overflow-hidden">
-                        <img src="https://i.imgur.com/vH9l2rN.png" alt="Ảnh thành viên 2" class="w-full h-80 object-cover object-top rounded-t-lg">
+                        <img src="/member2.jpg" alt="Ảnh thành viên 2" class="w-full h-80 object-cover object-top rounded-t-lg">
                     </div>
                     <div class="text-center">
                         <p class="font-bold text-xl text-amber-900 mt-2">Lê Phùng Tiến Quân</p>
@@ -259,7 +259,7 @@
 
                 <div class="bg-white p-4 pt-0 rounded-xl shadow-lg border-t-8 border-transparent transition duration-300 hover:shadow-xl hover:border-amber-900/50">
                     <div class="mb-4 bg-[#D1C6BB] rounded-t-xl overflow-hidden">
-                        <img src="https://i.imgur.com/2sR9c0r.png" alt="Ảnh thành viên 3" class="w-full h-80 object-cover object-top rounded-t-lg">
+                        <img src="/member3.jpg" alt="Ảnh thành viên 3" class="w-full h-80 object-cover object-top rounded-t-lg">
                     </div>
                     <div class="text-center">
                         <p class="font-bold text-xl text-amber-900 mt-2">Huỳnh Anh Quốc</p>
@@ -275,7 +275,7 @@
 
                 <div class="bg-white p-4 pt-0 rounded-xl shadow-lg border-t-8 border-transparent transition duration-300 hover:shadow-xl hover:border-amber-900/50">
                     <div class="mb-4 bg-[#EED7C8] rounded-t-xl overflow-hidden">
-                        <img src="https://i.imgur.com/G9C01s2.png" alt="Ảnh thành viên 4" class="w-full h-80 object-cover object-top rounded-t-lg">
+                        <img src="/member4.jpg" alt="Ảnh thành viên 4" class="w-full h-80 object-cover object-top rounded-t-lg">
                     </div>
                     <div class="text-center">
                         <p class="font-bold text-xl text-amber-900 mt-2">Đỗ Thành Nhựt</p>
@@ -334,90 +334,103 @@
             </div>
         </div>
         
-        <h3 class="text-2xl font-bold text-amber-900 mb-8">Facebook @MộcHome</h3>
-
-        <div class="w-full max-w-7xl px-4">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                
-                <a href="#" class="relative w-full h-72 rounded-xl overflow-hidden shadow-lg group block">
-                    <img src="https://i.imgur.com/vH9l2rN.png" alt="Ảnh nội thất 1" 
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    >
-                    <div class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300 group-hover:opacity-30"></div>
-                </a>
-                
-                <a href="#" class="relative w-full h-72 rounded-xl overflow-hidden shadow-lg group block">
-                    <img src="https://i.imgur.com/G9C01s2.png" alt="Ảnh nội thất 2" 
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    >
-                    <div class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300 group-hover:opacity-30"></div>
-                </a>
-
-                <a href="#" class="relative w-full h-72 rounded-xl overflow-hidden shadow-lg group block">
-                    <img src="https://i.imgur.com/2sR9c0r.png" alt="Ảnh nội thất 3" 
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    >
-                    <div class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300 group-hover:opacity-30"></div>
-                </a>
-
-                <a href="#" class="relative w-full h-72 rounded-xl overflow-hidden shadow-lg group block">
-                    <img src="https://i.imgur.com/r6wT9y0.png" alt="Ảnh nội thất 4" 
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    >
-                    <div class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300 group-hover:opacity-30"></div>
-                </a>
-
-                <a href="#" class="relative w-full h-72 rounded-xl overflow-hidden shadow-lg group block">
-                    <img src="https://i.imgur.com/8Q5F9Xj.png" alt="Ảnh nội thất 5" 
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    >
-                    <div class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300 group-hover:opacity-30"></div>
-                </a>
-                
-            </div>
-        </div>
+        
 
         
     </section>
 
 
-<div class="bg-stone-100 p-8 md:p-12 lg:p-16">
-    
-    <div class="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-x-8 gap-y-6 md:gap-x-12 lg:gap-x-16">
+    <div class="bg-stone-100 p-8 md:pt-16 lg:p-16">
         
-        <div class="text-gray-500 flex items-center space-x-1">
-            <span class="text-3xl font-serif italic">Ingoude</span>
-            <span class="text-sm">company</span>
-        </div>
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-x-8 gap-y-6 md:gap-x-12 lg:gap-x-16">
+            
+            <div class="text-gray-500 flex items-center space-x-1">
+                <span class="text-3xl font-serif italic">Ingoude</span>
+                <span class="text-sm">company</span>
+            </div>
 
-        <div class="text-gray-600">
-            <span class="text-3xl font-serif">ginyard</span>
-        </div>
+            <div class="text-gray-600">
+                <span class="text-3xl font-serif">ginyard</span>
+            </div>
 
-        <div class="text-gray-500 text-center">
-            <span class="text-4xl font-serif italic tracking-wider">ingoude</span>
-            <div class="text-xs tracking-widest uppercase">Company</div>
-        </div>
+            <div class="text-gray-500 text-center">
+                <span class="text-4xl font-serif italic tracking-wider">ingoude</span>
+                <div class="text-xs tracking-widest uppercase">Company</div>
+            </div>
 
-        <div class="text-gray-700 text-center">
-            <span class="text-3xl font-sans font-bold uppercase">velvet.</span>
-            <div class="text-xs tracking-widest uppercase">cosmetics</div>
-        </div>
-        
-        <div class="text-gray-700 text-center">
-            <span class="text-3xl font-sans font-extrabold uppercase tracking-widest">habur</span>
-            <div class="text-xs tracking-widest uppercase">furniture</div>
-        </div>
+            <div class="text-gray-700 text-center">
+                <span class="text-3xl font-sans font-bold uppercase">velvet.</span>
+                <div class="text-xs tracking-widest uppercase">cosmetics</div>
+            </div>
+            
+            <div class="text-gray-700 text-center">
+                <span class="text-3xl font-sans font-extrabold uppercase tracking-widest">habur</span>
+                <div class="text-xs tracking-widest uppercase">furniture</div>
+            </div>
 
-        <div class="text-gray-700 text-center">
-            <span class="text-3xl font-sans font-extrabold lowercase">coconut.</span>
-            <div class="text-xs tracking-widest uppercase">cosmetics</div>
+            <div class="text-gray-700 text-center">
+                <span class="text-3xl font-sans font-extrabold lowercase">coconut.</span>
+                <div class="text-xs tracking-widest uppercase">cosmetics</div>
+            </div>
+
         </div>
+    </div>
 
     </div>
-    </div>
+
+    <div>
+        <p class="font-semibold text-[30px] mb-[29px] text-center p-8">
+        Facebook <span class="text-primary">@MộcHome</span>
+        </p>
+        <UCarousel
+        v-slot="{ item }"
+        :items="items"
+        :slides-to-scroll="1"
+        :autoplay="{ delay: 2000 }"
+        :ui="{
+            container: 'gap-[10px]',
+            item: 'basis-[calc(20%-10px)]',
+        }"
+        >
+        <div class="size-[250px] rounded-xl overflow-hidden relative group">
+            <NuxtImg
+            src="/blog 1.png"
+            class="w-full h-full object-cover relative z-0"
+            />
+
+            <div
+            class="absolute inset-0 -translate-x-full bg-black/25 group-hover:translate-x-0 transition-transform duration-500 z-10"
+            ></div>
+
+            <div
+            class="absolute inset-0 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            >
+            <div
+                class="size-[40px] rounded-full bg-primary text-primary overflow-hidden relative"
+            >
+                <UIcon
+                name="i-uil-facebook-f"
+                class="size-10 text-white absolute -bottom-1 left-0.5"
+                />
+            </div>
+            </div>
+        </div>
+        </UCarousel>
     </div>
 </template>
 <script lang="ts" setup>
-// Không cần thay đổi script
+const items = [
+    "https://picsum.photos/468/468?random=1",
+    "https://picsum.photos/468/468?random=2",
+    "https://picsum.photos/468/468?random=3",
+    "https://picsum.photos/468/468?random=4",
+    "https://picsum.photos/468/468?random=5",
+    "https://picsum.photos/468/468?random=6",
+    "https://picsum.photos/468/468?random=1",
+    "https://picsum.photos/468/468?random=2",
+    "https://picsum.photos/468/468?random=3",
+    "https://picsum.photos/468/468?random=4",
+    "https://picsum.photos/468/468?random=5",
+    "https://picsum.photos/468/468?random=6",
+  ];
 </script>
