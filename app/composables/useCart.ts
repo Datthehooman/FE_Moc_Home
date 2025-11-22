@@ -5,13 +5,15 @@ export const useCart = () => {
   const cart = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  let tokenCookie = useCookie("tokenLocal")?.value;
 
-  if (!tokenCookie) {
+  // Get the ref object, don't destructure the value
+  let tokenCookie = useCookie("tokenLocal");
+
+  if (!tokenCookie.value) {
     tokenCookie = useCookie("token", {
       path: "/",
       domain: ".mocfurni.shop",
-    })?.value;
+    });
   }
 
   const getAuthHeader = () => ({
@@ -87,7 +89,6 @@ export const useCart = () => {
     try {
       await $fetch(
         `https://api.mocfurni.shop/api/client/cart/update-quantity`,
-
         {
           method: "PUT",
           query: { product_id, quantity },

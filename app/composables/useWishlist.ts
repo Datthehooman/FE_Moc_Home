@@ -6,13 +6,13 @@ export const useWishlist = () => {
   const wishlists = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  let tokenCookie = useCookie("tokenLocal")?.value;
+  let tokenCookie = useCookie("tokenLocal");
 
-  if (!tokenCookie) {
+  if (!tokenCookie.value) {
     tokenCookie = useCookie("token", {
       path: "/",
       domain: ".mocfurni.shop",
-    })?.value;
+    });
   }
 
   const getAuthHeader = () => ({

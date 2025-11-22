@@ -3,13 +3,13 @@ import { useCookie } from "#app";
 
 export function useCheckout() {
   const checkoutStore = useCheckoutStore();
-  let tokenCookie = useCookie("tokenLocal")?.value;
+  let tokenCookie = useCookie("tokenLocal");
 
-  if (!tokenCookie) {
+  if (!tokenCookie.value) {
     tokenCookie = useCookie("token", {
       path: "/",
       domain: ".mocfurni.shop",
-    })?.value;
+    });
   }
 
   const getAuthHeader = () => ({

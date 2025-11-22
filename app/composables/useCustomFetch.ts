@@ -4,13 +4,13 @@ export function useCustomFetch<T>(
   url: string | (() => string),
   options: UseFetchOptions<T> = {}
 ) {
-  let token = useCookie("tokenLocal")?.value;
+  let token = useCookie("tokenLocal");
 
   if (!token) {
     token = useCookie("token", {
       path: "/",
       domain: ".mocfurni.shop",
-    })?.value;
+    });
   }
 
   return useFetch(url, {

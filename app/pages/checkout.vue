@@ -339,13 +339,13 @@
   const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
   const checkoutStore = useCheckoutStore();
   const buyNowItem = checkoutStore.buyNowItem;
-  let tokenCookie = useCookie("tokenLocal")?.value;
+  let tokenCookie = useCookie("tokenLocal");
 
-  if (!tokenCookie) {
+  if (!tokenCookie.value) {
     tokenCookie = useCookie("token", {
       path: "/",
       domain: ".mocfurni.shop",
-    })?.value;
+    });
   }
   const isLoggedIn = computed(() => !!tokenCookie.value);
 

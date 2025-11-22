@@ -7,13 +7,13 @@ export function useOrderDetail() {
   const error = ref<string | null>(null);
   const canceling = ref(false); // trạng thái đang hủy
 
-  let tokenCookie = useCookie("tokenLocal")?.value;
+  let tokenCookie = useCookie("tokenLocal");
 
-  if (!tokenCookie) {
+  if (!tokenCookie.value) {
     tokenCookie = useCookie("token", {
       path: "/",
       domain: ".mocfurni.shop",
-    })?.value;
+    });
   }
 
   const getAuthHeader = () => ({
