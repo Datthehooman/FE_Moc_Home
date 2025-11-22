@@ -3,6 +3,7 @@ import { useCookie } from "#app";
 
 export function useCheckout() {
   const checkoutStore = useCheckoutStore();
+  const authStore = useAuthStore();
   let tokenCookie = useCookie("tokenLocal");
 
   if (!tokenCookie.value) {
@@ -38,7 +39,7 @@ export function useCheckout() {
   }) => {
     if (!tokenCookie.value) throw new Error("Vui lòng đăng nhập để thanh toán");
 
-    const user_id = checkoutStore.user?.id || null;
+    const user_id = authStore.user.user_id || null;
     const body = { ...payload, user_id };
 
     return await $fetch("https://api.mocfurni.shop/api/client/buy-now", {
@@ -83,7 +84,7 @@ export function useCheckout() {
     if (!checkoutStore.cartItems.length) throw new Error("Giỏ hàng rỗng");
 
     const payload = {
-      user_id: checkoutStore.user?.id || null,
+      user_id: authStore.user?.user_id || null,
       items: checkoutStore.cartItems.map((i) => ({
         product_id: i.product_id,
         quantity: i.quantity,
