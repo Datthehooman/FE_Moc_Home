@@ -4,10 +4,18 @@ export function useCustomFetch<T>(
   url: string | (() => string),
   options: UseFetchOptions<T> = {}
 ) {
-  const token = useCookie("token", {
+  const config = useRuntimeConfig();
+
+  // Determine token name based on environment
+  const tokenName = config.public.isDevelopment ? "tokenLocal" : "token";
+  const tokenDomain = config.public.isDevelopment
+    ? undefined
+    : ".mocfurni.shop";
+
+  const token = useCookie(tokenName, {
     path: "/",
-    domain: ".mocfurni.shop",
-  });
+    domain: tokenDomain,
+  })?.value;
 
   return useFetch(url, {
     ...options,

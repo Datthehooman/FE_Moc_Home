@@ -5,10 +5,18 @@ export const useCart = () => {
   const cart = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  const tokenCookie = useCookie("token", {
+  const config = useRuntimeConfig();
+
+  // Determine token name based on environment
+  const tokenName = config.public.isDevelopment ? "tokenLocal" : "token";
+  const tokenDomain = config.public.isDevelopment
+    ? undefined
+    : ".mocfurni.shop";
+
+  const tokenCookie = useCookie(tokenName, {
     path: "/",
-    domain: ".mocfurni.shop",
-  }); // token = string
+    domain: tokenDomain,
+  })?.value;
 
   const getAuthHeader = () => ({
     Authorization: `Bearer ${tokenCookie.value}`,
@@ -82,15 +90,13 @@ export const useCart = () => {
     if (!tokenCookie.value) return false;
     try {
       await $fetch(
-        
         `https://api.mocfurni.shop/api/client/cart/update-quantity`,
-       
+
         {
-            method: "PUT",
-            query: { product_id, quantity },
-            headers: getAuthHeader(),
-          }
-      
+          method: "PUT",
+          query: { product_id, quantity },
+          headers: getAuthHeader(),
+        }
       );
       await getCart();
       return true;

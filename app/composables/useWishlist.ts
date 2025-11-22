@@ -6,7 +6,18 @@ export const useWishlist = () => {
   const wishlists = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  const tokenCookie = useCookie("token");
+  const config = useRuntimeConfig();
+
+  // Determine token name based on environment
+  const tokenName = config.public.isDevelopment ? "tokenLocal" : "token";
+  const tokenDomain = config.public.isDevelopment
+    ? undefined
+    : ".mocfurni.shop";
+
+  const tokenCookie = useCookie(tokenName, {
+    path: "/",
+    domain: tokenDomain,
+  })?.value;
 
   const getAuthHeader = () => ({
     Authorization: `Bearer ${tokenCookie.value}`,
@@ -64,10 +75,13 @@ export const useWishlist = () => {
   const removeFromWishlist = async (product_id: number) => {
     if (!tokenCookie.value) return false;
     try {
-      await $fetch(`https://api.mocfurni.shop/api/client/wishlists/${product_id}`, {
-        method: "DELETE",
-        headers: getAuthHeader(),
-      });
+      await $fetch(
+        `https://api.mocfurni.shop/api/client/wishlists/${product_id}`,
+        {
+          method: "DELETE",
+          headers: getAuthHeader(),
+        }
+      );
       await fetchWishlist(); // Fetch lại danh sách
       return true;
     } catch (err: any) {
@@ -81,11 +95,14 @@ export const useWishlist = () => {
   const removeMultipleFromWishlist = async (product_ids: number[]) => {
     if (!tokenCookie.value) return false;
     try {
-      await $fetch("https://api.mocfurni.shop/api/client/wishlists/remove-multiple", {
-        method: "DELETE",
-        body: { product_ids },
-        headers: getAuthHeader(),
-      });
+      await $fetch(
+        "https://api.mocfurni.shop/api/client/wishlists/remove-multiple",
+        {
+          method: "DELETE",
+          body: { product_ids },
+          headers: getAuthHeader(),
+        }
+      );
       await fetchWishlist(); // Fetch lại danh sách
       return true;
     } catch (err: any) {
@@ -114,7 +131,7 @@ export const useWishlist = () => {
 
   // 🟢 Kiểm tra sản phẩm có trong wishlist không
   const isInWishlist = (product_id: number): boolean => {
-    return wishlists.value.some(item => item.product_id === product_id);
+    return wishlists.value.some((item) => item.product_id === product_id);
   };
 
   // 🟢 Lấy số lượng wishlist
