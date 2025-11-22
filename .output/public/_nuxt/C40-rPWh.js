@@ -1,1 +1,0 @@
-import{bj as n,aC as a,aD as i,aB as s}from"#entry";const f=n((u,r)=>{const o=a(),e=o.public.isDevelopment?"tokenLocal":"token",t=o.public.isDevelopment?void 0:".mocfurni.shop";if(!i(e,{path:"/",domain:t})?.value)return s("/error")});export{f as default};

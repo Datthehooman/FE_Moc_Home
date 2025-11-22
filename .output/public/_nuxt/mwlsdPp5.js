@@ -1,1 +1,0 @@
-import{aP as c,r as a}from"#entry";const m=c("checkout",()=>{const o=a(null),e=a([]),t=a("cart");return{buyNowItem:o,cartItems:e,checkoutMode:t,setBuyNowItem:u=>{o.value=u,e.value=[],t.value="buy-now"},setCartItems:u=>{e.value=[...u],t.value="cart"},clearCheckout:()=>{o.value=null,e.value=[],t.value="cart"}}});export{m as u};

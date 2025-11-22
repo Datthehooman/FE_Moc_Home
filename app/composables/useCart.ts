@@ -5,18 +5,14 @@ export const useCart = () => {
   const cart = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  const config = useRuntimeConfig();
+  let tokenCookie = useCookie("tokenLocal")?.value;
 
-  // Determine token name based on environment
-  const tokenName = config.public.isDevelopment ? "tokenLocal" : "token";
-  const tokenDomain = config.public.isDevelopment
-    ? undefined
-    : ".mocfurni.shop";
-
-  const tokenCookie = useCookie(tokenName, {
-    path: "/",
-    domain: tokenDomain,
-  })?.value;
+  if (!tokenCookie) {
+    tokenCookie = useCookie("token", {
+      path: "/",
+      domain: ".mocfurni.shop",
+    })?.value;
+  }
 
   const getAuthHeader = () => ({
     Authorization: `Bearer ${tokenCookie.value}`,
