@@ -1,27 +1,40 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+export const useCheckoutStore = defineStore("checkout", () => {
+  const user = ref<any>(null);
 
-export const useCheckoutStore = defineStore('checkout', () => {
-  const buyNowItem = ref<any>(null)
-  const cartItems = ref<any[]>([])
-  const checkoutMode = ref<'cart' | 'buy-now'>('cart')
+  const buyNowItem = ref<any>(null);
+  const cartItems = ref<any[]>([]);
+  const checkoutMode = ref<"cart" | "buy-now">("cart");
+
+  const setUser = (u: any) => {
+    user.value = u;
+  };
 
   const setBuyNowItem = (item: any) => {
-    buyNowItem.value = item
-    cartItems.value = []
-    checkoutMode.value = 'buy-now'
-  }
+    buyNowItem.value = item;
+    cartItems.value = [];
+    checkoutMode.value = "buy-now";
+  };
 
   const setCartItems = (items: any[]) => {
-    cartItems.value = [...items]
-    checkoutMode.value = 'cart'
-  }
+    cartItems.value = [...items];
+    checkoutMode.value = "cart";
+  };
 
   const clearCheckout = () => {
-    buyNowItem.value = null
-    cartItems.value = []
-    checkoutMode.value = 'cart'
-  }
+    buyNowItem.value = null;
+    cartItems.value = [];
+    checkoutMode.value = "cart";
+    user.value = null;
+  };
 
-  return { buyNowItem, cartItems, checkoutMode, setBuyNowItem, setCartItems, clearCheckout }
-})
+  return {
+    user,
+    buyNowItem,
+    cartItems,
+    checkoutMode,
+    setUser,
+    setBuyNowItem,
+    setCartItems,
+    clearCheckout,
+  };
+});
