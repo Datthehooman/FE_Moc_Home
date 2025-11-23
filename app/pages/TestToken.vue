@@ -15,10 +15,14 @@
   import { ref } from "vue";
   import { useCookie } from "#app";
 
-  const token = useCookie("token", {
-    path: "/",
-    domain: ".mocfurni.shop",
-  });
+  let token = useCookie("tokenLocal");
+
+  if (!token) {
+    token = useCookie("token", {
+      path: "/",
+      domain: ".mocfurni.shop",
+    });
+  }
   const tokenValue = ref(token.value);
 
   function showToken() {

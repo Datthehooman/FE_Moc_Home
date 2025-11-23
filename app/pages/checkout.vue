@@ -339,10 +339,14 @@
   const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
   const checkoutStore = useCheckoutStore();
   const buyNowItem = checkoutStore.buyNowItem;
-  const tokenCookie = useCookie("token", {
-    path: "/",
-    domain: ".mocfurni.shop",
-  });
+  let tokenCookie = useCookie("tokenLocal");
+
+  if (!tokenCookie.value) {
+    tokenCookie = useCookie("token", {
+      path: "/",
+      domain: ".mocfurni.shop",
+    });
+  }
   const isLoggedIn = computed(() => !!tokenCookie.value);
 
   // Cart items
@@ -416,7 +420,7 @@
 
   function validate() {
     // Reset errors
-  Object.keys(errors).forEach((key) => (errors[key] = ""));
+    Object.keys(errors).forEach((key) => (errors[key] = ""));
     let valid = true;
 
     if (!isLoggedIn.value) {
@@ -463,8 +467,8 @@
       valid = false;
     }
 
-  return valid
-}
+    return valid;
+  }
 
   const totalAmount = computed(() => {
     const items = checkoutItems.value.length

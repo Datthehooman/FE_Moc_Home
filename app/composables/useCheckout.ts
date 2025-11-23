@@ -3,10 +3,15 @@ import { useCookie } from "#app";
 
 export function useCheckout() {
   const checkoutStore = useCheckoutStore();
-  const tokenCookie = useCookie("token", {
-    path: "/",
-    domain: ".mocfurni.shop",
-  }); // token từ cookie
+  const authStore = useAuthStore();
+  let tokenCookie = useCookie("tokenLocal");
+
+  if (!tokenCookie.value) {
+    tokenCookie = useCookie("token", {
+      path: "/",
+      domain: ".mocfurni.shop",
+    });
+  }
 
   const getAuthHeader = () => ({
     Authorization: `Bearer ${tokenCookie.value}`,
@@ -34,7 +39,7 @@ export function useCheckout() {
   }) => {
     if (!tokenCookie.value) throw new Error("Vui lòng đăng nhập để thanh toán");
 
-    const user_id = checkoutStore.user?.id || null;
+    const user_id = authStore.user.user_id || null;
     const body = { ...payload, user_id };
 
     return await $fetch("https://api.mocfurni.shop/api/client/buy-now", {
@@ -57,14 +62,12 @@ export function useCheckout() {
   }) => {
     try {
       return await $fetch(
-        
         "https://api.mocfurni.shop/api/client/buy-now/guest",
-       
+
         {
-            method: "POST",
-            body: payload,
-          }
-      
+          method: "POST",
+          body: payload,
+        }
       );
     } catch (error: any) {
       console.error("❌ Lỗi server guest:", error.data || error);
@@ -81,7 +84,7 @@ export function useCheckout() {
     if (!checkoutStore.cartItems.length) throw new Error("Giỏ hàng rỗng");
 
     const payload = {
-      user_id: checkoutStore.user?.id || null,
+      user_id: authStore.user?.user_id || null,
       items: checkoutStore.cartItems.map((i) => ({
         product_id: i.product_id,
         quantity: i.quantity,

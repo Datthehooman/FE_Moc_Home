@@ -1,7 +1,12 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-  const token = useCookie("token", {
-    path: "/",
-    domain: ".mocfurni.shop",
-  })?.value;
+  let token = useCookie("tokenLocal");
+
+  if (!token) {
+    token = useCookie("token", {
+      path: "/",
+      domain: ".mocfurni.shop",
+    });
+  }
+
   if (!token) return navigateTo("/error");
 });
