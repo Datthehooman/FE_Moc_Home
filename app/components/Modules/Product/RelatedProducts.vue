@@ -251,53 +251,124 @@ const handleAddToWishlist = async (item: ProductItem) => {
 const { categories } = useCategories()
 
 const fetchRelatedProducts = async () => {
-  if (!productDetail.value?.category?.slug) return
+  if (!productDetail.value?.category?.slug) {
+  console.warn('❌ Category slug chưa có trong productDetail:', productDetail.value)
+  products.value = [] // fallback
+  return
+  }
+
   try {
-    const res = await fetch(`https://api.mocfurni.shop/api/client/category-by-product?slug=${productDetail.value.category.slug}`)
-    const json = await res.json()
+  const url = `https://api.mocfurni.shop/api/client/category-by-product?slug=${productDetail.value.category.slug}`
+  console.log('➡️ Fetching related products from:', url)
 
-    products.value = (json?.result?.data || []).map((p: any) => {
-      // Lấy category_name từ useCategories
-     const category = categories.value.find(c => c.id === p.category_id)
-      return {
-        product_id: p.product_id,
-        product_name: p.product_name,
-        slug: p.slug,
-        thumbnail: p.thumbnail,
-        images: p.images,
-        price: Number(p.price),
-        price_down: Number(p.price_down || p.price),
-        badge: p.badge,
-        rating: Number(p.rating || 0),
-        brand: p.brand,
-        sku: p.sku,
-        stock_quantity: p.stock_quantity,
-        category: { category_name: category?.category_name || 'N/A' }
-      }
-    })
 
-    relatedIndex.value = 0
-    await nextTick()
-    updateItemWidth()
+  const res = await fetch(url)
+  const json = await res.json()
+  console.log('📦 API response:', json)
+
+  const data = json?.result?.data
+  if (!data || !data.length) {
+    console.warn('⚠️ API trả về rỗng hoặc không hợp lệ:', data)
+    products.value = []
+    return
+  }
+
+  // Mapping sản phẩm
+  products.value = data.map((p: any) => {
+    const category = categories.value.find(c => c.id === p.category_id)
+    return {
+      product_id: p.product_id,
+      product_name: p.product_name,
+      slug: p.slug,
+      thumbnail: p.thumbnail,
+      images: p.images,
+      price: Number(p.price),
+      price_down: Number(p.price_down || p.price),
+      badge: p.badge,
+      rating: Number(p.rating || 0),
+      brand: p.brand,
+      sku: p.sku,
+      stock_quantity: p.stock_quantity,
+      category: { category_name: category?.category_name || 'N/A' }
+    }
+  })
+
+  console.log('✅ Related products mapped:', products.value)
+
+  relatedIndex.value = 0
+  await nextTick()
+  updateItemWidth()
+
+
   } catch (err) {
-    console.error('❌ Lỗi fetch sản phẩm liên quan:', err)
+  console.error('❌ Lỗi fetch sản phẩm liên quan:', err)
+  products.value = []
   }
 }
 
+// Fallback test nếu API rỗng
+// Uncomment để test slider hiển thị
+// products.value = [
+//   { product_id: 1, product_name: 'Test 1', price: 10000, slug: 'test-1', rating: 4, thumbnail: '' },
+//   { product_id: 2, product_name: 'Test 2', price: 20000, slug: 'test-2', rating: 5, thumbnail: '' }
+// ]
+
+
 const loadProducts = async () => {
+  // 1) Lấy chi tiết sản phẩm theo slug
   await fetchProductDetail(slug.value)
+
+  // 2) 🔥 FIX: map category.slug từ category_id của productDetail
+  try {
+    const category = categories.value.find(
+      c => Number(c.id) === Number(productDetail.value.category_id)
+    )
+
+    if (category) {
+      // Gắn category vào productDetail để fetch liên quan
+      productDetail.value.category = {
+        category_name: category.category_name,
+        slug: category.slug
+      }
+    } else {
+      console.warn(
+        "❌ Không tìm thấy category theo category_id:",
+        productDetail.value.category_id
+      )
+    }
+  } catch (err) {
+    console.error("❌ Lỗi khi map category cho productDetail:", err)
+  }
+
+  // 3) Tải sản phẩm liên quan
   await fetchRelatedProducts()
 }
 
+
 onMounted(async () => {
   await nextTick()
+
+  // 🔥 CHỜ categories load xong
+  if (categories.value.length === 0) {
+    const { fetchCategories } = useCategories()
+    await fetchCategories() 
+  }
+
   await loadProducts()
+
   window.addEventListener('resize', updateItemWidth)
 })
+
 onBeforeUnmount(() => window.removeEventListener('resize', updateItemWidth))
-watch(() => route.params.slug, async (newSlug) => {
-  slug.value = newSlug as string
-  relatedIndex.value = 0
-  await loadProducts()
-})
+watch(
+  () => categories.value,
+  async (list) => {
+    if (list.length > 0) {
+      await loadProducts()
+      updateItemWidth()
+    }
+  },
+  { immediate: true }
+)
+
 </script>
