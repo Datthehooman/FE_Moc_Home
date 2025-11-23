@@ -232,7 +232,7 @@
                   v-model="paymentMethod"
                   class="accent-[#A77A5D] w-5 h-5"
                 />
-                <span>Thanh toán khi nhận hàng (Cọc 50%)</span>
+                <span>Thanh toán khi nhận hàng </span>
               </label>
             </div>
             <p v-if="errors.paymentMethod" class="text-red-500 text-xs mt-1">
