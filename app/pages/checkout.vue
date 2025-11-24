@@ -503,6 +503,9 @@
     }
 
     const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
+    
+    // 1. KHAI BÁO BIẾN order_code ĐỂ LƯU KẾT QUẢ
+    let order_code = ""; 
 
     try {
       if (paymentMethod.value === "online") {
@@ -524,7 +527,9 @@
             quantity: i.quantity,
           })),
         };
-        await buyNow(payloadUser);
+        // LƯU KẾT QUẢ VÀ GÁN order_code
+        const result = await buyNow(payloadUser);
+        order_code = result.order_code; 
       } else {
         const payloadGuest = {
           customer_name: `${form.firstName} ${form.lastName}`,
@@ -538,12 +543,17 @@
             quantity: i.quantity,
           })),
         };
-        await buyNowGuest(payloadGuest);
+        // LƯU KẾT QUẢ VÀ GÁN order_code
+        const result = await buyNowGuest(payloadGuest);
+        order_code = result.order_code; 
       }
 
       alert("Thanh toán thành công! 🎉");
       checkoutStore.clearCheckout();
-      router.push("/thanks"); // ✅ chuyển về trang chủ
+      
+      // 2. CHUYỂN router.push SANG DẠNG TRUYỀN QUERY
+      router.push({ path: "/thanks", query: { order_code: order_code } });
+      
     } catch (err: any) {
       console.error("❌ Lỗi khi gọi API:", err);
       alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
