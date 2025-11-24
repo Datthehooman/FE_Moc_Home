@@ -485,6 +485,81 @@
     return total + (selectedShipping.value === "Nhanh" ? 30000 : 0);
   });
 
+  async function submitPayment() {
+    const itemsToPay = checkoutItems.value.length
+      ? checkoutItems.value
+      : buyNowItem
+      ? [buyNowItem]
+      : [];
+
+    if (!itemsToPay.length) {
+      alert("Không có sản phẩm để thanh toán");
+      router.replace("/error");
+      return;
+    }
+
+    if (!validate()) {
+      alert("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
+    const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
+    
+    // 1. KHAI BÁO BIẾN order_code ĐỂ LƯU KẾT QUẢ
+    let order_code = ""; 
+
+    try {
+      if (paymentMethod.value === "online") {
+        await payWithVNPAY({
+          amount: totalAmount.value,
+          orderInfo: `Thanh toán đơn hàng`,
+          shipping_address,
+        });
+        return;
+      }
+
+      if (isLoggedIn.value) {
+        const payloadUser = {
+          shipping_address,
+          note: form.note || "",
+          payment_method_id: 2,
+          items: itemsToPay.map((i) => ({
+            product_id: i.product_id,
+            quantity: i.quantity,
+          })),
+        };
+        // LƯU KẾT QUẢ VÀ GÁN order_code
+        const result = await buyNow(payloadUser);
+        order_code = result.order_code; 
+      } else {
+        const payloadGuest = {
+          customer_name: `${form.firstName} ${form.lastName}`,
+          customer_phone: form.phone,
+          customer_email: form.email,
+          shipping_address,
+          note: form.note || "",
+          payment_method_id: 2,
+          items: itemsToPay.map((i) => ({
+            product_id: i.product_id,
+            quantity: i.quantity,
+          })),
+        };
+        // LƯU KẾT QUẢ VÀ GÁN order_code
+        const result = await buyNowGuest(payloadGuest);
+        order_code = result.order_code; 
+      }
+
+      alert("Thanh toán thành công! 🎉");
+      checkoutStore.clearCheckout();
+      
+      // 2. CHUYỂN router.push SANG DẠNG TRUYỀN QUERY
+      router.push({ path: "/thanks", query: { order_code: order_code } });
+      
+    } catch (err: any) {
+      console.error("❌ Lỗi khi gọi API:", err);
+      alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
+    }
+  }
 async function submitPayment() {
 const itemsToPay = checkoutItems.value.length
 ? checkoutItems.value
