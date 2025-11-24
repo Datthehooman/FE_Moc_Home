@@ -83,35 +83,34 @@
               class="h-[55px] grid grid-cols-5 items-center bg-[#F5F7FA] rounded-[10px] px-3 text-sm hover:bg-[#ECEFF3] transition"
             >
               <div class="text-[#A77A5D] font-semibold cursor-pointer">{{ order.order_code }}</div>
-<div>{{ order.order_date  }}</div>
-<div>{{ order.total_amount  }} ₫</div>
-<div>
-  <span :class="{
-    'text-yellow-500 bg-yellow-100 px-2 py-1 rounded': order.order_status  === 'Đang chờ',
-    'text-blue-500 bg-blue-100 px-2 py-1 rounded': order.order_status  === 'Đang xử lý',
-    'text-green-500 bg-green-100 px-2 py-1 rounded': order.order_status  === 'Hoàn thành',
-    'text-red-500 bg-red-100 px-2 py-1 rounded': order.order_status  === 'Đã hủy'
-  }">{{ order.order_status  }}</span>
-</div>
+              <div>{{ order.order_date }}</div>
+              <div>{{ order.total_amount }} ₫</div>
 
+              <div>
+                <span :class="{
+                  'text-yellow-500 bg-yellow-100 px-2 py-1 rounded': order.order_status === 'Đang chờ',
+                  'text-blue-500 bg-blue-100 px-2 py-1 rounded': order.order_status === 'Đang xử lý',
+                  'text-green-500 bg-green-100 px-2 py-1 rounded': order.order_status === 'Hoàn thành',
+                  'text-red-500 bg-red-100 px-2 py-1 rounded': order.order_status === 'Đã hủy'
+                }">{{ order.order_status }}</span>
+              </div>
 
               <div
                 class="w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black"
               >
-<NuxtLink :to="`/user/orders/${order.order_id}`"
-  class="w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black"
->
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-    stroke-width="1.5" stroke="currentColor"
-    class="w-5 h-5 text-gray-500 hover:text-white transition">
-    <path stroke-linecap="round" stroke-linejoin="round"
-      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 8.354 7.36 5.25 12 
-      5.25c4.638 0 8.574 3.103 9.963 6.433.07.162.07.353 0 .515C20.574 
-      15.646 16.637 18.75 12 18.75c-4.64 0-8.577-3.103-9.964-6.428z" />
-    <path stroke-linecap="round" stroke-linejoin="round"
-      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-</NuxtLink>
+                <NuxtLink :to="`/user/orders/${order.order_id}`"
+                  class="w-[34px] h-[34px] flex items-center justify-center rounded-[5px]">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor"
+                    class="w-5 h-5 text-gray-500 hover:text-white transition">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 8.354 7.36 5.25 12 
+                      5.25c4.638 0 8.574 3.103 9.963 6.433.07.162.07.353 0 .515C20.574 
+                      15.646 16.637 18.75 12 18.75c-4.64 0-8.577-3.103-9.964-6.428z" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </NuxtLink>
               </div>
             </div>
           </div>
@@ -135,6 +134,7 @@
 definePageMeta({
   middleware: 'auth'
 })
+
 import { ref, computed, onMounted } from 'vue'
 import { useOrder } from '~/composables/useOrder'
 

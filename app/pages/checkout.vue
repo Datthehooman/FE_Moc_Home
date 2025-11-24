@@ -232,7 +232,7 @@
                   v-model="paymentMethod"
                   class="accent-[#A77A5D] w-5 h-5"
                 />
-                <span>Thanh toán khi nhận hàng (Cọc 50%)</span>
+                <span>Thanh toán khi nhận hàng </span>
               </label>
             </div>
             <p v-if="errors.paymentMethod" class="text-red-500 text-xs mt-1">
@@ -339,6 +339,7 @@
   const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
   const checkoutStore = useCheckoutStore();
   const buyNowItem = checkoutStore.buyNowItem;
+  const authStore = useAuthStore();
   let tokenCookie = useCookie("tokenLocal");
 
   if (!tokenCookie.value) {
@@ -559,6 +560,83 @@
       alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
     }
   }
+async function submitPayment() {
+const itemsToPay = checkoutItems.value.length
+? checkoutItems.value
+: buyNowItem
+? [buyNowItem]
+: [];
+
+if (!itemsToPay.length) {
+alert("Không có sản phẩm để thanh toán");
+router.replace("/error");
+return;
+}
+
+if (!validate()) {
+alert("Vui lòng điền đầy đủ thông tin");
+return;
+}
+
+const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
+
+try {
+// Thanh toán online VNPAY
+if (paymentMethod.value === "online") {
+await payWithVNPAY({
+amount: totalAmount.value,
+orderInfo: `Thanh toán đơn hàng`,
+order_type: "product",
+shipping_address,
+});
+return;
+}
+
+
+if (isLoggedIn.value && authStore.user) {
+  // ✅ User login
+  const payloadUser = {
+    user_id: authStore.user.user_id,
+    customer_name: authStore.user.full_name,
+    customer_phone: authStore.user.phone,
+    customer_email: authStore.user.email,
+    items: itemsToPay.map((i) => ({
+      product_id: i.product_id,
+      quantity: i.quantity,
+    })),
+    shipping_address,
+    note: form.note || "",
+    payment_method_id: paymentMethod.value === "offline" ? 1 : 2,
+  };
+  await buyNow(payloadUser);
+} else {
+  // ✅ Guest
+  const payloadGuest = {
+    customer_name: `${form.firstName} ${form.lastName}`,
+    customer_phone: form.phone,
+    customer_email: form.email,
+    items: itemsToPay.map((i) => ({
+      product_id: i.product_id,
+      quantity: i.quantity,
+    })),
+    shipping_address,
+    note: form.note || "",
+    payment_method_id: paymentMethod.value === "offline" ? 1 : 2,
+  };
+  await buyNowGuest(payloadGuest);
+}
+
+alert("Thanh toán thành công! 🎉");
+checkoutStore.clearCheckout();
+router.push("/thanks");
+
+
+} catch (err: any) {
+console.error("❌ Lỗi khi gọi API:", err);
+alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
+}
+}
+
 
   function formatPrice(value: number) {
     return new Intl.NumberFormat("vi-VN", {
