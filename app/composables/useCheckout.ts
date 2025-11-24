@@ -36,6 +36,7 @@ export function useCheckout() {
     shipping_address: string;
     note?: string;
     payment_method_id: number;
+      voucher_code?: string | null;   // <<< THÊM
   }) => {
     if (!tokenCookie.value) throw new Error("Vui lòng đăng nhập để thanh toán");
 
@@ -59,6 +60,7 @@ export function useCheckout() {
     shipping_address: string;
     note?: string;
     payment_method_id: number;
+      voucher_code?: string | null;  // <<< THÊM
   }) => {
     try {
       return await $fetch(

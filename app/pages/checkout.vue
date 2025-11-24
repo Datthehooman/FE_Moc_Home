@@ -316,6 +316,15 @@
         <div v-else class="text-center text-red-500">
           Không có sản phẩm để thanh toán, quay lại sản phẩm để mua
         </div>
+<div class="mt-4">
+  <label class="text-sm font-medium">Mã giảm giá</label>
+  <input
+    v-model="form.voucher_code"
+    type="text"
+    placeholder="Nhập mã giảm giá"
+    class="w-full mt-1 px-3 py-2 border rounded-lg"
+  />
+</div>
 
         <a
           href="/cart"
@@ -368,6 +377,7 @@
     phone: "",
     addressDetail: "",
     note: "",
+    voucher_code: ""   // <<< THÊM DÒNG NÀY
   });
 
   // Payment & shipping
@@ -485,82 +495,97 @@
     return total + (selectedShipping.value === "Nhanh" ? 30000 : 0);
   });
 
-async function submitPayment() {
-const itemsToPay = checkoutItems.value.length
-? checkoutItems.value
-: buyNowItem
-? [buyNowItem]
-: [];
+  async function submitPayment() {
+    const itemsToPay = checkoutItems.value.length
+      ? checkoutItems.value
+      : buyNowItem
+      ? [buyNowItem]
+      : [];
 
-if (!itemsToPay.length) {
-alert("Không có sản phẩm để thanh toán");
-router.replace("/error");
-return;
+    if (!itemsToPay.length) {
+      alert("Không có sản phẩm để thanh toán");
+      router.replace("/error");
+      return;
+    }
+
+    if (!validate()) {
+      alert("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
+    const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
+
+    // 1. KHAI BÁO BIẾN order_code ĐỂ LƯU KẾT QUẢ TỪ API
+    let order_code = ""; 
+
+    try {
+      // Thanh toán online VNPAY
+      if (paymentMethod.value === "online") {
+        await payWithVNPAY({
+          amount: totalAmount.value,
+          orderInfo: `Thanh toán đơn hàng`,
+          order_type: "product", // Thêm order_type nếu cần
+          shipping_address,
+        });
+        return;
+      }
+
+      // Xử lý thanh toán khi nhận hàng (offline)
+      if (isLoggedIn.value) {
+        // User login
+        // Lưu ý: Tôi đang giả định authStore.user có sẵn khi isLoggedIn.value là true.
+        // Cần đảm bảo `useAuthStore` và `authStore` đã được khai báo/import.
+const payloadUser: any = {
+          // user_id: authStore.user.user_id, // Bỏ user_id nếu API không yêu cầu
+          // customer_name: authStore.user.full_name, // Lấy thông tin từ form nếu cần, hoặc từ authStore
+          // customer_phone: authStore.user.phone,
+          // customer_email: authStore.user.email,
+          shipping_address,
+          note: form.note || "",
+          payment_method_id: 1, // 1: Thanh toán khi nhận hàng (Giả định ID cho "offline" là 1)
+            voucher_code: form.voucher_code || null,
+          items: itemsToPay.map((i) => ({
+            product_id: i.product_id,
+            quantity: i.quantity,
+          })),
+        };
+        if (form.voucher_code) {
+  payloadUser.voucher_code = form.voucher_code;}
+        // GỌI API VÀ LƯU KẾT QUẢ
+        const result = await buyNow(payloadUser);
+        order_code = result.order_code; // Gán mã đơn hàng
+      } else {
+        // Guest
+        const payloadGuest = {
+          customer_name: `${form.firstName} ${form.lastName}`,
+          customer_phone: form.phone,
+          customer_email: form.email,
+          shipping_address,
+          note: form.note || "",
+          payment_method_id: 1, // 1: Thanh toán khi nhận hàng
+          items: itemsToPay.map((i) => ({
+            product_id: i.product_id,
+            quantity: i.quantity,
+          })),
+        };
+        if (form.voucher_code) {
+  payloadGuest.voucher_code = form.voucher_code;
 }
+        // GỌI API VÀ LƯU KẾT QUẢ
+        const result = await buyNowGuest(payloadGuest);
+        order_code = result.order_code; // Gán mã đơn hàng
+      }
 
-if (!validate()) {
-alert("Vui lòng điền đầy đủ thông tin");
-return;
-}
+      alert("Thanh toán thành công! 🎉");
+      checkoutStore.clearCheckout();
 
-const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
-
-try {
-// Thanh toán online VNPAY
-if (paymentMethod.value === "online") {
-await payWithVNPAY({
-amount: totalAmount.value,
-orderInfo: `Thanh toán đơn hàng`,
-order_type: "product",
-shipping_address,
-});
-return;
-}
-
-
-if (isLoggedIn.value && authStore.user) {
-  // ✅ User login
-  const payloadUser = {
-    user_id: authStore.user.user_id,
-    customer_name: authStore.user.full_name,
-    customer_phone: authStore.user.phone,
-    customer_email: authStore.user.email,
-    items: itemsToPay.map((i) => ({
-      product_id: i.product_id,
-      quantity: i.quantity,
-    })),
-    shipping_address,
-    note: form.note || "",
-    payment_method_id: paymentMethod.value === "offline" ? 1 : 2,
-  };
-  await buyNow(payloadUser);
-} else {
-  // ✅ Guest
-  const payloadGuest = {
-    customer_name: `${form.firstName} ${form.lastName}`,
-    customer_phone: form.phone,
-    customer_email: form.email,
-    items: itemsToPay.map((i) => ({
-      product_id: i.product_id,
-      quantity: i.quantity,
-    })),
-    shipping_address,
-    note: form.note || "",
-    payment_method_id: paymentMethod.value === "offline" ? 1 : 2,
-  };
-  await buyNowGuest(payloadGuest);
-}
-
-alert("Thanh toán thành công! 🎉");
-checkoutStore.clearCheckout();
-router.push("/thanks");
-
-
-} catch (err: any) {
-console.error("❌ Lỗi khi gọi API:", err);
-alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
-}
-}
+      // 2. CHUYỂN router.push SANG DẠNG TRUYỀN QUERY
+      router.push({ path: "/thanks", query: { order_code: order_code } });
+    } catch (err: any) {
+      console.error("❌ Lỗi khi gọi API:", err);
+      alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
+    }
+  }
 
 
   function formatPrice(value: number) {

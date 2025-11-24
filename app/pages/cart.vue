@@ -109,7 +109,7 @@ async function fetchCartData() {
       const prod = products.value.find(p => p.product_id === item.product_id)
       return {
         ...item,
-        thumbnail: prod?.thumbnail || '/placeholder.png',
+        thumbnail: prod?.product_image || '/placeholder.png',
         subtotal: item.quantity * (item.product_sale || item.product_price),
       }
     })
