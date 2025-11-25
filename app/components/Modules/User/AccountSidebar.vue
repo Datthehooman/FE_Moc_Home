@@ -3,17 +3,22 @@
     class="w-64 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6"
   >
     <!-- Avatar -->
-    <div class="flex flex-col items-center mb-4 relative">
-      <div class="relative">
-        <img
-          src="https://live.themewild.com/fameo/assets/img/account/02.jpg"
-          alt="Avatar"
-          class="w-20 h-20 rounded-full border-2 border-gray-200"
-        />
-      </div>
-      <h2 class="mt-2 font-semibold text-gray-800">Lê Phùng Tiến Quân</h2>
-      <p class="text-sm text-gray-400">quanlptps39861@gmail.com</p>
-    </div>
+<div class="flex flex-col items-center mb-4 relative">
+  <div class="relative">
+    <img
+      src="https://live.themewild.com/fameo/assets/img/account/02.jpg"
+      alt="Avatar"
+      class="w-20 h-20 rounded-full border-2 border-gray-200"
+    />
+  </div>
+  <h2 class="mt-2 font-semibold text-gray-800">
+    {{ authStore.user.full_name || 'Người dùng' }}
+  </h2>
+  <p class="text-sm text-gray-400">
+    {{ authStore.user.email || 'Chưa có email' }}
+  </p>
+</div>
+
 
     <hr class="border-t border-gray-200 mb-4" />
 

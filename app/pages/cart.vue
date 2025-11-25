@@ -44,9 +44,34 @@
           </tbody>
         </table>
 
-        <div v-if="cart.length === 0" class="text-center py-4 text-gray-500 font-semibold">
-          Giỏ hàng trống, vui lòng thêm sản phẩm vào giỏ hàng!
-        </div>
+       <div
+  v-if="cart.length === 0"
+  class="flex flex-col items-center justify-center py-5 text-center text-gray-600"
+>
+  <!-- ICON GIỎ HÀNG -->
+  <div class="w-24 h-24  text-gray-300">
+    <UIcon name="i-lucide-shopping-cart" class="text-6xl text-gray-300" />
+  </div>
+
+  <!-- TEXT -->
+
+  <h3 class="text-lg font-semibold text-[#6E4E37]">
+    Giỏ hàng của bạn đang trống
+  </h3>
+  <p class="text-sm text-gray-400 mt-1">
+    Hãy thêm vài món đồ yêu thích để tiếp tục nhé!
+  </p>
+
+  <!-- BUTTON -->
+
+<a
+href="/"
+class="mt-5 bg-[#F7C59F] hover:bg-[#E8B58C] text-[#6E4E37] font-semibold py-2 px-6 rounded-lg transition"
+
+>
+Tiếp tục mua sắm
+  </a>
+</div>
       </div>
 
       <!-- HÓA ĐƠN -->

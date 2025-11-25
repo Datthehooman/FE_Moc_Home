@@ -18,7 +18,7 @@
           <div class="grid grid-cols-3 gap-4">
             <div class="bg-yellow-50 rounded-xl p-4 h-[130px] flex items-center justify-between">
               <div>
-                <p class="text-[30px] font-bold text-[#F7D155] leading-none">50</p>
+                <p class="text-[30px] font-bold text-[#F7D155] leading-none">{{ pendingOrders }}</p>
                 <p class="text-[15px] text-[#F7D155] mt-1">Đơn hàng đang chờ xử lý</p>
               </div>
               <div class="w-14 h-14 rounded-full bg-[#F7D155] flex items-center justify-center">
@@ -30,7 +30,7 @@
 
             <div class="bg-green-50 rounded-xl p-4 h-[130px] flex items-center justify-between">
               <div>
-                <p class="text-[30px] font-bold text-[#11B76B] leading-none">250</p>
+                <p class="text-[30px] font-bold text-[#11B76B] leading-none">{{ completedOrders }}</p>
                 <p class="text-[15px] text-[#11B76B] mt-1">Đơn hàng đã hoàn thành</p>
               </div>
               <div class="w-14 h-14 rounded-full bg-[#11B76B] flex items-center justify-center">
@@ -225,4 +225,18 @@ const pagesAround = computed(() => {
 
 const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++ }
 const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
+
+/* --- THỐNG KÊ --- */
+const pendingOrders = computed(() =>
+orders.value.filter(o => o.order_status === 'Đang chờ').length
+)
+
+const completedOrders = computed(() =>
+orders.value.filter(o => o.order_status === 'Hoàn thành').length
+)
+
+const totalBalance = computed(() =>
+orders.value.reduce((sum, o) => sum + o.total_amount, 0)
+)
+
 </script>
