@@ -1,13 +1,15 @@
 <template>
-  <div class="relative w-full h-[476px]">
-    <img src="/Banner 1.png" class="w-full" alt="Banner 1" />
+  <div class="relative w-full lg:h-[476px] h-auto">
+    <!-- Desktop Banner -->
+    <img src="/Banner 1.png" class="w-full hidden lg:block" alt="Banner 1" />
+
     <UCarousel
       v-slot="{ item }"
       :items="items"
       dots
       loop
       arrows
-      class="absolute inset-0 top-[28px]"
+      :class="['lg:absolute lg:inset-0 lg:top-[28px]', 'relative']"
       :autoplay="{ delay: 2000 }"
       :prev="{
         color: 'primary',
@@ -26,21 +28,24 @@
         },
       }"
       :ui="{
-        viewport: 'mx-[65px]',
+        viewport: 'lg:mx-[65px]',
         dot: [
-          'bg-white',
+          'bg-white lg:bg-white bg-primary',
           'size-2',
           'data-[state=active]:w-5',
           'data-[state=active]:h-2',
-          'data-[state=active]:bg-white',
+          'data-[state=active]:bg-white lg:data-[state=active]:bg-white data-[state=active]:bg-primary',
         ],
-        dots: 'bottom-7',
-        arrows: 'absolute right-20 z-10', // Add padding to arrows container
+        dots: 'lg:bottom-7 bottom-4',
+        arrows: 'lg:absolute lg:right-20 z-10 hidden lg:flex',
         prev: 'z-20',
-        next: ' z-20',
+        next: 'z-20',
       }"
     >
-      <div class="bg-transparent grid grid-cols-2 relative">
+      <!-- Desktop Layout -->
+      <div
+        class="bg-transparent lg:grid lg:grid-cols-2 relative hidden lg:block"
+      >
         <div class="absolute top-30 right-95">
           <UTooltip
             :delay-duration="0"
@@ -95,7 +100,7 @@
               size="xl"
               variant="solid"
               class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
-              @click="handleBuyNow(items[0])"
+              @click="handleBuyNow(item)"
             >
               <span
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
@@ -111,7 +116,7 @@
               size="xl"
               variant="solid"
               class="relative bg-white/20 text-white rounded-md overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
-              @click="handleDetail(items[0]?.slug)"
+              @click="handleDetail(item?.slug)"
             >
               <span
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
@@ -127,6 +132,87 @@
         </div>
         <div class="h-full pl-[164px]">
           <NuxtImg src="/image 10.png" alt="blue arm chair" class="w-full" />
+        </div>
+      </div>
+
+      <!-- Mobile Layout -->
+      <div class="lg:hidden relative">
+        <!-- Background Image for Mobile -->
+        <div class="relative w-full min-h-[600px]">
+          <NuxtImg
+            src="/Banner 1.png"
+            class="absolute inset-0 w-full h-full object-cover"
+            alt="Banner Mobile"
+          />
+
+          <!-- Content Overlay -->
+          <div
+            class="relative z-10 flex flex-col items-center text-center px-6 py-12"
+          >
+            <!-- Welcome Badge -->
+            <div
+              class="h-[33px] w-fit [clip-path:polygon(0_0,100%_0,calc(100%-16px)_50%,100%_100%,0_100%)] rounded-l-full uppercase bg-info font-bold flex items-center pl-4 pr-8 mb-4 text-sm"
+            >
+              CHÀO MỪNG ĐẾN VỚI MỘC HOME!
+            </div>
+
+            <!-- Title -->
+            <div class="text-[28px] sm:text-[32px] font-bold text-white mb-3">
+              <p>Nội thất <span class="text-info">hiện đại</span></p>
+              <p>Nâng tầm không gian sống</p>
+            </div>
+
+            <!-- Description -->
+            <p class="text-white leading-6 mb-6 max-w-md text-sm sm:text-base">
+              Thiết kế tinh tế, chất lượng bền bỉ, mang đến sự tiện nghi và
+              phong cách cho ngôi nhà của bạn.
+            </p>
+
+            <!-- Buttons (Inline) -->
+            <div class="flex items-center gap-3 mb-8 flex-wrap justify-center">
+              <UButton
+                size="lg"
+                variant="solid"
+                class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out cursor-pointer"
+                @click="handleBuyNow(item)"
+              >
+                <span
+                  class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
+                ></span>
+                <span
+                  class="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500"
+                >
+                  <span>Mua ngay</span>
+                  <UIcon name="i-lucide-arrow-right"></UIcon>
+                </span>
+              </UButton>
+              <UButton
+                size="lg"
+                variant="solid"
+                class="relative bg-white/20 text-white rounded-md overflow-hidden group transition-all duration-500 hover:rounded-md ease-out cursor-pointer"
+                @click="handleDetail(item?.slug)"
+              >
+                <span
+                  class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
+                ></span>
+                <span
+                  class="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500"
+                >
+                  <span>Tìm hiểu thêm</span>
+                  <UIcon name="i-lucide-arrow-right"></UIcon>
+                </span>
+              </UButton>
+            </div>
+
+            <!-- Product Image at Bottom -->
+            <div class="mt-auto">
+              <NuxtImg
+                :src="item.thumbnail || '/image 10.png'"
+                alt="Product"
+                class="w-64 h-64 object-contain mx-auto"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </UCarousel>
