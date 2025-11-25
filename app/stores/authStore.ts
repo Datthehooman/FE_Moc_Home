@@ -58,60 +58,53 @@ export const useAuthStore = defineStore("auth", {
   },
 
   actions: {
-    async login(data: { email: string; password_hash: string }) {
-      this.isSubmitting = true;
+     async login(data: { email: string; password_hash: string }) {
+    this.isSubmitting = true;
 
-      try {
-        const response = await $fetch(
-          "https://api.mocfurni.shop/api/client/login",
-          {
-            method: "POST",
-            body: data,
-          }
-        );
+    try {
+      const response = await $fetch(
+        "https://api.mocfurni.shop/api/client/login",
+        { method: "POST", body: data }
+      );
 
-        const accessToken = response.data?.access_token;
+      const accessToken = response.data?.access_token;
 
-        if (response.success && accessToken) {
-          this.user = response.data.user;
-          this.isLogged = true;
+      if (response.success && accessToken) {
+        this.user = response.data.user;
+        this.isLogged = true;
+        this.token = accessToken;
+        this.tokenLocal = accessToken;
 
-          // Store token globally
-          this.token = accessToken;
-          this.tokenLocal = accessToken;
+        // lưu cookie
+        useCookie("token", {
+          path: "/",
+          maxAge: 60 * 60 * 24,
+          domain: ".mocfurni.shop",
+          sameSite: "lax",
+          secure: true,
+        }).value = accessToken;
 
-          // Save production cookie token
-          useCookie("token", {
-            path: "/",
-            maxAge: 60 * 60 * 24,
-            domain: ".mocfurni.shop",
-            sameSite: "lax",
-            secure: true,
-          }).value = accessToken;
-
-          // Save local dev token
-          useCookie("tokenLocal", {
-            path: "/",
-            maxAge: 60 * 60 * 24,
-          }).value = accessToken;
-        }
-
-        return {
-          data: this.user,
-          token: this.token,
-          tokenLocal: this.tokenLocal,
-          error: null,
-        };
-      } catch (error: any) {
-        return {
-          data: null,
-          token: null,
-          error: error?.data?.message || "Lỗi kết nối server",
-        };
-      } finally {
-        this.isSubmitting = false;
+        useCookie("tokenLocal", {
+          path: "/",
+          maxAge: 60 * 60 * 24,
+        }).value = accessToken;
       }
-    },
+
+      return { data: this.user, token: this.token, error: null };
+    } catch (err: any) {
+      const status = err?.response?.status || 500;
+      const msg = err?.response?.data?.message || "Lỗi kết nối server";
+      const errors = err?.response?.data?.errors || null;
+
+      return {
+        data: null,
+        token: null,
+        error: { statusCode: status, message: msg, data: errors },
+      };
+    } finally {
+      this.isSubmitting = false;
+    }
+  },
 
     async logout() {
       this.token = null;

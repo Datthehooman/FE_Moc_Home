@@ -36,6 +36,7 @@ export function useCheckout() {
     shipping_address: string;
     note?: string;
     payment_method_id: number;
+      voucher_code?: string | null;   // <<< THÊM
   }) => {
     if (!tokenCookie.value) throw new Error("Vui lòng đăng nhập để thanh toán");
 
@@ -62,6 +63,7 @@ export function useCheckout() {
     shipping_address: string;
     note?: string;
     payment_method_id: number;
+      voucher_code?: string | null;  // <<< THÊM
   }) => {
     try {
       const res: any = await $fetch(
@@ -128,40 +130,52 @@ export function useCheckout() {
   };
 
   // 💳 Thanh toán online qua VNPAY
-  const payWithVNPAY = async (
-    amount: number,
-    orderInfo: string,
-    orderType: string
-  ) => {
-    if (!amount || amount <= 0) return alert("Số tiền thanh toán không hợp lệ");
+// 💳 Thanh toán online qua VNPAY
+const payWithVNPAY = async (payload: {
+  amount: number;
+  orderInfo: string;
+  order_type: string;
+  order_id: string | number;
+}) => {
+  if (!payload.amount || payload.amount <= 0) return alert("Số tiền thanh toán không hợp lệ");
 
-    try {
-      console.log("🔥 Dữ liệu gửi VNPAY:", {
-        amount,
-        order_info: orderInfo,
-        order_type: orderType,
-      });
+  // ✅ log ra payload trước khi gửi
+  console.log("🔥 VNPAY Payload:", {
+    amount: payload.amount,
+    orderInfo: payload.orderInfo,
+    order_type: payload.order_type,
+    order_id: payload.order_id,
+  });
 
-      const res: any = await $fetch(
-        "https://api.mocfurni.shop/api/client/vnpay-payment",
-        {
-          method: "POST",
-          body: { amount, order_info: orderInfo, order_type: orderType },
-        }
-      );
+  try {
+    const res: any = await $fetch("https://api.mocfurni.shop/api/client/vnpay-payment", {
+      method: "POST",
+      body: payload,
+    });
 
-      console.log("✅ Phản hồi từ server VNPAY:", res);
+  // const res: any = await $fetch("https://api.mocfurni.shop/api/client/vnpay-payment", {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: payload,
+  // });
 
-      if (res?.data) {
-        window.location.href = res.data;
-      } else {
-        alert("Không nhận được link thanh toán từ server");
-      }
-    } catch (err: any) {
-      console.error("❌ Lỗi VNPAY:", err?.data || err);
-      alert("Thanh toán VNPAY thất bại!");
+
+    const queryString = res?.data || res;
+    if (queryString) {
+      const vnpayBase = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+        const url = queryString.startsWith("?") ? vnpayBase + queryString : vnpayBase + "?" + queryString;
+        window.location.href = url; // redirect sang VNPAY
+    } else {
+      alert("Không nhận được link thanh toán từ server");
+      console.log("VNPAY response:", res);
     }
-  };
+  } catch (err: any) {
+    console.error("❌ Lỗi VNPAY:", err?.data || err);
+    alert("Thanh toán VNPAY thất bại!");
+  }
+};
+
+
 
   const clearCheckout = () => {
     checkoutStore.clearCheckout();
