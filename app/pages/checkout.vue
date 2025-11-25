@@ -656,22 +656,25 @@ order_code = orderResult.result.data.order_code;
 
 // 2. Nếu chọn online → gọi VNPAY
 if (paymentMethod.value === "online") {
-  // await payWithVNPAY({
-  //   amount: totalAmount.value,
-  //   orderInfo: `Thanh toán đơn hàng ${order_code}`,
-  //   order_type: "product",
-  //   order_id: Number(order_id), 
-  // });
-
   await payWithVNPAY({
-  amount: String(totalAmount.value), // ép kiểu thành string
-  orderInfo: `Thanh toán đơn hàng ${order_code}`,
-  order_type: "product",
-  order_id: String(order_id),       // ép kiểu string
-});
+    amount: totalAmount.value,
+    orderInfo: `Thanh toán đơn hàng ${order_code}`,
+    order_type: "product",
+    order_id: Number(order_id), 
+  });
+
+//   await payWithVNPAY({
+//   amount: String(totalAmount.value), // ép kiểu thành string
+//   orderInfo: `Thanh toán đơn hàng ${order_code}`,
+//   order_type: "product",
+//   order_id: String(order_id),       // ép kiểu string
+// });
 
   return; // redirect sang VNPAY, không chạy tiếp
 }
+
+
+
 
 // 3. Offline → thông báo thành công, xóa giỏ hàng, chuyển trang
 alert("Thanh toán thành công! 🎉");
