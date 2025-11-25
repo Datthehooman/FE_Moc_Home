@@ -13,61 +13,103 @@
 
         <form class="space-y-6 text-[14px]" @submit.prevent="submitPayment">
           <!-- Họ và tên, email, phone (chỉ hiển thị khi guest) -->
-          <div v-if="!isLoggedIn">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Họ</label>
-                <input
-                  v-model="form.firstName"
-                  placeholder="Nhập họ"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-                />
-                <p v-if="errors.firstName" class="text-red-500 text-xs mt-1">
-                  {{ errors.firstName }}
-                </p>
-              </div>
-              <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Tên</label>
-                <input
-                  v-model="form.lastName"
-                  placeholder="Nhập tên"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-                />
-                <p v-if="errors.lastName" class="text-red-500 text-xs mt-1">
-                  {{ errors.lastName }}
-                </p>
-              </div>
-            </div>
+<!-- Họ và tên -->
+<!-- Nếu đã đăng nhập -->
+<div v-if="isLoggedIn">
+  <div>
+    <label class="block font-medium mb-1 text-[#6E4E37]">Họ và tên</label>
+    <input
+      v-model="form.full_name"
+      placeholder="Nhập họ và tên"
+      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-[#A77A5D]"
+    />
+    <p v-if="errors.full_name" class="text-red-500 text-xs mt-1">
+      {{ errors.full_name }}
+    </p>
+  </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-              <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]"
-                  >Email</label
-                >
-                <input
-                  v-model="form.email"
-                  placeholder="Nhập email"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-                />
-                <p v-if="errors.email" class="text-red-500 text-xs mt-1">
-                  {{ errors.email }}
-                </p>
-              </div>
-              <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]"
-                  >Số điện thoại</label
-                >
-                <input
-                  v-model="form.phone"
-                  placeholder="Nhập số điện thoại"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-                />
-                <p v-if="errors.phone" class="text-red-500 text-xs mt-1">
-                  {{ errors.phone }}
-                </p>
-              </div>
-            </div>
-          </div>
+   <div class="grid grid-cols-2 gap-4 mt-3">
+    <div>
+      <label class="block font-medium mb-1 text-[#6E4E37]">Email</label>
+      <input
+        v-model="form.email"
+        placeholder="Nhập email"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+      <p v-if="errors.email" class="text-red-500 text-xs mt-1">
+        {{ errors.email }}
+      </p>
+    </div>
+    <div>
+      <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại</label>
+      <input
+        v-model="form.phone"
+        placeholder="Nhập số điện thoại"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+      <p v-if="errors.phone" class="text-red-500 text-xs mt-1">
+        {{ errors.phone }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Nếu chưa đăng nhập -->
+<div v-else>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block font-medium mb-1 text-[#6E4E37]">Họ</label>
+      <input
+        v-model="form.firstName"
+        placeholder="Nhập họ"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+      <p v-if="errors.firstName" class="text-red-500 text-xs mt-1">
+        {{ errors.firstName }}
+      </p>
+    </div>
+    <div>
+      <label class="block font-medium mb-1 text-[#6E4E37]">Tên</label>
+      <input
+        v-model="form.lastName"
+        placeholder="Nhập tên"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+      <p v-if="errors.lastName" class="text-red-500 text-xs mt-1">
+        {{ errors.lastName }}
+      </p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 mt-3">
+    <div>
+      <label class="block font-medium mb-1 text-[#6E4E37]">Email</label>
+      <input
+        v-model="form.email"
+        placeholder="Nhập email"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+      <p v-if="errors.email" class="text-red-500 text-xs mt-1">
+        {{ errors.email }}
+      </p>
+    </div>
+    <div>
+      <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại</label>
+      <input
+        v-model="form.phone"
+        placeholder="Nhập số điện thoại"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+      <p v-if="errors.phone" class="text-red-500 text-xs mt-1">
+        {{ errors.phone }}
+      </p>
+    </div>
+  </div>
+</div>
+
+
+
+
 
           <!-- Địa chỉ -->
           <div>
@@ -214,6 +256,16 @@
               Phương thức thanh toán
             </h3>
             <div class="flex flex-col gap-3">
+                <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="offline"
+                  v-model="paymentMethod"
+                  class="accent-[#A77A5D] w-5 h-5"
+                />
+                <span>Thanh toán khi nhận hàng </span>
+              </label>
               <label class="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
@@ -223,16 +275,6 @@
                   class="accent-[#A77A5D] w-5 h-5"
                 />
                 <span>Thanh toán Online (VNPAY)</span>
-              </label>
-              <label class="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="offline"
-                  v-model="paymentMethod"
-                  class="accent-[#A77A5D] w-5 h-5"
-                />
-                <span>Thanh toán khi nhận hàng </span>
               </label>
             </div>
             <p v-if="errors.paymentMethod" class="text-red-500 text-xs mt-1">
@@ -363,16 +405,28 @@
   const checkoutItems = computed(() => checkoutStore.cartItems || []);
 
   // Nếu không có sản phẩm => redirect /error
-  onMounted(() => {
-    if (!checkoutItems.value.length && !buyNowItem) {
-      router.replace("/error");
-    }
-  });
+onMounted(() => {
+  // Nếu đã login thì điền sẵn thông tin
+  if (isLoggedIn.value && authStore.user) {
+    form.firstName = authStore.user.firstName || "";
+    form.lastName = authStore.user.lastName || "";
+      form.full_name = authStore.user.full_name || "";
+    form.email = authStore.user.email || "";
+    form.phone = authStore.user.phone || "";
+  }
+
+  // Nếu không có sản phẩm => redirect /error
+  if (!checkoutItems.value.length && !buyNowItem) {
+    router.replace("/error");
+  }
+});
+
 
   // Form
   const form = reactive({
     firstName: "",
     lastName: "",
+    full_name:"",
     email: "",
     phone: "",
     addressDetail: "",
@@ -381,7 +435,7 @@
   });
 
   // Payment & shipping
-  const paymentMethod = ref("");
+  const paymentMethod = ref("offline");
   const selectedShipping = ref("Tiêu chuẩn");
 
   // Location
@@ -424,62 +478,104 @@
 
   const shippingMethods = [
     { name: "Tiêu chuẩn", desc: "6–7 ngày", price: "Miễn phí" },
-    { name: "Nhanh", desc: "3–4 ngày", price: "30.000 đ" },
+    // { name: "Nhanh", desc: "3–4 ngày", price: "30.000 đ" },
   ];
 
   const errors = reactive({});
 
-  function validate() {
-    // Reset errors
-    Object.keys(errors).forEach((key) => (errors[key] = ""));
-    let valid = true;
+function validate() {
+// Reset errors
+Object.keys(errors).forEach((key) => (errors[key] = ""));
+let valid = true;
 
-    if (!isLoggedIn.value) {
-      if (!form.firstName) {
-        errors.firstName = "Họ không được để trống";
-        valid = false;
-      }
-      if (!form.lastName) {
-        errors.lastName = "Tên không được để trống";
-        valid = false;
-      }
-      if (!form.email) {
-        errors.email = "Email không được để trống";
-        valid = false;
-      }
-      if (!form.phone) {
-        errors.phone = "SĐT không được để trống";
-        valid = false;
-      }
-    }
+// Regex
+const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
+const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
 
-    if (!selectedProvince.value) {
-      errors.province = "Chọn tỉnh/thành phố";
-      valid = false;
-    }
-    if (!selectedDistrict.value) {
-      errors.district = "Chọn quận/huyện";
-      valid = false;
-    }
-    if (!selectedWard.value) {
-      errors.ward = "Chọn xã/phường";
-      valid = false;
-    }
-    if (!form.addressDetail) {
-      errors.addressDetail = "Nhập địa chỉ cụ thể";
-      valid = false;
-    }
-    if (!selectedShipping.value) {
-      errors.shipping = "Chọn hình thức vận chuyển";
-      valid = false;
-    }
-    if (!paymentMethod.value) {
-      errors.paymentMethod = "Chọn phương thức thanh toán";
-      valid = false;
-    }
 
-    return valid;
-  }
+if (isLoggedIn.value) {
+// User đã đăng nhập
+if (!form.full_name) {
+errors.full_name = "Họ và tên không được để trống";
+valid = false;
+}
+
+
+if (!form.email) {
+  errors.email = "Email không được để trống";
+  valid = false;
+} else if (!emailRegex.test(form.email)) {
+  errors.email = "Email không đúng định dạng";
+  valid = false;
+}
+
+if (!form.phone) {
+  errors.phone = "SĐT không được để trống";
+  valid = false;
+} else if (!phoneRegex.test(form.phone)) {
+  errors.phone = "Số điện thoại không đúng định dạng";
+  valid = false;
+}
+
+
+} else {
+// Guest
+if (!form.firstName) {
+errors.firstName = "Họ không được để trống";
+valid = false;
+}
+if (!form.lastName) {
+errors.lastName = "Tên không được để trống";
+valid = false;
+}
+if (!form.email) {
+errors.email = "Email không được để trống";
+valid = false;
+} else if (!emailRegex.test(form.email)) {
+errors.email = "Email không đúng định dạng";
+valid = false;
+}
+if (!form.phone) {
+errors.phone = "SĐT không được để trống";
+valid = false;
+} else if (!phoneRegex.test(form.phone)) {
+errors.phone = "Số điện thoại không đúng định dạng";
+valid = false;
+}
+}
+
+// Địa chỉ
+if (!selectedProvince.value) {
+errors.province = "Chọn tỉnh/thành phố";
+valid = false;
+}
+if (!selectedDistrict.value) {
+errors.district = "Chọn quận/huyện";
+valid = false;
+}
+if (!selectedWard.value) {
+errors.ward = "Chọn xã/phường";
+valid = false;
+}
+if (!form.addressDetail) {
+errors.addressDetail = "Nhập địa chỉ cụ thể";
+valid = false;
+}
+
+// Vận chuyển & thanh toán
+if (!selectedShipping.value) {
+errors.shipping = "Chọn hình thức vận chuyển";
+valid = false;
+}
+if (!paymentMethod.value) {
+errors.paymentMethod = "Chọn phương thức thanh toán";
+valid = false;
+}
+
+return valid;
+}
+
+
 
   const totalAmount = computed(() => {
     const items = checkoutItems.value.length
@@ -496,102 +592,104 @@
   });
 
   async function submitPayment() {
-    const itemsToPay = checkoutItems.value.length
-      ? checkoutItems.value
-      : buyNowItem
-      ? [buyNowItem]
-      : [];
+const itemsToPay = checkoutItems.value.length
+? checkoutItems.value
+: buyNowItem
+? [buyNowItem]
+: [];
 
-    if (!itemsToPay.length) {
-      alert("Không có sản phẩm để thanh toán");
-      router.replace("/error");
-      return;
-    }
-
-    if (!validate()) {
-      alert("Vui lòng điền đầy đủ thông tin");
-      return;
-    }
-
-    const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
-
-    // 1. KHAI BÁO BIẾN order_code ĐỂ LƯU KẾT QUẢ TỪ API
-    let order_code = ""; 
-
-    try {
-      // Thanh toán online VNPAY
-      if (paymentMethod.value === "online") {
-        await payWithVNPAY({
-          amount: totalAmount.value,
-          orderInfo: `Thanh toán đơn hàng`,
-          order_type: "product", // Thêm order_type nếu cần
-          shipping_address,
-        });
-        return;
-      }
-
-      // Xử lý thanh toán khi nhận hàng (offline)
-      if (isLoggedIn.value) {
-        // User login
-        // Lưu ý: Tôi đang giả định authStore.user có sẵn khi isLoggedIn.value là true.
-        // Cần đảm bảo `useAuthStore` và `authStore` đã được khai báo/import.
-const payloadUser: any = {
-          // user_id: authStore.user.user_id, // Bỏ user_id nếu API không yêu cầu
-          // customer_name: authStore.user.full_name, // Lấy thông tin từ form nếu cần, hoặc từ authStore
-          // customer_phone: authStore.user.phone,
-          // customer_email: authStore.user.email,
-          shipping_address,
-          note: form.note || "",
-          payment_method_id: 1, // 1: Thanh toán khi nhận hàng (Giả định ID cho "offline" là 1)
-            voucher_code: form.voucher_code || null,
-          items: itemsToPay.map((i) => ({
-            product_id: i.product_id,
-            quantity: i.quantity,
-          })),
-        };
-        if (form.voucher_code) {
-  payloadUser.voucher_code = form.voucher_code;}
-        // GỌI API VÀ LƯU KẾT QUẢ
-        const result = await buyNow(payloadUser);
-        order_code = result.order_code; // Gán mã đơn hàng
-      } else {
-        // Guest
-        const payloadGuest = {
-          customer_name: `${form.firstName} ${form.lastName}`,
-          customer_phone: form.phone,
-          customer_email: form.email,
-          shipping_address,
-          note: form.note || "",
-          payment_method_id: 1, // 1: Thanh toán khi nhận hàng
-          items: itemsToPay.map((i) => ({
-            product_id: i.product_id,
-            quantity: i.quantity,
-          })),
-        };
-        if (form.voucher_code) {
-  payloadGuest.voucher_code = form.voucher_code;
+if (!itemsToPay.length) {
+alert("Không có sản phẩm để thanh toán");
+router.replace("/error");
+return;
 }
-        // GỌI API VÀ LƯU KẾT QUẢ
-        const result = await buyNowGuest(payloadGuest);
-        order_code = result.order_code; // Gán mã đơn hàng
-      }
 
-      alert("Thanh toán thành công! 🎉");
-      checkoutStore.clearCheckout();
+if (!validate()) {
+alert("Vui lòng điền đầy đủ thông tin");
+return;
+}
 
-      // 2. CHUYỂN router.push SANG DẠNG TRUYỀN QUERY
-      router.push({ path: "/thanks", query: { order_code: order_code } });
-    } catch (err: any) {
-      console.error("❌ Lỗi khi gọi API:", err);
-      alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
-    }
-  }
+const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
+let order_code = "";
+let order_id: string | number = "";
+
+try {
+// 1. Xử lý tạo order trước
+let orderResult: any;
 
 
-  function formatPrice(value: number) {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(value);
-  }
+if (isLoggedIn.value) {
+  // User đã đăng nhập
+  const payloadUser: any = {
+        full_name: form.full_name,
+    shipping_address,
+    note: form.note || "",
+    payment_method_id: paymentMethod.value === "online" ? 2 : 1, // 2 online, 1 offline
+    voucher_code: form.voucher_code || null,
+    items: itemsToPay.map((i) => ({
+      product_id: i.product_id,
+      quantity: i.quantity,
+    })),
+  };
+  orderResult = await buyNow(payloadUser);
+} else {
+  // Guest
+  const payloadGuest = {
+    customer_name: `${form.firstName} ${form.lastName}`,
+    customer_phone: form.phone,
+    customer_email: form.email,
+    shipping_address,
+    note: form.note || "",
+    payment_method_id: paymentMethod.value === "online" ? 2 : 1,
+    voucher_code: form.voucher_code || null,
+    items: itemsToPay.map((i) => ({
+      product_id: i.product_id,
+      quantity: i.quantity,
+    })),
+  };
+  orderResult = await buyNowGuest(payloadGuest);
+}
+
+// Lấy order_id và order_code
+order_id = orderResult.result.data.order_id || orderResult.result.data.order_code;
+order_code = orderResult.result.data.order_code;
+
+// 2. Nếu chọn online → gọi VNPAY
+if (paymentMethod.value === "online") {
+  // await payWithVNPAY({
+  //   amount: totalAmount.value,
+  //   orderInfo: `Thanh toán đơn hàng ${order_code}`,
+  //   order_type: "product",
+  //   order_id: Number(order_id), 
+  // });
+
+  await payWithVNPAY({
+  amount: String(totalAmount.value), // ép kiểu thành string
+  orderInfo: `Thanh toán đơn hàng ${order_code}`,
+  order_type: "product",
+  order_id: String(order_id),       // ép kiểu string
+});
+
+  return; // redirect sang VNPAY, không chạy tiếp
+}
+
+// 3. Offline → thông báo thành công, xóa giỏ hàng, chuyển trang
+alert("Thanh toán thành công! 🎉");
+checkoutStore.clearCheckout();
+router.push({ path: "/thanks", query: { order_code } });
+
+
+} catch (err: any) {
+console.error("❌ Lỗi khi gọi API:", err);
+alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
+}
+}
+
+
+
+function formatPrice(value: number | undefined | null) {
+  const v = Number(value) || 0;
+  return v.toLocaleString("vi-VN") + " đ";
+}
+
 </script>

@@ -1,4 +1,4 @@
-<template>
+c<template>
   <div>
     <div
       class="flex flex-col items-center text-center w-[190px] h-[260px] border border-success rounded-4xl justify-center cursor-pointer hover:border-primary transition-colors duration-300 ease-out group"

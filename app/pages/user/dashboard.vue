@@ -3,7 +3,7 @@
     <div class="flex w-full max-w-[85%]">
 
       <!-- Sidebar -->
-   <ModulesUserAccountSidebar />
+      <ModulesUserAccountSidebar />
 
       <!-- Main Content -->
       <main class="flex-1 p-6">
@@ -54,32 +54,66 @@
           </div>
         </section>
 
-        <!-- Đơn hàng gần đây -->
-        <section class="bg-white rounded-xl p-4 shadow">
+        <!-- ĐƠN HÀNG GẦN ĐÂY (NÂNG CẤP GIỐNG TRANG LIST) -->
+        <section class="bg-white rounded-xl p-5 shadow">
+
           <div class="flex justify-between items-center mb-2">
             <h3 class="font-semibold text-gray-700 text-[20px]">Đơn hàng gần đây</h3>
-           <button
-  class="relative overflow-hidden px-5 py-2 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow flex justify-center items-center group transition-colors duration-500"
->
-  <!-- Layer hiệu ứng nổ -->
-  <span class="absolute inset-0 flex justify-center items-center">
-    <span
-      class="w-1 h-1 bg-[#000000] rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100 origin-center"
-    ></span>
-  </span>
 
-  <!-- Text -->
-  <span class="relative z-10 group-hover:text-white text-[15px] transition-colors duration-300">
-    Xem tất cả
-  </span>
-</button>
+            <!-- TÌM KIẾM + LỌC -->
+            <div class="flex items-center gap-3">
 
+              <!-- SEARCH -->
+              <div class="h-[45px] px-4 flex items-center border border-gray-300 rounded-[10px] bg-transparent gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="w-5 h-5 text-gray-400">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
+                </svg>
+
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="Tìm kiếm đơn hàng..."
+                  class="flex-1 bg-transparent outline-none placeholder:text-gray-400"
+                />
+              </div>
+
+              <!-- FILTER DROPDOWN -->
+              <div class="relative">
+                <button 
+                  @click="showFilter = !showFilter"
+                  class="h-[45px] px-4 flex items-center justify-between border border-gray-300 rounded-[10px] bg-transparent cursor-pointer w-[180px]"
+                >
+                  <span class="text-gray-600 text-sm">
+                    {{ filterStatus || 'Tất cả trạng thái' }}
+                  </span>
+
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+
+                <div 
+                  v-if="showFilter"
+                  class="absolute top-[48px] left-0 w-full bg-white border border-gray-200 rounded-[10px] shadow-md overflow-hidden z-20"
+                >
+                  <div @click="applyFilter('')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Tất cả trạng thái</div>
+                  <div @click="applyFilter('Đang chờ')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Đang chờ</div>
+                  <div @click="applyFilter('Đang xử lý')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Đang xử lý</div>
+                  <div @click="applyFilter('Hoàn thành')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Hoàn thành</div>
+                  <div @click="applyFilter('Đã hủy')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Đã hủy</div>
+                </div>
+              </div>
+
+            </div>
           </div>
 
           <hr class="border-t border-gray-200 mb-4">
 
           <!-- HEADER -->
-          <div class="grid grid-cols-5 text-[#6E4E37] font-semibold text-sm px-2 mb-3 text[16px ]">
+          <div class="grid grid-cols-5 text-[#6E4E37] font-semibold text-sm px-2 mb-3">
             <div>#Mã đơn</div>
             <div>Ngày mua</div>
             <div>Tổng</div>
@@ -87,50 +121,54 @@
             <div>Hành động</div>
           </div>
 
-        <!-- LIST -->
-<div class="space-y-2">
-  <div
-    v-for="(order, i) in orders"
-    :key="i"
-    class="grid grid-cols-5 items-center bg-[#F5F7FA] h-[55px] rounded-[10px] px-3 text-sm hover:bg-[#ECEFF3] transition"
-  >
-    <div class="text-[#A77A5D] font-semibold cursor-pointer font-medium">{{ order.code }}</div>
-    <div>{{ order.date }}</div>
-    <div>{{ order.total }}</div>
-    <div>
-      <span
-        :class="{
-          'text-yellow-500 bg-yellow-100 px-2 py-1 rounded': order.status === 'Đang chờ',
-          'text-blue-500 bg-blue-100 px-2 py-1 rounded': order.status === 'Đang xử lý',
-          'text-green-500 bg-green-100 px-2 py-1 rounded': order.status === 'Hoàn thành',
-          'text-red-500 bg-red-100 px-2 py-1 rounded': order.status === 'Đã hủy'
-        }"
-      >
-        {{ order.status }}
-      </span>
-    </div>
-   <div
-  class="w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition
-         hover:bg-black/20 hover:border-black/20"
->
-  <svg xmlns="http://www.w3.org/2000/svg" 
-    fill="none" 
-    viewBox="0 0 24 24" 
-    stroke-width="1.5" 
-    stroke="currentColor" 
-    class="w-5 h-5 text-gray-500 transition
-           group-hover:text-white hover:text-white">
-    <path stroke-linecap="round" stroke-linejoin="round" 
-      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 8.354 7.36 5.25 12 
-      5.25c4.638 0 8.574 3.103 9.963 6.433.07.162.07.353 0 .515C20.574 
-      15.646 16.637 18.75 12 18.75c-4.64 0-8.577-3.103-9.964-6.428z" />
-    <path stroke-linecap="round" stroke-linejoin="round" 
-      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-</div>
+          <!-- LIST -->
+          <div class="space-y-2">
+            <div
+              v-for="order in paginatedOrders"
+              :key="order.order_id"
+              class="h-[55px] grid grid-cols-5 items-center bg-[#F5F7FA] rounded-[10px] px-3 text-sm hover:bg-[#ECEFF3] transition"
+            >
+              <div class="text-[#A77A5D] font-semibold cursor-pointer">{{ order.order_code }}</div>
+              <div>{{ order.order_date }}</div>
+              <div>{{ order.total_amount }} ₫</div>
 
-  </div>
-</div>
+              <div>
+                <span :class="{
+                  'text-yellow-500 bg-yellow-100 px-2 py-1 rounded': order.order_status === 'Đang chờ',
+                  'text-blue-500 bg-blue-100 px-2 py-1 rounded': order.order_status === 'Đang xử lý',
+                  'text-green-500 bg-green-100 px-2 py-1 rounded': order.order_status === 'Hoàn thành',
+                  'text-red-500 bg-red-100 px-2 py-1 rounded': order.order_status === 'Đã hủy'
+                }">{{ order.order_status }}</span>
+              </div>
+
+              <NuxtLink 
+                :to="`/user/orders/${order.order_id}`"
+                class="w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor"
+                  class="w-5 h-5 text-gray-500 hover:text-white transition">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 8.354 7.36 5.25 12 
+                      5.25c4.638 0 8.574 3.103 9.963 6.433.07.162.07.353 0 .515C20.574 
+                      15.646 16.637 18.75 12 18.75c-4.64 0-8.577-3.103-9.964-6.428z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </NuxtLink>
+
+            </div>
+          </div>
+
+          <!-- PAGINATION -->
+          <ModulesUserPagination
+            :current-page="currentPage"
+            :total-pages="totalPages"
+            :pages-around="pagesAround"
+            @prev="prevPage"
+            @next="nextPage"
+            @go="(p) => currentPage = p"
+          />
 
         </section>
 
@@ -139,22 +177,52 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({
   middleware: 'auth'
 })
-import { ref } from 'vue'
 
-const menuItems = [
-  { name: 'Hồ sơ của tôi', icon: 'user', active: true },
-  { name: 'Danh sách đơn hàng', icon: 'clipboard-list', active: false }
-]
+import { ref, computed, onMounted } from 'vue'
+import { useOrder } from '~/composables/useOrder'
 
-const orders = ref([
-  { code: '#28VR5K01', date: '20/08/2025', total: '450.000 ₫', status: 'Đang chờ' },
-  { code: '#28VR5K02', date: '21/08/2025', total: '1.200.000 ₫', status: 'Đang xử lý' },
-  { code: '#28VR5K03', date: '22/08/2025', total: '850.000 ₫', status: 'Hoàn thành' },
-  { code: '#28VR5K04', date: '23/08/2025', total: '2.000.000 ₫', status: 'Hoàn thành' },
-  { code: '#28VR5K05', date: '24/08/2025', total: '350.000 ₫', status: 'Đã hủy' }
-])
+/* --- FETCH ORDERS --- */
+const { orders, fetchOrders } = useOrder()
+onMounted(() => fetchOrders())
+
+/* --- SEARCH & FILTER --- */
+const searchQuery = ref('')
+const showFilter = ref(false)
+const filterStatus = ref('')
+
+const applyFilter = (v: string) => {
+  filterStatus.value = v
+  showFilter.value = false
+}
+
+/* --- PAGINATION --- */
+const currentPage = ref(1)
+const perPage = 5 
+
+const filteredOrders = computed(() =>
+  orders.value
+    .filter(o => o.order_code.toLowerCase().includes(searchQuery.value.toLowerCase()))
+    .filter(o => filterStatus.value === '' || o.order_status === filterStatus.value)
+)
+
+const totalPages = computed(() => Math.ceil(filteredOrders.value.length / perPage))
+
+const paginatedOrders = computed(() =>
+  filteredOrders.value.slice((currentPage.value - 1) * perPage, currentPage.value * perPage)
+)
+
+const pagesAround = computed(() => {
+  let p = currentPage.value
+  let t = totalPages.value
+  let arr: number[] = []
+  for (let i = p - 1; i <= p + 1; i++) if (i > 1 && i < t) arr.push(i)
+  return arr
+})
+
+const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++ }
+const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
 </script>
