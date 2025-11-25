@@ -16,7 +16,7 @@
             </h2>
 
             <p class="text-gray-600 mb-6 leading-relaxed">
-                Đơn hàng của bạn đã được đặt và sẽ được xử lý sớm nhất có thể. Vui lòng ghi lại mã đơn hàng là **3BHF654DWR**. Bạn sẽ sớm nhận được email xác nhận đơn hàng.
+                Đơn hàng của bạn đã được đặt và sẽ được xử lý sớm nhất có thể. Vui lòng ghi lại mã đơn hàng là <strong class="text-[#A77A5D]">{{ orderCode }}</strong>. Bạn sẽ sớm nhận được email xác nhận đơn hàng.
             </p>
 
             <div class="flex flex-col sm:flex-row justify-center gap-4">
@@ -39,5 +39,14 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+
+const orderCode = computed(() => {
+    // Đọc order_code từ query param. Cung cấp giá trị mặc định nếu không có.
+    const code = route.query.order_code;
+    return Array.isArray(code) ? code[0] : code || 'Đang cập nhật...';
+});
 </script>

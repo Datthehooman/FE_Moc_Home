@@ -43,11 +43,14 @@ export function useCheckout() {
     const user_id = authStore.user.user_id || null;
     const body = { ...payload, user_id };
 
-    return await $fetch("https://api.mocfurni.shop/api/client/buy-now", {
+    const res: any = await $fetch("https://api.mocfurni.shop/api/client/buy-now", {
       method: "POST",
       headers: { ...getAuthHeader(), "Content-Type": "application/json" },
       body,
     });
+    
+    // ✅ FIX: Trả về đối tượng data nằm trong result.
+    return res?.result?.data || res;
   };
 
   // 🔥 Thanh toán 1 sản phẩm cho guest
@@ -63,7 +66,7 @@ export function useCheckout() {
       voucher_code?: string | null;  // <<< THÊM
   }) => {
     try {
-      return await $fetch(
+      const res: any = await $fetch(
         "https://api.mocfurni.shop/api/client/buy-now/guest",
 
         {
@@ -71,6 +74,9 @@ export function useCheckout() {
           body: payload,
         }
       );
+      // ✅ FIX: Trả về đối tượng data nằm trong result.
+      return res?.result?.data || res;
+      
     } catch (error: any) {
       console.error("❌ Lỗi server guest:", error.data || error);
       throw new Error("Lỗi server");
