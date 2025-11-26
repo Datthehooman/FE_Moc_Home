@@ -687,7 +687,8 @@
             <div class="col-span-2 rounded-xl overflow-hidden relative group">
               <NuxtImg
                 src="/Home-GHE-011.jpg"
-                class="w-full relative z-0 object-cover"
+                class="w-full h-[300px] object-cover relative z-0"
+                alt="Gallery image"
               />
               <div
                 class="absolute inset-0 h-[200%] -translate-y-full group-hover:translate-y-0 transition-transform duration-1000 z-10"
