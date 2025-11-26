@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-[#FFFBF8] flex flex-col">
-    <div class="flex-grow flex items-center justify-center p-4 mt-[50px]">
+    <div class="flex items-center justify-center p-4 mt-[50px]">
       <div class="w-full max-w-[500px] bg-white rounded-xl shadow-lg p-8 space-y-6">
 
         <!-- Logo -->
@@ -93,7 +93,10 @@ const sendResetLink = async () => {
     if (res?.success || res?.status === 200) {
       success.value = res?.message || 'Đã gửi mã OTP đến email của bạn!'
 
-      // 🟢 Chuyển sang trang xác minh OTP sau 1 giây
+      // ✅ Lưu email để trang OTP dùng lại
+      localStorage.setItem("resetEmail", email.value)
+
+      // 🟢 Chuyển sang trang xác minh OTP
       setTimeout(() => {
         navigateTo('/OtpVerify')
       }, 1000)
@@ -107,4 +110,5 @@ const sendResetLink = async () => {
     loading.value = false
   }
 }
+
 </script>
