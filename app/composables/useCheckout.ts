@@ -135,17 +135,9 @@ const payWithVNPAY = async (payload: {
   amount: number;
   orderInfo: string;
   order_type: string;
-  order_id: string | number;
+  order_id: number; // đã ép sang number
 }) => {
   if (!payload.amount || payload.amount <= 0) return alert("Số tiền thanh toán không hợp lệ");
-
-  // ✅ log ra payload trước khi gửi
-  console.log("🔥 VNPAY Payload:", {
-    amount: payload.amount,
-    orderInfo: payload.orderInfo,
-    order_type: payload.order_type,
-    order_id: payload.order_id,
-  });
 
   try {
     const res: any = await $fetch("https://api.mocfurni.shop/api/client/vnpay-payment", {
@@ -153,18 +145,11 @@ const payWithVNPAY = async (payload: {
       body: payload,
     });
 
-  // const res: any = await $fetch("https://api.mocfurni.shop/api/client/vnpay-payment", {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: payload,
-  // });
-
-
     const queryString = res?.data || res;
     if (queryString) {
       const vnpayBase = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        const url = queryString.startsWith("?") ? vnpayBase + queryString : vnpayBase + "?" + queryString;
-        window.location.href = url; // redirect sang VNPAY
+      const url = queryString.startsWith("?") ? vnpayBase + queryString : vnpayBase + "?" + queryString;
+      window.location.href = url;
     } else {
       alert("Không nhận được link thanh toán từ server");
       console.log("VNPAY response:", res);
@@ -174,7 +159,6 @@ const payWithVNPAY = async (payload: {
     alert("Thanh toán VNPAY thất bại!");
   }
 };
-
 
 
   const clearCheckout = () => {
