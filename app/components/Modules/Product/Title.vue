@@ -11,11 +11,21 @@
       label="xem thêm"
       trailing-icon="i-lucide-chevrons-right"
       class="text-accent text-info cursor-pointer"
+      @click="goToProductList"
     />
   </div>
 </template>
+
 <script lang="ts" setup>
-  const props = defineProps<{
-    title?: String;
-  }>();
+import { useRouter } from 'vue-router'
+
+const props = defineProps<{
+  title?: String;
+}>()
+
+const router = useRouter()
+
+function goToProductList() {
+  router.push('/ProductList')
+}
 </script>

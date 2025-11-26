@@ -46,6 +46,17 @@ const titles = {
   ProductList: 'Cửa hàng',
   OtpVerify: 'Xác minh OTP',
   'reset-password': 'Đặt lại mật khẩu',
+  'user-dashboard': 'Bảng điều khiển',
+  'user-profile': 'Hồ sơ cá nhân',
+  'user-orders-list': 'Đơn hàng của tôi',
+  'user-wishlist': 'Danh sách yêu thích',
+  'user-address': 'Địa chỉ của tôi',
+  'user-support': 'Hỗ trợ',
+  'user-track-order': 'Theo dõi đơn hàng',
+  'user-payment': 'Phương thức thanh toán',
+  'user-notifications': 'Thông báo',
+  'user-messages': 'Tin nhắn',
+  'user-settings': 'Cài đặt',
 }
 
 // pageTitle sẽ tự động cập nhật khi route thay đổi
