@@ -67,13 +67,15 @@
             </div>
             <template #content>
               <div class="flex items-center rounded-3xl bg-white p-3">
-                <NuxtImg src="/image 10.png" class="size-[81px] mr-3" />
+                <NuxtImg :src="item.thumbnail" class="size-[81px] mr-3" />
                 <div>
-                  <p class="font-bold text-[16px] mb-1">Ghế sofa mini</p>
+                  <p class="font-bold text-[16px] mb-1">
+                    {{ item.product_name }}
+                  </p>
                   <p class="text-[16px]">
                     Giá:
                     <span class="text-[#FF0000] font-semibold text-[13px]"
-                      >180.000 đ</span
+                      >{{ item.product_price }} đ</span
                     >
                   </p>
                 </div>
@@ -130,8 +132,12 @@
             </UButton>
           </div>
         </div>
-        <div class="h-full pl-[164px]">
-          <NuxtImg src="/image 10.png" alt="blue arm chair" class="w-full" />
+        <div class="flex items-center justify-center h-[400px]">
+          <NuxtImg
+            :src="item.thumbnail"
+            alt="Product"
+            class="h-[350px] object-contain"
+          />
         </div>
       </div>
 
@@ -222,37 +228,37 @@
 <script setup lang="ts">
   const items = [
     {
-      product_id: 22,
-      product_name: "Ghế Bành Vải Xanh",
-      slug: "ghe-banh-vai-xanh",
-      price: 2500000,
-      product_price: 2500000,
-      product_sale: 1900000,
+      product_id: 27,
+      product_name: "Giường Ngủ Bọc Vải Xám",
+      slug: "giuong-ngu-boc-vai-xam",
+      price: 6500000,
+      product_price: 6500000,
+      product_sale: null,
       quantity: 1,
       thumbnail:
-        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+        "https://api.mocfurni.shop/storage/clientsite/products/images/GN-VX-001_main.png",
     },
     {
-      product_id: 22,
-      product_name: "Ghế Bành Vải Xanh",
-      slug: "ghe-banh-vai-xanh",
-      price: 2500000,
-      product_price: 2500000,
-      product_sale: 1900000,
+      product_id: 28,
+      product_name: "Sofa Băng Vải Be (3 Chỗ)",
+      slug: "sofa-bang-vai-be-3-cho",
+      price: 7000000,
+      product_price: 7000000,
+      product_sale: null,
       quantity: 1,
       thumbnail:
-        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+        "https://api.mocfurni.shop/storage/clientsite/products/images/SF-VB-001_main.png",
     },
     {
-      product_id: 22,
-      product_name: "Ghế Bành Vải Xanh",
-      slug: "ghe-banh-vai-xanh",
-      price: 2500000,
-      product_price: 2500000,
-      product_sale: 1900000,
+      product_id: 29,
+      product_name: "Bàn Làm Việc Chữ L (Gaming)",
+      slug: "ban-lam-viec-chu-l-gaming",
+      price: 4500000,
+      product_price: 4500000,
+      product_sale: null,
       quantity: 1,
       thumbnail:
-        "https://api.mocfurni.shop/storage/clientsite/products/images/GB-VX-001_main.png",
+        "https://api.mocfurni.shop/storage/clientsite/products/images/BLV-GM-001_main.png",
     },
   ];
 

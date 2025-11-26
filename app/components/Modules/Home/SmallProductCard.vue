@@ -23,10 +23,12 @@
         />
       </div>
     </UTooltip>
-    <div class="size-30 p-2.5 bg-white rounded-2xl z-10 mr-3.5 overflow-hidden">
+    <div
+      class="size-30 p-2.5 bg-white rounded-2xl z-10 mr-3.5 overflow-hidden flex items-center justify-center"
+    >
       <NuxtImg
         :src="image || '/image 10.png'"
-        class="w-full max-h-[207px] object-contain mb-[13px] mx-auto transition-transform duration-300 group-hover:scale-110"
+        class="max-h-[207px] max-w-full object-contain transition-transform duration-300 group-hover:scale-110"
         @click="goToDetail(slug)"
       />
     </div>
