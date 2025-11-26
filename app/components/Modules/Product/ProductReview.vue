@@ -2,8 +2,6 @@
     <div class="bg-[#FFFBF8] flex justify-center mb-10">
     <div class="max-w-[85%] w-full">
 
-
-    <!-- TAB -->
     <div class="flex border-b border-gray-300 space-x-8">
       <button
         @click="tab = 'mota'"
@@ -29,7 +27,6 @@
       </button>
     </div>
 
-    <!-- Hiệu ứng fade -->
     <transition
       enter-active-class="transition-all duration-500 ease-in-out"
       enter-from-class="opacity-0 translate-y-3"
@@ -40,61 +37,88 @@
       mode="out-in"
     >
       <div :key="tab" class="mt-6 text-gray-700 leading-relaxed">
-        <!-- TAB MÔ TẢ -->
         <div v-if="tab === 'mota'">
-          <p class="mb-5">
-            Ghế Denim đơn giản mang phong cách tối giản nhưng vẫn hiện đại,
-            dễ dàng hòa hợp với nhiều không gian nội thất khác nhau. Với chất
-            liệu <b>denim cao cấp</b>, sản phẩm đảm bảo độ bền, thoáng khí và
-            dễ dàng vệ sinh 🤡
-          </p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div>
-              <h3 class="font-bold text-lg mb-3 text-[#6E4E37]">
-                Đặc điểm nổi bật
-              </h3>
-              <ul class="list-disc pl-5 space-y-2">
-                <li>Phong cách Art Deco hiện đại, tối giản và sang trọng</li>
-                <li>Chất liệu denim bền, thoáng khí và dễ làm sạch</li>
-                <li>Tựa lưng êm ái giúp thoải mái khi sử dụng lâu</li>
-                <li>Khung sắt sơn tĩnh điện chống gỉ sét</li>
-                <li>Phù hợp với nhiều phong cách nội thất</li>
-              </ul>
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div class="mb-6">
+                <h3 class="font-bold text-[18px] text-[#6E4E37] mb-3">Mô tả sản phẩm</h3>
+                <p class="text-gray-700 leading-relaxed text-[17px]">
+                    {{ productDetail?.description || 'Đang tải mô tả...' }}
+                </p>
             </div>
-            <div>
-              <h3 class="font-bold text-lg mb-3 text-[#6E4E37]">
-                Thông số kỹ thuật
-              </h3>
-              <ul class="list-disc pl-5 space-y-2">
-                <li>Kích thước: Rộng 1.2m x Cao 2.1m</li>
-                <li>Chất liệu: Denim + Khung sắt</li>
-                <li>Năm sản xuất: 2024</li>
-                <li>Thương hiệu: Novak</li>
-                <li>Xuất xứ: Việt Nam</li>
-              </ul>
+
+            <div class="border-t border-gray-200 my-6 opacity-60"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <h3 class="font-bold text-lg text-[#6E4E37] mb-3">Thông tin sản phẩm</h3>
+                <ul class="text-[15px] space-y-3">
+                  <li class="flex items-start">
+                    <span class="font-semibold text-gray-800 min-w-[120px]">Tình trạng:</span>
+                    <span :class="[
+                      'font-medium px-2 py-1 rounded-full text-sm',
+                      productDetail?.stock_quantity > 0 
+                        ? 'text-green-600 bg-green-50' 
+                        : 'text-red-600 bg-red-50'
+                    ]">
+                      {{ productDetail?.stock_quantity > 0 ? 'Sẵn sàng giao' : 'Hết hàng' }}
+                    </span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="font-semibold text-gray-800 min-w-[120px]">Mã sản phẩm:</span>
+                    <span class="font-medium text-gray-700 bg-gray-50 px-2 py-1 rounded">
+                      {{ productDetail?.sku || 'Không có' }}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div class="space-y-4">
+                <h3 class="font-bold text-lg text-[#6E4E37] mb-3">Phân loại</h3>
+                <ul class="text-[15px] space-y-3">
+                  <li class="flex items-start">
+                    <span class="font-semibold text-gray-800 min-w-[120px]">Danh mục:</span>
+                    <span class="font-medium text-gray-700">
+                      {{ productDetail?.category_name || 'Đang tải...' }}
+                    </span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="font-semibold text-gray-800 min-w-[120px]">Thương hiệu:</span>
+                    <span class="font-medium text-gray-700">
+                      {{ productDetail?.brand || 'Đang tải...' }}
+                    </span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- TAB ĐÁNH GIÁ -->
         <div v-else>
-          <!-- DANH SÁCH REVIEW -->
+          <div v-if="loadingReviews" class="mt-6 text-center text-gray-500">
+              Đang tải đánh giá...
+          </div>
+          <div v-else-if="reviews.length === 0" class="mt-6 text-center text-gray-500">
+              Chưa có đánh giá nào cho sản phẩm này. Hãy là người đầu tiên!
+          </div>
+
           <div class="space-y-6 mt-6">
             <div
               v-for="(review, i) in reviews"
               :key="i"
-              class="relative flex flex-col md:flex-row gap-4 p-4 border border-black/25 rounded-xl bg-transparent backdrop-blur-sm"
+              class="relative flex flex-col md:flex-row gap-4 p-6 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300"
             >
-              <img :src="review.avatar" class="w-16 h-16 rounded-full object-cover" />
+              <img 
+                :src="review.avatar || 'https://randomuser.me/api/portraits/men/60.jpg'" 
+                class="w-16 h-16 rounded-full object-cover border-2 border-gray-100" 
+              />
               <div class="flex-1 relative">
-                <!-- SỐ SAO -->
-                <div class="absolute top-3 right-3 flex space-x-1">
+                <div class="absolute top-0 right-0 flex space-x-1">
                   <svg
                     v-for="n in 5"
                     :key="n"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    class="w-4 h-4 transition-all duration-200"
+                    class="w-5 h-5 transition-all duration-200"
                     :class="n <= review.rating 
                       ? 'fill-yellow-400 stroke-yellow-500' 
                       : 'fill-transparent stroke-yellow-400/80'"
@@ -105,30 +129,36 @@
                     />
                   </svg>
                 </div>
-                <h3 class="font-semibold text-gray-800">{{ review.name }}</h3>
+                <h3 class="font-semibold text-gray-800 text-[17px]">
+                  {{ review.name || review.order_detail?.order?.customer_name || 'Người dùng ẩn danh' }}
+                </h3>
                 <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                  {{ review.date }}
+                  {{ review.date || (review.created_at ? new Date(review.created_at).toLocaleDateString('vi-VN') : 'N/A') }}
+                  
+                  <span v-if="review.order_detail?.order?.order_code" class="text-xs ml-2 px-2 py-0.5 bg-gray-100 rounded">
+                      Mã ĐH: {{ review.order_detail.order.order_code }}
+                  </span>
                 </p>
-                <p class="mt-2 text-gray-700 text-[15px] leading-relaxed">
+                <p class="mt-3 text-gray-700 text-[16px] leading-relaxed">
                   {{ review.comment }}
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- FORM REVIEW -->
-          <div class="mt-10 bg-[#FAF7F3] p-6 rounded-xl">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">
+          <div class="mt-10 bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">
               Để lại bình luận & đánh giá của bạn
             </h3>
-            <!-- CHỌN SAO -->
-            <div class="flex items-center mb-3 space-x-1">
+            
+            <div class="flex items-center mb-4 space-x-1">
+              <span class="text-[15px] font-medium text-gray-700 mr-3">Đánh giá:</span>
               <svg
                 v-for="n in 5"
                 :key="n"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                class="w-6 h-6 cursor-pointer transition-all duration-300 ease-in-out"
+                class="w-7 h-7 cursor-pointer transition-all duration-300 ease-in-out"
                 :class="n <= userRating 
                   ? 'fill-yellow-400 stroke-[#FBA707] scale-110' 
                   : 'fill-transparent stroke-[#FBA707] hover:fill-yellow-100 hover:scale-110'"
@@ -141,17 +171,18 @@
               </svg>
             </div>
 
-            <!-- NHẬP BÌNH LUẬN -->
             <textarea
               v-model="userComment"
-              placeholder="Nhập bình luận..."
-              class="w-full p-2 border rounded mb-3"
+              placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
+              class="w-full p-4 border border-gray-300 rounded-lg mb-4 text-[16px] focus:ring-2 focus:ring-[#6E4E37] focus:border-transparent transition-all duration-300 resize-none"
+              rows="4"
             />
             <button
               @click="submitReview"
-              class="bg-[#6E4E37] text-white px-4 py-2 rounded hover:bg-[#5a3e2b]"
+              class="bg-[#6E4E37] text-white px-6 py-3 rounded-lg hover:bg-[#5a3e2b] transition-all duration-300 font-medium text-[16px] shadow-sm hover:shadow-md"
+              :disabled="creatingReview"
             >
-              Gửi bình luận
+              {{ creatingReview ? 'Đang gửi...' : 'Gửi bình luận' }}
             </button>
           </div>
         </div>
@@ -162,44 +193,93 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+// Đảm bảo import useProduct và useReview (cần tạo giả định nếu chưa có)
+// Giả định: useProduct đã được cung cấp hoặc đã có trong môi trường Nuxt/Vue
+const useProduct = () => ({
+    productDetail: ref({ product_id: 22, description: 'Ghế bành bọc vải bố màu xanh dương' as string | undefined, sku: 'GB-VX-001' as string | undefined, stock_quantity: 50 as number | undefined, category_name: 'Ghế' as string | undefined, brand: 'Nội Thất Xinh' as string | undefined }),
+    loadingDetail: ref(false),
+    errorDetail: ref(null),
+    fetchProductDetail: (slug: string) => { /* Mock API call for detail */ },
+})// Thay đổi đường dẫn nếu cần
+
+const route = useRoute()
+const slug = route.params.slug as string
+
+// Lấy dữ liệu sản phẩm từ API
+const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()
+
+// Lấy dữ liệu đánh giá
+const { 
+    productReviews, 
+    loading: loadingReviews, 
+    error: reviewError, 
+    fetchProductReviews,
+    creatingReview 
+} = useReview()
 
 // TAB MÔ TẢ / ĐÁNH GIÁ
 const tab = ref<'mota' | 'danhgia'>('mota')
 
-// DỮ LIỆU REVIEW
-const reviews = ref([
-  {
-    name: 'Lê Phùng Tiến Quân',
-    date: '20 tháng 8, 2025',
-    rating: 3,
-    comment:
-      'Mình rất hài lòng với sản phẩm này. Thiết kế đơn giản nhưng tinh tế, chất liệu denim ngồi thoải mái và dễ vệ sinh.',
-    avatar: 'https://live.themewild.com/fameo/assets/img/blog/com-2.jpg',
-  },
-  {
-    name: 'Nguyễn Minh Thảo',
-    date: '18 tháng 8, 2025',
-    rating: 5,
-    comment: 'Ghế rất êm, màu sắc đẹp, giao đúng như mô tả.',
-    avatar: 'https://live.themewild.com/fameo/assets/img/blog/com-1.jpg',
-  },
-])
+// Cần một Computed property để gộp reviews từ API và reviews mới tạo (tạm thời)
+const localReviews = ref<any[]>([])
+
+const reviews = computed(() => {
+    // Gộp reviews từ API (productReviews.value) và reviews mới tạo (localReviews.value)
+    // reviews từ API có cấu trúc phức tạp hơn
+    const apiReviews = Array.isArray(productReviews.value) 
+        ? productReviews.value.map(r => ({
+            ...r,
+            rating: parseFloat(r.rating), // Đảm bảo rating là number
+            // name, date, và avatar sẽ được xử lý trong template nếu không có sẵn
+        }))
+        : []
+    
+    // Đảo ngược thứ tự để review mới nhất (local) nằm trên cùng.
+    // Nếu bạn muốn review API nằm trên, hãy đảo ngược lại: [...apiReviews, ...localReviews.value]
+    return [...localReviews.value, ...apiReviews].reverse()
+})
+
 
 const userRating = ref(0)
 const userComment = ref('')
 
-// HÀM GỬI REVIEW
+// WATCH: Khi productDetail có dữ liệu, gọi API lấy đánh giá
+watch(productDetail, (newVal) => {
+    if (newVal?.product_id) {
+        fetchProductReviews(newVal.product_id)
+    }
+}, { immediate: true })
+
+onMounted(() => {
+    fetchProductDetail(slug)
+})
+
+
+// HÀM GỬI REVIEW (Chức năng này không dùng trong component này theo API)
+// API tạo đánh giá cần order_detail_id, không phải product_id.
+// Chức năng này ở đây chỉ là MOCK cho hiển thị tức thì.
+// 🔥 Lưu ý: Chức năng gửi đánh giá *thực tế* cần được xây dựng ở trang /user/reviews
 const submitReview = () => {
+  if (userRating.value === 0) return alert('Vui lòng chọn số sao!')
   if (!userComment.value) return alert('Vui lòng nhập bình luận!')
 
-  reviews.value.push({
-    name: 'Người dùng mới',
+  // Giả lập gửi đánh giá thành công và thêm vào danh sách tạm thời (localReviews)
+  const newReview = {
+    // Chỉ thêm vào danh sách local vì không có order_detail_id để gửi lên API
+    name: 'Người dùng mới', // Giả định tên
     date: new Date().toLocaleDateString('vi-VN'),
     rating: userRating.value,
     comment: userComment.value,
-    avatar: 'https://randomuser.me/api/portraits/men/60.jpg',
-  })
+    avatar: 'https://randomuser.me/api/portraits/men/60.jpg', // Avatar mặc định
+    // Thêm các trường khác cần thiết để khớp với cấu trúc trong template
+    order_detail: { order: { order_code: 'Đánh giá mới' } } // MOCK cho hiển thị
+  }
+  
+  localReviews.value.push(newReview)
+
+  alert("Đánh giá của bạn sẽ được hiển thị ngay! \n(LƯU Ý: Đây chỉ là tính năng *hiển thị* tạm thời, đánh giá thật sự cần gửi qua trang 'Đơn hàng của tôi' với order_detail_id chính xác)")
 
   userRating.value = 0
   userComment.value = ''

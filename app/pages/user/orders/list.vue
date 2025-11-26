@@ -90,7 +90,7 @@
                 <span :class="{
                   'text-yellow-500 bg-yellow-100 px-2 py-1 rounded': order.order_status === 'Đang chờ',
                   'text-blue-500 bg-blue-100 px-2 py-1 rounded': order.order_status === 'Đang xử lý',
-                  'text-green-500 bg-green-100 px-2 py-1 rounded': order.order_status === 'Hoàn thành',
+                  'text-green-500 bg-green-100 px-2 py-1 rounded': order.order_status === 'Hoàn tất',
                   'text-red-500 bg-red-100 px-2 py-1 rounded': order.order_status === 'Đã hủy'
                 }">{{ order.order_status }}</span>
               </div>
