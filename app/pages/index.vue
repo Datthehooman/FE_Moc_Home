@@ -686,7 +686,7 @@
             </div>
             <div class="col-span-2 rounded-xl overflow-hidden relative group">
               <NuxtImg
-                src="/Home-GHE-001.jpg"
+                src="/Home-GHE-011.jpg"
                 class="w-full relative z-0 object-cover"
               />
               <div

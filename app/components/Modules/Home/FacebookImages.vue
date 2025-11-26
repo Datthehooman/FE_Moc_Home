@@ -38,7 +38,7 @@
 </template>
 <script setup lang="ts">
   const items = [
-    "/Home-GHE-001.jpg",
+    "/Home-GHE-011.jpg",
     "/Home-GHE-002.avif",
     "/Home-GHE-003.jpg",
     "/Home-GHE-004.avif",
@@ -47,6 +47,6 @@
     "/Home-GHE-007.jpg",
     "/Home-GHE-008.jpg",
     "/Home-GHE-009.jpg",
-    "/Home-GHE-0010.jpg",
+    "/Home-GHE-010.jpg",
   ];
 </script>
