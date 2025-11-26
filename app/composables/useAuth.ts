@@ -190,6 +190,26 @@ export const useAuth = () => {
     }
   };
 
+  // ===================== VERIFY OTP =====================
+const verifyOtp = async (otp: string): Promise<{ success: boolean; message: string; data?: any }> => {
+  try {
+    const res = await $fetch("https://api.mocfurni.shop/api/client/verify-otp", {
+      method: "POST",
+      body: { otp },
+    });
+
+    // Giả sử API trả về success/false và message
+    return {
+      success: res.success ?? true,
+      message: res.message || "Xác thực OTP thành công",
+      data: res.data || null,
+    };
+  } catch (error: any) {
+    const msg = error?.data?.message || "Xác thực OTP thất bại";
+    return { success: false, message: msg };
+  }
+};
+
   // ===================== LOGOUT =====================
   const logout = () => {
     tokenCookie.value = null;
@@ -205,6 +225,7 @@ export const useAuth = () => {
     checkEmailAvailable,
     checkPhoneAvailable,
     updateUserProfile,
+    verifyOtp, 
     tokenCookie,
     isLogged,
     user,
