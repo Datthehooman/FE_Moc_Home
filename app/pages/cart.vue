@@ -44,9 +44,34 @@
           </tbody>
         </table>
 
-        <div v-if="cart.length === 0" class="text-center py-4 text-gray-500 font-semibold">
-          Giỏ hàng trống, vui lòng thêm sản phẩm vào giỏ hàng!
-        </div>
+       <div
+  v-if="cart.length === 0"
+  class="flex flex-col items-center justify-center py-5 text-center text-gray-600"
+>
+  <!-- ICON GIỎ HÀNG -->
+  <div class="w-24 h-24  text-gray-300">
+    <UIcon name="i-lucide-shopping-cart" class="text-6xl text-gray-300" />
+  </div>
+
+  <!-- TEXT -->
+
+  <h3 class="text-lg font-semibold text-[#6E4E37]">
+    Giỏ hàng của bạn đang trống
+  </h3>
+  <p class="text-sm text-gray-400 mt-1">
+    Hãy thêm vài món đồ yêu thích để tiếp tục nhé!
+  </p>
+
+  <!-- BUTTON -->
+
+<a
+href="/"
+class="mt-5 bg-[#F7C59F] hover:bg-[#E8B58C] text-[#6E4E37] font-semibold py-2 px-6 rounded-lg transition"
+
+>
+Tiếp tục mua sắm
+  </a>
+</div>
       </div>
 
       <!-- HÓA ĐƠN -->
@@ -69,10 +94,10 @@
         </button>
 
         <!-- NHẬP MÃ GIẢM GIÁ -->
-        <div class="flex items-stretch mt-5 border border-gray-300 rounded-lg overflow-hidden">
+        <!-- <div class="flex items-stretch mt-5 border border-gray-300 rounded-lg overflow-hidden">
           <input v-model="discountCode" placeholder="Nhập mã giảm giá" class="px-3 py-2 flex-1 text-[14px] focus:outline-none" />
           <button @click="applyDiscount" class="bg-[#F7C59F] text-[#6E4E37] px-4 font-medium text-[13px]">Xác nhận</button>
-        </div>
+        </div> -->
 
         <a href="/" class="flex items-center gap-2 text-sm mt-3 text-gray-600 hover:underline">
           ← Tiếp tục mua sắm
@@ -100,24 +125,26 @@ const discountCode = ref('')
 const apiTotal = ref(0)
 
 async function fetchCartData() {
-  await fetchProducts() // đảm bảo products đã load
-  const data = await getCart()
+const data = await getCart()
 
-  if (data) {
-    apiTotal.value = data.total
-    cart.value = data.items.map((item: any) => {
-      const prod = products.value.find(p => p.product_id === item.product_id)
-      return {
-        ...item,
-        thumbnail: prod?.thumbnail || '/placeholder.png',
-        subtotal: item.quantity * (item.product_sale || item.product_price),
-      }
-    })
-  } else {
-    apiTotal.value = 0
-    cart.value = []
-  }
+if (data && data.items) {
+apiTotal.value = data.total
+cart.value = data.items.map((item: any) => {
+const price = Number(item.product_sale || item.product_price)
+const quantity = Number(item.quantity)
+return {
+...item,
+thumbnail: item.product_image || '/placeholder.png',
+quantity,
+subtotal: price * quantity,
 }
+})
+} else {
+apiTotal.value = 0
+cart.value = []
+}
+}
+
 
 onMounted(fetchCartData)
 

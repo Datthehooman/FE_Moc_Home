@@ -1,7 +1,9 @@
 <template>
-  <div class="flex justify-between mb-[25px]">
+  <div class="flex justify-between items-center mb-4 sm:mb-6 lg:mb-[25px]">
     <div>
-      <p class="text-primary font-semibold text-[26px]">
+      <p
+        class="text-primary font-semibold text-base sm:text-xl md:text-2xl lg:text-[26px]"
+      >
         {{ title || "Danh mục hàng đầu" }}
       </p>
       <div class="absolute w-10.5 h-0.5 bg-secondary" />
@@ -10,10 +12,12 @@
       variant="link"
       label="xem thêm"
       trailing-icon="i-lucide-chevrons-right"
-      class="text-accent text-info cursor-pointer"
+      class="text-accent text-info cursor-pointer shrink-0 text-xs sm:text-sm"
+      size="sm"
     />
   </div>
 </template>
+
 <script lang="ts" setup>
   const props = defineProps<{
     title?: String;

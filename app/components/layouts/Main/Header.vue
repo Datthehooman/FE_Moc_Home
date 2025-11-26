@@ -8,7 +8,7 @@
     ]"
   >
     <div
-      class="max-w-[85%] mx-auto flex justify-between items-center w-full px-6 transition-all duration-500"
+      class="w-full max-w-[85%] lg:max-w-[90%] mx-auto flex justify-between items-center px-4 lg:px-6"
     >
       <!-- Logo -->
       <NuxtLink
@@ -26,8 +26,8 @@
         />
       </NuxtLink>
 
-      <!-- Menu -->
-      <nav class="flex items-center">
+      <!-- Desktop Menu -->
+      <nav class="hidden lg:flex items-center">
         <ul class="flex space-x-8 text-[16px] font-medium">
           <li>
             <NuxtLink
@@ -131,8 +131,8 @@
       <div
         class="flex items-center gap-4 text-[#654538] transition-all duration-500"
       >
-        <!-- Search -->
-        <div class="relative">
+        <!-- Desktop Search (Always visible) -->
+        <div class="relative hidden lg:block">
           <input
             type="text"
             placeholder="Tìm kiếm..."
@@ -146,77 +146,186 @@
           />
         </div>
 
-        <!-- Wishlist -->
-        <div @click="goWishlist">
-          <UIcon
-            name="heroicons:heart"
-            class="w-5 h-6 cursor-pointer hover:text-[#A77A5D]"
+        <!-- Mobile Search (Expandable) -->
+        <div class="relative flex items-center lg:hidden">
+          <!-- Search Input (Expandable on mobile) -->
+          <input
+            v-show="isSearchOpen"
+            type="text"
+            placeholder="Tìm kiếm..."
+            v-model="searchQuery"
+            @keydown.enter="goSearch"
+            ref="searchInputRef"
+            class="border border-[#A77A5D] rounded-lg px-3 py-1.5 pr-8 text-sm focus:border-[#654538] outline-none bg-transparent transition-all duration-300 absolute right-0"
+            :class="isSearchOpen ? 'w-48 opacity-100' : 'w-0 opacity-0'"
           />
+
+          <!-- Search Icon Button (Mobile only) -->
+          <button
+            @click="toggleSearch"
+            class="hover:text-[#A77A5D] transition-colors relative z-10"
+          >
+            <UIcon
+              :name="
+                isSearchOpen ? 'heroicons:x-mark' : 'heroicons:magnifying-glass'
+              "
+              class="w-5 h-5 mt-1 mr-2"
+            />
+          </button>
         </div>
 
-        <!-- Cart -->
-        <NuxtLink to="/cart">
-          <UIcon
-            name="heroicons:shopping-bag"
-            class="w-5 h-5 cursor-pointer hover:text-[#A77A5D]"
-          />
-        </NuxtLink>
+        <!-- Other Icons (Hidden when search is open on mobile) -->
+        <div
+          class="flex items-center gap-4"
+          :class="isSearchOpen ? 'hidden' : 'flex lg:flex'"
+        >
+          <!-- Wishlist -->
+          <button @click="goWishlist" class="hover:text-[#A77A5D]">
+            <UIcon name="heroicons:heart" class="w-5 h-6 cursor-pointer" />
+          </button>
 
-        <!-- User -->
-        <div class="relative flex items-center" ref="userDropdownRef">
-          <UIcon
-            name="heroicons:user"
-            class="w-5 h-5 cursor-pointer hover:text-[#A77A5D]"
-            @click="toggleUserDropdown"
-          />
+          <!-- Cart -->
+          <NuxtLink to="/cart" class="hover:text-[#A77A5D]">
+            <UIcon
+              name="heroicons:shopping-bag"
+              class="w-5 h-5 cursor-pointer"
+            />
+          </NuxtLink>
 
-          <div
-            v-if="isUserDropdownOpen"
-            class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] opacity-0 translate-y-2 transition-all duration-300"
-            :class="{ 'opacity-100 translate-y-0': isUserDropdownOpen }"
-          >
-            <div class="p-4">
-              <!-- Nếu đã đăng nhập -->
-              <template v-if="authStore.isLogged">
-                <NuxtLink
-                  to="/user/dashboard"
-                  class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
-                >
-                  Tài khoản của tôi
-                </NuxtLink>
-                <a
-                  v-if="authStore.user.role === '1'"
-                  href="https://admin.mocfurni.shop"
-                  class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
-                >
-                  Đi đến trang admin
-                </a>
+          <!-- User -->
+          <div class="relative flex items-center" ref="userDropdownRef">
+            <button @click="toggleUserDropdown" class="hover:text-[#A77A5D]">
+              <UIcon name="heroicons:user" class="w-5 h-5 cursor-pointer" />
+            </button>
 
-                <button
-                  @click="logout"
-                  class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded-lg text-red-600"
-                >
-                  Đăng xuất
-                </button>
-              </template>
+            <div
+              v-if="isUserDropdownOpen"
+              class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] transition-all duration-300"
+              :class="{
+                'opacity-100 translate-y-0': isUserDropdownOpen,
+                'opacity-0 translate-y-2': !isUserDropdownOpen,
+              }"
+            >
+              <div class="p-4">
+                <!-- Nếu đã đăng nhập -->
+                <template v-if="authStore.isLogged">
+                  <NuxtLink
+                    to="/user/dashboard"
+                    class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
+                  >
+                    Tài khoản của tôi
+                  </NuxtLink>
+                  <a
+                    v-if="authStore.user.role === '1'"
+                    href="https://admin.mocfurni.shop"
+                    class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
+                  >
+                    Đi đến trang admin
+                  </a>
 
-              <!-- Nếu chưa đăng nhập -->
-              <template v-else>
-                <NuxtLink
-                  to="/login"
-                  class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
-                >
-                  Đăng nhập
-                </NuxtLink>
-                <NuxtLink
-                  to="/register"
-                  class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg"
-                >
-                  Đăng ký
-                </NuxtLink>
-              </template>
+                  <button
+                    @click="logout"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded-lg text-red-600"
+                  >
+                    Đăng xuất
+                  </button>
+                </template>
+
+                <!-- Nếu chưa đăng nhập -->
+                <template v-else>
+                  <NuxtLink
+                    to="/login"
+                    class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg mb-2"
+                  >
+                    Đăng nhập
+                  </NuxtLink>
+                  <NuxtLink
+                    to="/register"
+                    class="block px-4 py-2 text-sm hover:bg-gray-100 rounded-lg"
+                  >
+                    Đăng ký
+                  </NuxtLink>
+                </template>
+              </div>
             </div>
           </div>
+
+          <!-- Mobile Menu Button (Slideover) -->
+          <USlideover v-model:open="isMobileMenuOpen" side="left">
+            <button class="lg:hidden text-[#654538]">
+              <UIcon name="i-lucide-list" class="w-7 h-7" />
+            </button>
+
+            <template #body>
+              <nav class="flex flex-col space-y-4 p-4">
+                <NuxtLink
+                  to="/"
+                  @click="isMobileMenuOpen = false"
+                  class="text-black hover:text-[#654538] text-lg py-2"
+                  active-class="text-[#654538] font-semibold"
+                >
+                  Trang chủ
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/about"
+                  @click="isMobileMenuOpen = false"
+                  class="text-black hover:text-[#654538] text-lg py-2"
+                  active-class="text-[#654538] font-semibold"
+                >
+                  Về chúng tôi
+                </NuxtLink>
+
+                <!-- Mobile Categories -->
+                <div class="border-t border-gray-200 pt-4">
+                  <p class="text-[#654538] font-semibold mb-3">Danh mục</p>
+                  <div v-for="(cat, i) in categories" :key="i" class="mb-4">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-2">
+                      {{ cat.title }}
+                    </h4>
+                    <ul class="space-y-2 ml-4">
+                      <li v-for="(item, j) in cat.items" :key="j">
+                        <NuxtLink
+                          :to="`/san-pham/${item.slug}`"
+                          @click="isMobileMenuOpen = false"
+                          class="text-gray-600 hover:text-[#654538] text-sm block"
+                        >
+                          {{ item.name }}
+                        </NuxtLink>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <NuxtLink
+                  to="/ProductList"
+                  @click="isMobileMenuOpen = false"
+                  class="text-black hover:text-[#654538] text-lg py-2"
+                  active-class="text-[#654538] font-semibold"
+                >
+                  Cửa hàng
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/blog"
+                  @click="isMobileMenuOpen = false"
+                  class="text-black hover:text-[#654538] text-lg py-2"
+                  active-class="text-[#654538] font-semibold"
+                >
+                  Blog
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/contact"
+                  @click="isMobileMenuOpen = false"
+                  class="text-black hover:text-[#654538] text-lg py-2"
+                  active-class="text-[#654538] font-semibold"
+                >
+                  Liên hệ
+                </NuxtLink>
+              </nav>
+            </template>
+          </USlideover>
         </div>
       </div>
     </div>
@@ -232,6 +341,23 @@
   const handleScroll = () => {
     isScrolled.value = window.scrollY > 50;
   };
+
+  // Search toggle (mobile only)
+  const isSearchOpen = ref(false);
+  const searchInputRef = ref<HTMLInputElement | null>(null);
+  const toggleSearch = () => {
+    isSearchOpen.value = !isSearchOpen.value;
+    if (isSearchOpen.value) {
+      nextTick(() => {
+        searchInputRef.value?.focus();
+      });
+    } else {
+      searchQuery.value = "";
+    }
+  };
+
+  // Mobile menu
+  const isMobileMenuOpen = ref(false);
 
   // User dropdown
   const isUserDropdownOpen = ref(false);
@@ -262,8 +388,9 @@
     if (
       userDropdownRef.value &&
       !userDropdownRef.value.contains(e.target as Node)
-    )
+    ) {
       closeUserDropdown();
+    }
   };
 
   // Categories + products
@@ -301,12 +428,13 @@
             items,
           };
         })
-        .filter((c) => c.items.length > 0) // remove empty categories
-        .slice(0, 3); // limit to 3 categories
+        .filter((c) => c.items.length > 0)
+        .slice(0, 3);
     } catch (error) {
       console.error("❌ Error fetching categories/products:", error);
     }
   };
+
   // Search
   const searchQuery = ref("");
   const goSearch = () => {
@@ -315,6 +443,7 @@
         path: "/ProductList",
         query: { search: searchQuery.value.trim() },
       });
+      isSearchOpen.value = false;
     }
   };
 

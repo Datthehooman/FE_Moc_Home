@@ -102,6 +102,7 @@
                 <div class="w-28 text-right">Tổng tiền</div>
                 <div class="w-28 text-center">Đánh giá</div> <!-- Cột mới -->
               </div>
+            </div>
 
               <!-- LIST SẢN PHẨM -->
               <div class="divide-y divide-gray-200">
@@ -211,9 +212,9 @@ const cancelReasons = [
 
 // Khi click chọn 1 lý do hủy
 const applyFilter = (val: string) => {
-  cancelReason.value = val       // gán lý do hủy
-  filterStatus.value = val       // hiển thị trên button
-  showFilter.value = false       // đóng dropdown
+  cancelReason.value = val
+  filterStatus.value = val
+  showFilter.value = false
 }
 
 const { order, loading, fetchOrderDetail, cancelOrder, canceling } = useOrderDetail();
