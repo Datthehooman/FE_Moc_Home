@@ -1,3 +1,5 @@
+// ProductReview.vue
+
 <template>
     <div class="bg-[#FFFBF8] flex justify-center mb-10">
     <div class="max-w-[85%] w-full">
@@ -42,7 +44,8 @@
             <div class="mb-6">
                 <h3 class="font-bold text-[18px] text-[#6E4E37] mb-3">Mô tả sản phẩm</h3>
                 <p class="text-gray-700 leading-relaxed text-[17px]">
-                    {{ productDetail?.description || 'Đang tải mô tả...' }}
+                    <span v-if="loadingDetail">Đang tải mô tả...</span>
+                    <span v-else>{{ productDetail?.description || 'Không có mô tả chi tiết.' }}</span>
                 </p>
             </div>
 
@@ -54,7 +57,8 @@
                 <ul class="text-[15px] space-y-3">
                   <li class="flex items-start">
                     <span class="font-semibold text-gray-800 min-w-[120px]">Tình trạng:</span>
-                    <span :class="[
+                    <span v-if="loadingDetail" class="font-medium text-gray-500">Đang tải...</span>
+                    <span v-else :class="[
                       'font-medium px-2 py-1 rounded-full text-sm',
                       productDetail?.stock_quantity > 0 
                         ? 'text-green-600 bg-green-50' 
@@ -65,7 +69,8 @@
                   </li>
                   <li class="flex items-start">
                     <span class="font-semibold text-gray-800 min-w-[120px]">Mã sản phẩm:</span>
-                    <span class="font-medium text-gray-700 bg-gray-50 px-2 py-1 rounded">
+                    <span v-if="loadingDetail" class="font-medium text-gray-500">Đang tải...</span>
+                    <span v-else class="font-medium text-gray-700 bg-gray-50 px-2 py-1 rounded">
                       {{ productDetail?.sku || 'Không có' }}
                     </span>
                   </li>
@@ -77,14 +82,16 @@
                 <ul class="text-[15px] space-y-3">
                   <li class="flex items-start">
                     <span class="font-semibold text-gray-800 min-w-[120px]">Danh mục:</span>
-                    <span class="font-medium text-gray-700">
-                      {{ productDetail?.category_name || 'Đang tải...' }}
+                     <span v-if="loadingDetail" class="font-medium text-gray-500">Đang tải...</span>
+                    <span v-else class="font-medium text-gray-700">
+                      {{ productDetail?.category_name || 'Không có' }}
                     </span>
                   </li>
                   <li class="flex items-start">
                     <span class="font-semibold text-gray-800 min-w-[120px]">Thương hiệu:</span>
-                    <span class="font-medium text-gray-700">
-                      {{ productDetail?.brand || 'Đang tải...' }}
+                    <span v-if="loadingDetail" class="font-medium text-gray-500">Đang tải...</span>
+                    <span v-else class="font-medium text-gray-700">
+                      {{ productDetail?.brand || 'Không có' }}
                     </span>
                   </li>
                 </ul>
@@ -195,22 +202,21 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-// Đảm bảo import useProduct và useReview (cần tạo giả định nếu chưa có)
-// Giả định: useProduct đã được cung cấp hoặc đã có trong môi trường Nuxt/Vue
-const useProduct = () => ({
-    productDetail: ref({ product_id: 22, description: 'Ghế bành bọc vải bố màu xanh dương' as string | undefined, sku: 'GB-VX-001' as string | undefined, stock_quantity: 50 as number | undefined, category_name: 'Ghế' as string | undefined, brand: 'Nội Thất Xinh' as string | undefined }),
-    loadingDetail: ref(false),
-    errorDetail: ref(null),
-    fetchProductDetail: (slug: string) => { /* Mock API call for detail */ },
-})// Thay đổi đường dẫn nếu cần
+// 🔥 THAY THẾ: Xóa Mocking và giả định Import composable thực tế
+// VUI LÒNG CUNG CẤP FILE useProduct.ts để tôi biết đường dẫn chính xác và các biến!
+// TẠM THỜI GIẢ ĐỊNH ĐƯỜNG DẪN:
+import { useProduct } from '~/composables/useProduct' // <--- HÃY THAY ĐỔI ĐƯỜNG DẪN NÀY CHO CHÍNH XÁC
+import { useReview } from '~/composables/useReview' // <--- GIẢ ĐỊNH ĐƯỜNG DẪN CỦA useReview
+
 
 const route = useRoute()
 const slug = route.params.slug as string
 
-// Lấy dữ liệu sản phẩm từ API
+// Lấy dữ liệu sản phẩm từ composable useProduct THẬT
+// Giả định useProduct() trả về productDetail, loadingDetail, fetchProductDetail
 const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()
 
-// Lấy dữ liệu đánh giá
+// Lấy dữ liệu đánh giá từ composable useReview THẬT
 const { 
     productReviews, 
     loading: loadingReviews, 
@@ -231,13 +237,12 @@ const reviews = computed(() => {
     const apiReviews = Array.isArray(productReviews.value) 
         ? productReviews.value.map(r => ({
             ...r,
-            rating: parseFloat(r.rating), // Đảm bảo rating là number
-            // name, date, và avatar sẽ được xử lý trong template nếu không có sẵn
+            // Đảm bảo rating là number (từ API có thể là string)
+            rating: parseFloat(r.rating as any), 
         }))
         : []
     
     // Đảo ngược thứ tự để review mới nhất (local) nằm trên cùng.
-    // Nếu bạn muốn review API nằm trên, hãy đảo ngược lại: [...apiReviews, ...localReviews.value]
     return [...localReviews.value, ...apiReviews].reverse()
 })
 
@@ -246,21 +251,23 @@ const userRating = ref(0)
 const userComment = ref('')
 
 // WATCH: Khi productDetail có dữ liệu, gọi API lấy đánh giá
+// Logic này hoạt động đúng: lấy product_id từ productDetail và gọi fetchProductReviews
 watch(productDetail, (newVal) => {
     if (newVal?.product_id) {
+        // GỌI API ĐÁNH GIÁ BẰNG PRODUCT_ID LẤY TỪ DỮ LIỆU THẬT
         fetchProductReviews(newVal.product_id)
     }
 }, { immediate: true })
 
 onMounted(() => {
+    // GỌI API LẤY CHI TIẾT SẢN PHẨM BẰNG SLUG THẬT
     fetchProductDetail(slug)
 })
 
 
-// HÀM GỬI REVIEW (Chức năng này không dùng trong component này theo API)
-// API tạo đánh giá cần order_detail_id, không phải product_id.
-// Chức năng này ở đây chỉ là MOCK cho hiển thị tức thì.
-// 🔥 Lưu ý: Chức năng gửi đánh giá *thực tế* cần được xây dựng ở trang /user/reviews
+// HÀM GỬI REVIEW (Chức năng này vẫn là MOCK)
+// Chức năng gửi đánh giá *thực tế* cần order_detail_id, không phải product_id.
+// Chức năng ở đây chỉ là MOCK cho hiển thị tức thì trên trang chi tiết sản phẩm.
 const submitReview = () => {
   if (userRating.value === 0) return alert('Vui lòng chọn số sao!')
   if (!userComment.value) return alert('Vui lòng nhập bình luận!')
@@ -273,8 +280,8 @@ const submitReview = () => {
     rating: userRating.value,
     comment: userComment.value,
     avatar: 'https://randomuser.me/api/portraits/men/60.jpg', // Avatar mặc định
-    // Thêm các trường khác cần thiết để khớp với cấu trúc trong template
-    order_detail: { order: { order_code: 'Đánh giá mới' } } // MOCK cho hiển thị
+    // MOCK cho hiển thị
+    order_detail: { order: { order_code: 'Đánh giá mới' } } 
   }
   
   localReviews.value.push(newReview)
