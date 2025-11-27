@@ -642,14 +642,9 @@ return valid;
       }
 
       order_id = Number(orderData.order_id); // Ép sang number
-      const totalAmountToPay = totalAmount.value;
 
-      await payWithVNPAY({
-        amount: totalAmountToPay,
-        orderInfo: `Thanh toán đơn hàng #${order_id}`,
-        order_type: "product",
-        order_id,
-      });
+      // Chỉ gửi order_id cho VNPAY
+      await payWithVNPAY({ order_id });
 
       return; // redirect sang VNPAY xong
     }
@@ -690,8 +685,6 @@ return valid;
     alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
   }
 }
-
-
 
 
 function formatPrice(value: number | undefined | null) {
