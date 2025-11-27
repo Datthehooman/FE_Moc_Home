@@ -2,117 +2,20 @@
   <div class="flex justify-center bg-[#FFFBF8] min-h-screen">
     <div class="flex w-full max-w-[85%]">
 
-      <!-- Sidebar -->
       <ModulesUserAccountSidebar />
 
-      <!-- Main Content -->
       <main class="flex-1 p-6">
 
-        <!-- Thống kê -->
         <section class="bg-white rounded-xl p-5 shadow mb-6">
-          <div class="flex justify-between items-center mb-2">
-            <h3 class="font-semibold text-gray-700 text-[20px]">Thống kê</h3>
-          </div>
-          <hr class="border-t border-gray-200 mb-4">
+          </section>
 
-          <div class="grid grid-cols-3 gap-4">
-            <div class="bg-yellow-50 rounded-xl p-4 h-[130px] flex items-center justify-between">
-              <div>
-                <p class="text-[30px] font-bold text-[#F7D155] leading-none">{{ pendingOrders }}</p>
-                <p class="text-[15px] text-[#F7D155] mt-1">Đơn hàng đang chờ xử lý</p>
-              </div>
-              <div class="w-14 h-14 rounded-full bg-[#F7D155] flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </div>
-            </div>
-
-            <div class="bg-green-50 rounded-xl p-4 h-[130px] flex items-center justify-between">
-              <div>
-                <p class="text-[30px] font-bold text-[#11B76B] leading-none">{{ completedOrders }}</p>
-                <p class="text-[15px] text-[#11B76B] mt-1">Đơn hàng đã hoàn thành</p>
-              </div>
-              <div class="w-14 h-14 rounded-full bg-[#11B76B] flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </div>
-
-            <div class="bg-red-50 rounded-xl p-4 h-[130px] flex items-center justify-between">
-              <div>
-                <p class="text-[30px] font-bold text-[#F05454] leading-none">1.5 triệu</p>
-                <p class="text-[15px] text-[#F05454] mt-1">Số dư của tôi</p>
-              </div>
-              <div class="w-14 h-14 rounded-full bg-[#F05454] flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ĐƠN HÀNG GẦN ĐÂY (NÂNG CẤP GIỐNG TRANG LIST) -->
         <section class="bg-white rounded-xl p-5 shadow">
 
           <div class="flex justify-between items-center mb-2">
-            <h3 class="font-semibold text-gray-700 text-[20px]">Đơn hàng gần đây</h3>
-
-            <!-- TÌM KIẾM + LỌC -->
-            <div class="flex items-center gap-3">
-
-              <!-- SEARCH -->
-              <div class="h-[45px] px-4 flex items-center border border-gray-300 rounded-[10px] bg-transparent gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                  class="w-5 h-5 text-gray-400">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
-                </svg>
-
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Tìm kiếm đơn hàng..."
-                  class="flex-1 bg-transparent outline-none placeholder:text-gray-400"
-                />
-              </div>
-
-              <!-- FILTER DROPDOWN -->
-              <div class="relative">
-                <button 
-                  @click="showFilter = !showFilter"
-                  class="h-[45px] px-4 flex items-center justify-between border border-gray-300 rounded-[10px] bg-transparent cursor-pointer w-[180px]"
-                >
-                  <span class="text-gray-600 text-sm">
-                    {{ filterStatus || 'Tất cả trạng thái' }}
-                  </span>
-
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
-
-                <div 
-                  v-if="showFilter"
-                  class="absolute top-[48px] left-0 w-full bg-white border border-gray-200 rounded-[10px] shadow-md overflow-hidden z-20"
-                >
-                  <div @click="applyFilter('')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Tất cả trạng thái</div>
-                  <div @click="applyFilter('Đang chờ')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Đang chờ</div>
-                  <div @click="applyFilter('Đang xử lý')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Đang xử lý</div>
-                  <div @click="applyFilter('Hoàn thành')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Hoàn thành</div>
-                  <div @click="applyFilter('Đã hủy')" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">Đã hủy</div>
-                </div>
-              </div>
-
             </div>
-          </div>
 
           <hr class="border-t border-gray-200 mb-4">
 
-          <!-- HEADER -->
           <div class="grid grid-cols-5 text-[#6E4E37] font-semibold text-sm px-2 mb-3">
             <div>#Mã đơn</div>
             <div>Ngày mua</div>
@@ -121,7 +24,6 @@
             <div>Hành động</div>
           </div>
 
-          <!-- LIST -->
           <div class="space-y-2">
             <div
               v-for="order in paginatedOrders"
@@ -134,33 +36,52 @@
 
               <div>
                 <span :class="{
-                  'text-yellow-500 bg-yellow-100 px-2 py-1 rounded': order.order_status === 'Đang chờ',
-                  'text-blue-500 bg-blue-100 px-2 py-1 rounded': order.order_status === 'Đang xử lý',
-                  'text-green-500 bg-green-100 px-2 py-1 rounded': order.order_status === 'Hoàn thành',
+                  'text-yellow-500 bg-yellow-100 px-2 py-1 rounded': order.order_status === 'Chờ xác nhận',
+                  'text-blue-500 bg-blue-100 px-2 py-1 rounded': order.order_status === 'Đã xác nhận',
+                  'text-purple-500 bg-purple-100 px-2 py-1 rounded': order.order_status === 'Đang xử lý',
+                  'text-green-500 bg-green-100 px-2 py-1 rounded': order.order_status === 'Hoàn tất',
                   'text-red-500 bg-red-100 px-2 py-1 rounded': order.order_status === 'Đã hủy'
                 }">{{ order.order_status }}</span>
               </div>
 
-              <NuxtLink 
-                :to="`/user/orders/${order.order_id}`"
-                class="w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                  stroke-width="1.5" stroke="currentColor"
-                  class="w-5 h-5 text-gray-500 hover:text-white transition">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 8.354 7.36 5.25 12 
-                      5.25c4.638 0 8.574 3.103 9.963 6.433.07.162.07.353 0 .515C20.574 
-                      15.646 16.637 18.75 12 18.75c-4.64 0-8.577-3.103-9.964-6.428z" />
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </NuxtLink>
+              <div class="flex items-center gap-2">
+                <NuxtLink 
+                    :to="`/user/orders/${order.order_id}`"
+                    class="w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black"
+                    title="Xem chi tiết đơn hàng"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor"
+                        class="w-5 h-5 text-gray-500 hover:text-white transition">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 8.354 7.36 5.25 12 
+                                5.25c4.638 0 8.574 3.103 9.963 6.433.07.162.07.353 0 .515C20.574 
+                                15.646 16.637 18.75 12 18.75c-4.64 0-8.577-3.103-9.964-6.428z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </NuxtLink>
+
+                <NuxtLink 
+                    v-if="order.order_status === 'Hoàn tất'"
+                    :to="`/user/orders/${order.order_id}`"
+                    :class="{
+                        'w-[34px] h-[34px] flex items-center justify-center rounded-[5px] cursor-pointer transition': true,
+                        'bg-green-500 border border-green-600 hover:bg-green-600': !order.is_fully_reviewed, 
+                        'bg-gray-300 border border-gray-400 cursor-default': order.is_fully_reviewed
+                    }"
+                    :title="order.is_fully_reviewed ? 'Đơn hàng đã được đánh giá' : 'Đánh giá sản phẩm ngay'"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
+                        <path v-if="!order.is_fully_reviewed" stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.102 5.618.498a.562.562 0 0 1 .31 1.018l-4.238 3.626 1.258 5.669a.562.562 0 0 1-.86.671l-4.814-2.885-4.814 2.885a.562.562 0 0 1-.86-.671l1.257-5.67-4.238-3.625a.562.562 0 0 1 .31-1.018l5.618-.498L11.48 3.5z" /> 
+                        <path v-else stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /> 
+                    </svg>
+                </NuxtLink>
+              </div>
 
             </div>
           </div>
 
-          <!-- PAGINATION -->
           <ModulesUserPagination
             :current-page="currentPage"
             :total-pages="totalPages"
@@ -228,11 +149,15 @@ const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
 
 /* --- THỐNG KÊ --- */
 const pendingOrders = computed(() =>
-orders.value.filter(o => o.order_status === 'Đang chờ').length
+orders.value.filter(o => 
+  o.order_status === 'Chờ xác nhận' || 
+  o.order_status === 'Đã xác nhận' ||
+  o.order_status === 'Đang xử lý' // Tính 3 trạng thái là đang chờ xử lý chung
+).length
 )
 
 const completedOrders = computed(() =>
-orders.value.filter(o => o.order_status === 'Hoàn thành').length
+orders.value.filter(o => o.order_status === 'Hoàn tất').length
 )
 
 const totalBalance = computed(() =>
