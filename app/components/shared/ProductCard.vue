@@ -160,8 +160,107 @@
         body: 'p-0 !pb-[29px] sm:p-0 overflow-hidden',
         header: 'p-0',
       }"
-      :close="{ color: 'primary', variant: 'solid', class: 'rounded-full' }"
+      :close="{
+        color: 'primary',
+        variant: 'solid',
+        class: 'rounded-full',
+      }"
     >
+      <template #body>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+          <!-- Left Column - Image -->
+          <div class="pl-7.5 pr-5.5 flex items-center justify-center">
+            <NuxtImg
+              :src="image || '/image 10.png'"
+              class="w-full h-full max-h-[500px] object-contain rounded-lg"
+            />
+          </div>
+
+          <!-- Right Column - Product Details -->
+          <div class="flex flex-col gap-3">
+            <!-- Product Title -->
+            <h3 class="text-xl font-bold">
+              {{ title || "Ghế Denim đơn giản" }}
+            </h3>
+
+            <!-- Rating -->
+            <div class="flex items-center gap-1">
+              <template v-for="star in 5" :key="star">
+                <UIcon
+                  v-if="star <= Math.floor(Number(stars) || 0)"
+                  name="i-heroicons-star-solid"
+                  class="size-5 text-yellow-400"
+                />
+                <div
+                  v-else-if="star - 0.5 <= (Number(stars) || 0)"
+                  class="relative size-5"
+                >
+                  <UIcon
+                    name="i-heroicons-star"
+                    class="size-5 text-yellow-400 absolute"
+                  />
+                  <UIcon
+                    name="i-heroicons-star-solid"
+                    class="size-5 text-yellow-400 absolute"
+                    style="clip-path: inset(0 50% 0 0)"
+                  />
+                </div>
+                <UIcon
+                  v-else
+                  name="i-heroicons-star"
+                  class="size-5 text-yellow-400"
+                />
+              </template>
+              <span class="text-muted ml-2"
+                >({{ view }} người đã đánh giá)</span
+              >
+            </div>
+
+            <!-- Price -->
+            <div v-if="Number(salePrice) === 0" class="flex items-center">
+              <p class="text-primary text-[19px] font-bold">
+                {{ price || "190.000 " }} đ
+              </p>
+            </div>
+            <div v-else class="flex items-center">
+              <p class="line-through text-muted text-[19px] mr-[13px]">
+                {{ price || "250.000 " }} đ&nbsp;
+              </p>
+              <p class="text-toned text-[19px] font-bold">
+                {{ salePrice || "190.000 " }} đ
+              </p>
+            </div>
+            <p class="text-muted text-sm">
+              Thương hiệu:<span class="font-bold">{{ " " + brand }}</span>
+            </p>
+            <p class="text-muted text-sm">
+              Loại:<span class="font-bold">{{ " " + room_id }}</span>
+            </p>
+            <p class="text-muted text-sm">
+              Hàng có sẵn:<span class="font-bold">{{
+                status ? " Có sẵn" : " Hết hàng"
+              }}</span>
+            </p>
+            <p class="text-muted text-sm">Mã số:{{ " " + sku }}</p>
+            <UButton
+              size="xl"
+              variant="solid"
+              class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
+              @click="handleAddToCart()"
+            >
+              <span
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
+              ></span>
+              <span
+                class="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500"
+              >
+                <span>Thêm giỏ hàng</span>
+                <UIcon name="i-lucide-arrow-right"></UIcon>
+              </span>
+            </UButton>
+          </div>
+        </div>
+      </template>
       <!-- Modal content stays the same -->
     </UModal>
   </div>
