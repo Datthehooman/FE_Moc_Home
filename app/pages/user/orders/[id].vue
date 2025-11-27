@@ -2,18 +2,17 @@
   <div class="flex justify-center bg-[#FFFBF8] min-h-screen">
     <div class="flex w-full max-w-[85%]">
 
-      <!-- Sidebar -->
       <ModulesUserAccountSidebar class="flex-shrink-0 sticky top-6 self-start"/>
 
-      <!-- Main -->
       <main class="flex-1 p-6">
         <section class="bg-white rounded-xl p-6 shadow">
 
-          <!-- Loading -->
-          <div v-if="loading" class="text-center py-10 text-gray-500">Đang tải...</div>
+          <div v-if="loading" class="text-center py-10 text-gray-500">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A77A5D] mx-auto mb-3"></div>
+            Đang tải chi tiết đơn hàng...
+          </div>
 
           <template v-else-if="order">
-            <!-- Header -->
             <div class="flex justify-between items-center mb-4">
               <div>
                 <h3 class="text-[20px] font-semibold text-gray-700">
@@ -23,7 +22,7 @@
                   Trạng thái: 
                   <span 
                     :class="{
-                      'text-green-600': order.status === 'completed',
+                      'text-green-600': order.status === 'paid',
                       'text-yellow-500': order.status === 'pending',
                       'text-red-500': order.status === 'cancelled'
                     }"
@@ -33,130 +32,134 @@
                 </p>
               </div>
 
-              <div class="flex gap-2">
-                <NuxtLink
-                  to="/user/orders/list"
-                  class="px-4 py-2 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow hover:bg-[#FECB96] transition"
-                >
-                  &larr; Danh sách đơn hàng
-                </NuxtLink>
-
-                <!-- Hủy đơn -->
-                <div v-if="order.status === 'pending'" class="flex items-center gap-2">
-
-                  <!-- Dropdown chọn lý do hủy -->
-                  <div class="relative">
-                    <button
-                      @click="showFilter = !showFilter"
-                      class="h-[45px] px-4 flex items-center justify-between border border-gray-300 rounded-xl bg-white shadow-sm hover:shadow-md transition w-[240px]"
-                    >
-                      <span class="text-gray-600 text-sm">
-                        {{ filterStatus || 'Chọn lý do hủy đơn' }}
-                      </span>
-
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500 transition-transform duration-200"
-                        :class="{ 'rotate-180': showFilter }">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
-                      </svg>
-                    </button>
-
-                    <!-- Dropdown list -->
-                    <transition name="fade-slide">
-                      <div
-                        v-if="showFilter"
-                        class="absolute top-[50px] left-0 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20"
-                      >
-                        <div
-                          v-for="val in cancelReasonList"
-                          :key="val"
-                          @click="applyFilter(val)"
-                          class="px-4 py-2 hover:bg-orange-100 cursor-pointer text-sm transition"
+              <div class="flex gap-3 items-center">
+                <div v-if="order.status === 'pending'" class="relative">
+                  <button 
+                    @click="showFilter = !showFilter"
+                    class="flex items-center gap-2 h-10 px-4 text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
+                    :disabled="canceling"
+                  >
+                    {{ canceling ? 'Đang hủy...' : (cancelReason || 'Hủy đơn hàng') }}
+                    <svg v-if="!canceling" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  <transition name="fade-slide">
+                    <div v-if="showFilter" class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                      <div class="py-1">
+                        <p class="text-xs text-gray-500 px-4 pt-2 pb-1">Chọn lý do hủy:</p>
+                        <a 
+                          v-for="reason in cancelReasons"
+                          :key="reason"
+                          href="#" 
+                          @click.prevent="applyFilter(reason)" 
+                          class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
-                          {{ val || 'Chọn lý do hủy đơn' }}
+                          {{ reason }}
+                        </a>
+                        <div v-if="cancelReason" class="border-t mt-1 pt-2">
+                           <button 
+                              @click="handleCancel"
+                              class="w-full text-sm font-semibold text-white bg-red-500 hover:bg-red-600 py-2 rounded-b-lg"
+                           >
+                              Xác nhận Hủy Đơn
+                           </button>
                         </div>
                       </div>
-                    </transition>
-                  </div>
-
-                  <!-- Nút hủy đơn -->
-                  <button
-                    @click="handleCancel"
-                    class="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition"
-                    :disabled="canceling || !cancelReason"
-                  >
-                    {{ canceling ? 'Đang hủy...' : 'Hủy đơn hàng' }}
-                  </button>
-
+                    </div>
+                  </transition>
                 </div>
+
+                <NuxtLink to="/user/orders/list" class="h-10 w-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                </NuxtLink>
               </div>
             </div>
 
-            <hr class="border-t border-gray-200 mb-6" />
+            <div class="mt-8 border border-gray-200 rounded-xl overflow-hidden">
+              <div class="bg-gray-50 p-4 border-b border-gray-200">
+                <h4 class="text-lg font-semibold text-gray-700">Sản phẩm đã mua</h4>
+              </div>
+              
+              <div class="flex items-center font-semibold text-gray-700 p-4 border-b border-gray-200 text-sm">
+                <div class="flex-1">Sản phẩm</div>
+                <div class="w-20 text-center hidden sm:block">Thương hiệu</div>
+                <div class="w-20 text-center">SL</div>
+                <div class="w-20 text-center hidden sm:block">Màu sắc</div>
+                <div class="w-28 text-right">Tổng tiền</div>
+                <div class="w-28 text-center">Đánh giá</div> </div>
+            </div>
 
-            <!-- Products -->
-            <div class="space-y-3">
+            <div class="divide-y divide-gray-200">
               <div
                 v-for="(product, i) in order.products"
                 :key="i"
-                class="flex items-center justify-between bg-[#F5F7FA] rounded-xl p-4 hover:bg-[#ECEFF3] transition"
+                class="flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition text-sm"
               >
-                <div class="flex items-center gap-4">
-                  <img :src="product.image" class="w-16 h-16 rounded-lg object-cover" />
+                <div class="flex items-center gap-4 flex-1">
+                  <img :src="product.image" class="w-16 h-16 rounded-lg object-cover border border-gray-100" alt="product image">
                   <div>
                     <p class="font-semibold text-gray-700">{{ product.name }}</p>
-                    <p class="text-gray-500 text-sm">Mã số: {{ product.code }}</p>
+                    <p class="text-gray-500 text-xs">Mã số: {{ product.code }}</p>
                   </div>
                 </div>
 
-                <div class="text-gray-600">{{ product.brand }}</div>
-                <div class="text-gray-600">{{ product.quantity }}</div>
-                <div class="text-gray-600">{{ product.color }}</div>
-                <div class="text-gray-700 font-semibold">{{ product.total }}</div>
-              </div>
-            </div>
-
-            <!-- Address + Invoice -->
-            <div class="flex flex-col md:flex-row gap-6 mt-6">
-
-              <div class="flex-1 bg-[#F5F7FA] rounded-xl p-4">
-                <h4 class="text-gray-700 font-semibold mb-2">Địa chỉ nhận hàng</h4>
-                <p class="text-gray-500 text-sm">{{ order.address }}</p>
-              </div>
-
-              <div class="flex-1 bg-[#F5F7FA] rounded-xl p-4">
-                <h4 class="text-gray-700 font-semibold mb-2">Hóa đơn</h4>
-
-                <div class="text-gray-600 text-sm space-y-1">
-                  <div class="flex justify-between">
-                    <span>Tạm tính:</span>
-                    <span>{{ order.subtotal }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Giảm giá:</span>
-                    <span>{{ order.discount }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Vận chuyển:</span>
-                    <span>{{ order.shipping }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Thuế:</span>
-                    <span>{{ order.tax }}</span>
-                  </div>
-
-                  <div class="flex justify-between font-semibold mt-2 border-t border-gray-300 pt-2">
-                    <span>Tổng tiền:</span>
-                    <span>{{ order.total }}</span>
-                  </div>
-
-                  <p class="text-gray-500 text-sm mt-1">Thanh toán bằng thẻ tín dụng</p>
+                <div class="w-20 text-center text-gray-600 hidden sm:block">{{ product.brand }}</div>
+                <div class="w-20 text-center text-gray-600">{{ product.quantity }}</div>
+                <div class="w-20 text-center text-gray-600 hidden sm:block">{{ product.color }}</div>
+                <div class="w-28 text-right text-gray-700 font-semibold">{{ product.total }}</div>
+                
+                <div class="w-28 text-center">
+                  <template v-if="order.status === 'paid' || order.status === 'completed'">
+                    <button
+                      v-if="!product.isReviewed"
+                      @click="goToReview(product.orderDetailId)"
+                      class="px-3 py-1 bg-[#A77A5D] text-white rounded-md text-xs font-medium hover:bg-[#6E4E37] transition shadow-md"
+                    >
+                      Đánh giá ngay
+                    </button>
+                    <span v-else class="text-green-600 text-xs font-medium">Đã đánh giá</span>
+                  </template>
+                  <span v-else class="text-gray-400 text-xs">Chưa hoàn tất</span>
                 </div>
               </div>
             </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mt-8">
+              <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h4 class="font-semibold text-gray-700 mb-3">Địa chỉ giao hàng</h4>
+                <p class="text-gray-600 text-sm whitespace-pre-wrap">{{ order.address }}</p>
+              </div>
+
+              <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h4 class="font-semibold text-gray-700 mb-3">Tóm tắt đơn hàng</h4>
+                <dl class="text-sm space-y-2">
+                  <div class="flex justify-between">
+                    <dt class="text-gray-600">Tổng phụ (Subtotal):</dt>
+                    <dd class="font-medium text-gray-700">{{ order.subtotal }}</dd>
+                  </div>
+                  <div class="flex justify-between">
+                    <dt class="text-gray-600">Giảm giá (Discount):</dt>
+                    <dd class="font-medium text-red-500">- {{ order.discount }}</dd>
+                  </div>
+                  <div class="flex justify-between">
+                    <dt class="text-gray-600">Phí vận chuyển (Shipping):</dt>
+                    <dd class="font-medium text-gray-700">{{ order.shipping }}</dd>
+                  </div>
+                  <div class="flex justify-between border-t border-gray-300 pt-3 mt-3 text-lg font-bold">
+                    <dt class="text-gray-700">Tổng cộng:</dt>
+                    <dd class="text-[#A77A5D]">{{ order.total }}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+            
           </template>
 
-          <div v-else class="text-center py-10 text-red-500">Không có dữ liệu đơn hàng.</div>
+          <div v-else class="text-center py-10 text-gray-500">Không tìm thấy đơn hàng.</div>
 
         </section>
       </main>
@@ -165,33 +168,31 @@
 </template>
 
 <script setup lang="ts">
+// Đảm bảo Nuxt 3 route middleware hoạt động
 definePageMeta({
   middleware: 'auth'
 })
 
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router"; // Cần import useRouter
 import { onMounted, ref } from "vue";
-import { useOrderDetail } from "@/composables/useOrderDetail";
+import { useOrderDetail } from "@/composables/useOrderDetail"; // Cần đảm bảo path đúng
 
 const route = useRoute();
+const router = useRouter(); // Khởi tạo router
 const id = Number(route.params.id);
 
-const showFilter = ref(false)
-const cancelReason = ref('')
-const filterStatus = ref('')
+const showFilter = ref(false)      // trạng thái mở/đóng dropdown
+const cancelReason = ref('')       // lý do hủy đơn
+const filterStatus = ref('')       // dùng làm label hiển thị trong dropdown
 
-// DANH SÁCH LÝ DO HỦY ĐƠN
-const cancelReasonList = [
-  '',
-  'Tôi muốn thay đổi địa chỉ nhận hàng',
-  'Tôi muốn thay đổi sản phẩm',
-  'Đặt nhầm sản phẩm',
-  'Thời gian giao hàng quá lâu',
-  'Tìm thấy giá tốt hơn ở nơi khác',
-  'Không còn nhu cầu nữa'
+const cancelReasons = [
+  'Đã tìm được sản phẩm khác tốt hơn',
+  'Thay đổi ý định mua hàng',
+  'Giá quá cao so với dự kiến',
+  'Lý do khác'
 ]
 
-// Khi chọn lý do hủy
+// Khi click chọn 1 lý do hủy
 const applyFilter = (val: string) => {
   cancelReason.value = val
   filterStatus.value = val
@@ -200,10 +201,29 @@ const applyFilter = (val: string) => {
 
 const { order, loading, fetchOrderDetail, cancelOrder, canceling } = useOrderDetail();
 
+// Gọi hàm hủy đơn hàng với lý do đã chọn
 const handleCancel = async () => {
+  // Thay thế alert/confirm bằng logic modal UI
   if (!cancelReason.value) return;
-  await cancelOrder(id, cancelReason.value);
-  cancelReason.value = "";
+  await cancelOrder(cancelReason.value); // Chỉ truyền lý do hủy
+  // Tự động tải lại chi tiết đơn hàng sau khi hủy (nếu cần cập nhật UI nhanh)
+  await fetchOrderDetail(id);
+  // Reset trạng thái sau khi hủy thành công
+  if (order.value?.status === 'cancelled') {
+    cancelReason.value = "";
+    filterStatus.value = "";
+  }
+};
+
+// Hàm điều hướng đến trang tạo đánh giá
+const goToReview = (orderDetailId: number) => {
+  // ✅ SỬA LỖI: Dùng đường dẫn tĩnh /review và truyền ID qua query parameter
+  router.push({ 
+    path: '/review', 
+    query: { 
+      orderDetailId: orderDetailId 
+    } 
+  }); 
 };
 
 onMounted(() => fetchOrderDetail(id));
@@ -213,20 +233,8 @@ onMounted(() => fetchOrderDetail(id));
 .fade-slide-enter-active, .fade-slide-leave-active {
   transition: all 0.2s ease;
 }
-.fade-slide-enter-from {
+.fade-slide-enter-from, .fade-slide-leave-to {
   opacity: 0;
-  transform: translateY(-5px);
-}
-.fade-slide-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-}
-.fade-slide-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-5px);
+  transform: translateY(-10px);
 }
 </style>

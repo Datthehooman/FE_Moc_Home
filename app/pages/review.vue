@@ -1,124 +1,212 @@
 <template>
-    <div class="bg-gray-50 p-6 sm:p-8">
-        <div class="review-container mx-auto bg-white shadow-2xl rounded-xl overflow-hidden">
+    <div class="bg-gray-50 p-6 sm:p-8 min-h-screen flex justify-center items-start">
+        <div div class="review-container w-full max-w-[80%] bg-white shadow-2xl rounded-xl overflow-hidden">
         
-        <div class="bg-[#AC8972] text-white p-5 sm:p-6">
-            <h1 class="text-3xl font-extrabold mb-1">Đánh Giá Sản Phẩm Nội Thất</h1>
-            <p class="opacity-90 text-sm">Chia sẻ trải nghiệm của bạn để giúp chúng tôi tốt hơn!</p>
-        </div>
-
-        <div class="p-5 border-b border-gray-200 flex items-center space-x-4">
-            <div class="w-24 h-24 flex-shrink-0 bg-gray-100 flex items-center justify-center rounded-md overflow-hidden shadow-inner border border-gray-200">
-                <span class="text-gray-400 text-xs text-center">Ảnh sản phẩm</span>
-            </div>
-            <div>
-                <h2 class="text-lg font-bold text-gray-800 mb-1">Ghế Sofa Đơn Bọc Da Cao Cấp</h2>
-                <p class="text-sm text-gray-600 mb-1">Phân loại: <span class="font-medium text-gray-700">Màu Nâu Đậm, Kích thước L</span></p>
-                <p class="text-xl font-extrabold text-[#623B27]">5.500.000 <span class="text-base">VNĐ</span></p>
-            </div>
-        </div>
-
-        <div class="p-5 border-b border-gray-200">
-            <h3 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                <span class="mr-2 text-[#AC8972]">✨</span> Bạn cảm thấy sản phẩm này như thế nào?
-            </h3>
-            <div class="star-rating flex flex-row-reverse justify-center md:justify-start items-center space-x-1 my-3">
-                <input type="radio" id="star5" name="rating" value="5" class="hidden">
-                <label for="star5" title="Tuyệt vời - 5 sao" data-rating-text="Tuyệt vời! Rất hài lòng về sản phẩm và dịch vụ."></label>
-                <input type="radio" id="star4" name="rating" value="4" class="hidden">
-                <label for="star4" title="Rất tốt - 4 sao" data-rating-text="Rất tốt, chất lượng đạt yêu cầu, sẽ mua lại."></label>
-                <input type="radio" id="star3" name="rating" value="3" class="hidden">
-                <label for="star3" title="Bình thường - 3 sao" data-rating-text="Bình thường, có một vài điểm cần cải thiện."></label>
-                <input type="radio" id="star2" name="rating" value="2" class="hidden">
-                <label for="star2" title="Tệ - 2 sao" data-rating-text="Không hài lòng, chất lượng kém hơn mong đợi."></label>
-                <input type="radio" id="star1" name="rating" value="1" class="hidden">
-                <label for="star1" title="Rất tệ - 1 sao" data-rating-text="Rất tệ! Có lỗi nghiêm trọng hoặc không sử dụng được."></label>
-            </div>
-            <p id="rating-message" class="text-sm text-gray-500 text-center md:text-left">Chạm để chọn số sao bạn muốn đánh giá.</p>
-        </div>
-        
-        <div class="p-5">
-            <h3 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                <span class="mr-2 text-[#AC8972]">✍️</span> Viết nhận xét của bạn
-            </h3>
-            <textarea 
-                id="comment-textarea"
-                class="w-full h-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AC8E] resize-y text-gray-700 placeholder-gray-400 text-sm"
-                placeholder="Hãy chia sẻ cảm nhận về chất lượng, thiết kế, và trải nghiệm của bạn..."
-            ></textarea>
-            
-            <div class="mt-4 text-center md:text-right">
-                <button 
-                    id="submit-review-btn"
-                    class="btn-primary"
+            <div class="bg-[#AC8972] text-white p-5 sm:p-6 flex justify-between items-start">
+                <div>
+                    <h1 class="text-4xl font-extrabold mb-1">Đánh Giá Sản Phẩm Nội Thất</h1>
+                    <p class="opacity-90 text-lg">Chia sẻ trải nghiệm của bạn để giúp chúng tôi tốt hơn!</p>
+                </div>
+                
+                <NuxtLink
+                    to="/user/orders/list"
+                    class="ml-4 px-4 py-2 bg-[#FEE1C7] rounded-lg text-black font-medium shadow hover:bg-[#FCD8B9] transition text-sm flex-shrink-0"
                 >
-                    Gửi Đánh Giá
-                </button>
+                    &larr; Quay lại đơn hàng
+                </NuxtLink>
             </div>
-        </div>
+
+            <div v-if="loading" class="p-10 text-center text-xl text-gray-500">
+                <p>Đang tải thông tin sản phẩm...</p>
+            </div>
+
+            <div v-else-if="error" class="p-10 text-center text-xl text-red-600">
+                
+                <p class="text-base text-gray-600">Bạn đã đánh giá sản phẩm này rồi!</p>
+            </div>
+
+            <div v-else-if="detailToReview" class="p-6 sm:p-8">
+                
+                <div class="p-6 border-b border-gray-200 flex items-center space-x-6 bg-gray-50 rounded-lg mb-8">
+                    <div class="w-32 h-32 flex-shrink-0 bg-white flex items-center justify-center rounded-lg overflow-hidden shadow-md border border-gray-200">
+                        <img v-if="detailToReview.image" :src="detailToReview.image" :alt="detailToReview.name" class="object-cover w-full h-full"/>
+                        <span v-else class="text-sm text-gray-400 p-2 text-center">Không ảnh sản phẩm</span>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-2xl text-gray-800 mb-1">{{ detailToReview.name }}</h3>
+                        <p class="text-md text-gray-600">Màu sắc: <span class="font-medium">{{ detailToReview.color ?? 'N/A' }}</span></p>
+                        <p class="text-md text-gray-600">Số lượng: <span class="font-medium">{{ detailToReview.quantity }}</span></p>
+                        <p class="font-bold text-red-600 text-xl mt-2">Giá: {{ detailToReview.price }} ₫</p>
+                        <p class="text-sm text-gray-400 mt-2">Mã đơn hàng: <span class="font-semibold text-gray-500">#{{ detailToReview.order_code }}</span></p>
+                    </div>
+                </div>
+
+                <form @submit.prevent="submitReview" class="space-y-8">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        <div>
+                            <label class="block text-gray-700 text-lg font-bold mb-3">Chất lượng sản phẩm <span class="text-red-500">*</span></label>
+                            <div class="flex items-center space-x-1">
+                                <span 
+                                    v-for="star in 5" 
+                                    :key="star" 
+                                    @click="reviewForm.rating = star"
+                                    :class="[
+                                        'cursor-pointer transition-colors',
+                                        reviewForm.rating >= star ? 'text-yellow-500' : 'text-gray-300'
+                                    ]"
+                                >
+                                    <svg class="w-10 h-10 fill-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div v-if="reviewForm.rating > 0" class="p-4 bg-yellow-50/50 border border-yellow-200 rounded-lg transition-opacity duration-300">
+                            <label class="block text-gray-700 text-lg font-bold mb-2">Đánh giá chung:</label>
+                            <p class="text-xl font-semibold text-gray-800">{{ ratingComment }}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="comment" class="block text-gray-700 text-lg font-bold mb-3">Ý kiến chi tiết của bạn <span class="text-red-500">*</span></label>
+                        <textarea 
+                            id="comment" 
+                            v-model="reviewForm.comment" 
+                            rows="5" 
+                            class="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-[#AC8972] focus:border-[#AC8972] transition duration-200 text-base"
+                            placeholder="Hãy chia sẻ cảm nhận chi tiết của bạn về chất lượng sản phẩm, dịch vụ giao hàng và đóng gói..."
+                            maxlength="500"
+                        ></textarea>
+                        <p class="text-sm text-gray-500 mt-2 text-right">Giới hạn 500 ký tự (Đã nhập: {{ reviewForm.comment.trim().length }})</p>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        :disabled="!isFormValid || creatingReview" 
+                        :class="[
+                            'w-full py-4 rounded-xl text-white font-extrabold text-xl transition duration-300 transform hover:scale-[1.005] focus:outline-none focus:ring-4 focus:ring-[#AC8972]/50',
+                            isFormValid && !creatingReview ? 'bg-[#AC8972] hover:bg-[#8e7362] shadow-lg' : 'bg-gray-400 cursor-not-allowed'
+                        ]"
+                    >
+                        <span v-if="creatingReview">Đang gửi đánh giá...</span>
+                        <span v-else>HOÀN TẤT VÀ GỬI ĐÁNH GIÁ</span>
+                    </button>
+                </form>
+            </div>
+            
         </div>
     </div>
 </template>
-<style>
-        /* Áp dụng phông chữ Roboto cho toàn bộ trang */
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
 
-        /* CSS Tùy Chỉnh cho Màu và Sao */
-        .star-rating input[type="radio"] { display: none; }
-        .star-rating label {
-            font-size: 2.25rem;
-            color: #ccc; 
-            cursor: pointer;
-            transition: color 0.2s ease-in-out;
-            display: inline-block;
-            margin: 0 2px;
-        }
+<script setup lang="ts">
+definePageMeta({
+    middleware: 'auth'
+})
 
-        /* Định nghĩa Icon Sao rỗng và đầy */
-        .star-rating label:before { content: "☆"; }
-        .star-rating input[type="radio"]:checked ~ label:before,
-        .star-rating label:hover:before,
-        .star-rating label:hover ~ label:before { content: "★"; }
+import { useRoute, useRouter } from 'vue-router'
+import { onMounted, ref, computed } from 'vue'
+import { useReview } from '~/composables/useReview' 
+// Giả định có composable/plugin toast, ở đây dùng alert() để mô phỏng.
 
-        /* Đổi màu khi được chọn / hover */
-        .star-rating input[type="radio"]:checked ~ label,
-        .star-rating label:hover,
-        .star-rating label:hover ~ label {
-            color: #D4AC8E; /* Màu nhạt từ bảng màu của bạn */
-        }
-        .star-rating input[type="radio"]:checked + label { color: #D4AC8E; }
-        .star-rating input[type="radio"]:checked + label:before { content: "★"; }
+const route = useRoute()
+const router = useRouter()
 
+// --- State ---
+const orderDetailId = ref<number | null>(null)
+const reviewForm = ref({
+    rating: 0, // 1 đến 5
+    comment: '',
+    order_detail_id: 0, 
+})
 
-        /* Định nghĩa Nút Chính (Màu #623B27) */
-        .btn-primary {
-            background-color: #623B27;
-            color: white;
-            font-weight: bold;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.3s ease-in-out, transform 0.1s ease-in-out;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #88604A; /* Màu nhạt hơn khi hover */
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
-        .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+const { loading, error, detailToReview, createReview, creatingReview, fetchDetailToReview } = useReview() 
 
-        /* Căn giữa và chiếm 80% chiều ngang */
-        .review-container {
-            width: 80%; /* Chiếm 80% chiều ngang màn hình */
-            max-width: 1000px; /* Giới hạn tối đa để không quá lớn trên màn hình rộng */
-        }
-</style>
-<script lang="ts" setup>
+// --- Data for Rating Comments (Nhận xét mặc định) ---
+const RATING_COMMENTS: Record<number, string> = {
+    1: 'Thất vọng! Sản phẩm/dịch vụ cần cải thiện rất nhiều.',
+    2: 'Không hài lòng. Vẫn còn nhiều thiếu sót cần khắc phục.',
+    3: 'Bình thường. Chất lượng ở mức chấp nhận được.',
+    4: 'Hài lòng. Sản phẩm tốt, gần như hoàn hảo.',
+    5: 'Tuyệt vời! Sản phẩm vượt qué đẹp. Rất đáng tiền!'
+}
 
+// --- Computed ---
+const isFormValid = computed(() => {
+    // Form hợp lệ khi rating > 0 và comment phải có ít nhất 5 ký tự
+    return reviewForm.value.rating > 0 && reviewForm.value.comment.trim().length >= 5
+})
+
+const ratingComment = computed(() => {
+    return RATING_COMMENTS[reviewForm.value.rating] || 'Hãy chọn số sao để chúng tôi hiểu mức độ hài lòng của bạn.'
+})
+
+// --- Methods ---
+
+// Xử lý gửi đánh giá
+const submitReview = async () => {
+    if (!isFormValid.value || !orderDetailId.value) return; //
+    
+    // Giả định bạn cần lấy Order ID gốc từ detailToReview để quay lại trang chi tiết đơn hàng
+    // Nhưng vì detailToReview chỉ có order_code, chúng ta sẽ quay về list để đơn giản.
+    // Nếu bạn muốn quay về trang chi tiết đơn hàng, bạn cần biết ID của đơn hàng gốc (không phải orderDetailId)
+    // Hiện tại, ta quay về list đơn hàng:
+    
+    try {
+        await createReview({
+            order_detail_id: orderDetailId.value, //
+            rating: reviewForm.value.rating, //
+            comment: reviewForm.value.comment.trim(), //
+        });
+        
+        // 🔥 CẢI TIẾN: Thay vì chuyển về trang chủ ('/'), ta chuyển về trang list đơn hàng 
+        // và thêm query parameter để báo hiệu đánh giá thành công.
+        alert("Đánh giá đã được gửi thành công! 🎉 Cảm ơn bạn!"); // Toast mô phỏng
+        
+        // Chuyển hướng về list đơn hàng và thêm flag 'refresh'
+        router.push({ 
+            path: '/user/orders/list', 
+            query: { refresh: 'true' } 
+        }); 
+        
+    } catch (e: any) {
+        console.error("Lỗi khi gửi đánh giá:", e); //
+        alert(`Lỗi: ${e.message}`); // Toast báo lỗi
+    }
+};
+
+// Lấy dữ liệu khi component được mount
+onMounted(async () => {
+    // 🔥 SỬA: Chỉ lấy ID từ query parameter (orderDetailId) vì route là tĩnh /review
+    const idParam = route.query.orderDetailId; 
+
+    if (idParam) {
+        // Đảm bảo xử lý đúng kiểu dữ liệu (từ string sang number)
+        const id = Array.isArray(idParam) 
+            ? parseInt(idParam[0] as string) 
+            : parseInt(idParam as string);
+        
+        if (!isNaN(id) && id > 0) {
+            orderDetailId.value = id;
+            reviewForm.value.order_detail_id = id; 
+
+            // Gọi API để lấy chi tiết sản phẩm cần đánh giá
+            await fetchDetailToReview(id); 
+        } else {
+            error.value = "ID chi tiết đơn hàng không hợp lệ (không phải số).";
+            loading.value = false;
+        }
+    } else {
+        error.value = "Thiếu ID chi tiết đơn hàng để đánh giá. Vui lòng quay lại trang chi tiết đơn hàng.";
+        loading.value = false;
+    }
+});
 </script>
+
+<style scoped>
+/* Không cần phần <style> tùy chỉnh vì đã dùng Tailwind CSS class chi tiết hơn */
+.review-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+</style>
