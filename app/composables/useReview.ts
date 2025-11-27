@@ -135,6 +135,23 @@ export function useReview() {
         return false; // Mặc định là chưa đánh giá/không truy cập được nếu có lỗi
     }
   };
+
+  const checkOrderFullyReviewed = async (orderDetails: OrderDetail[]): Promise<boolean> => {
+    if (!orderDetails || orderDetails.length === 0) {
+        return true; // Nếu không có sản phẩm nào, coi như đã hoàn tất đánh giá
+    }
+
+    // Tạo một mảng các Promises để kiểm tra trạng thái đánh giá cho từng sản phẩm
+    const reviewChecks = orderDetails.map(detail => 
+        checkOrderDetailReviewed(detail.order_detail_id)
+    );
+
+    // Chờ tất cả Promises hoàn thành
+    const results = await Promise.all(reviewChecks);
+
+    // Nếu TẤT CẢ kết quả là TRUE (đã đánh giá) thì đơn hàng được coi là hoàn tất đánh giá
+    return results.every(isReviewed => isReviewed === true);
+  };
   /**
    * Lấy danh sách đánh giá mới nhất (Không cần Auth)
    * Route: /reviews/latest
@@ -233,6 +250,7 @@ export function useReview() {
     fetchProductReviews,
     fetchProductRatingStats,
     fetchUserReviews,
+    checkOrderFullyReviewed,
     
   }
 }

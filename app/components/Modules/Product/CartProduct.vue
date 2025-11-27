@@ -119,7 +119,7 @@
   import { computed, ref, nextTick } from "vue";
   import { useRouter } from "vue-router";
   import { useCart } from "~/composables/useCart";
-  import { useWishlist } from "~/composables/useWishlist"; // Đảm bảo import useWishlist
+  import { useWishlist } from "~/composables/useWishlist";
 
   interface ProductItem {
     product_id: number;
@@ -145,6 +145,7 @@
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
   const errorImage = ref(false);
+  const toast = useToast();
 
   const resolvedThumbnail = computed(() => {
     if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
@@ -169,7 +170,7 @@
 
   const handleAddToCart = async () => {
     if (!props.item.product_id) {
-      alert("❌ Sản phẩm không hợp lệ");
+      toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
       return;
     }
 
@@ -177,38 +178,53 @@
       const result = await addToCart(props.item.product_id, 1);
 
       if (result) {
-        alert("✅ Đã thêm vào giỏ hàng!");
+        toast.add({ title: "✅ Đã thêm vào giỏ hàng!", color: "success" });
       } else {
-        alert("❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.");
+        toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "error" });
       }
     } catch (error: any) {
-      alert(
-        "❌ Lỗi khi thêm vào giỏ hàng: " +
-          (error?.message || "Không rõ nguyên nhân")
-      );
+      toast.add({ 
+        title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"), 
+        color: "error" 
+      });
     }
   };
 
-  // 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI ALERT
+  // 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI TOAST
   const handleAddToWishlist = async () => {
     if (!props.item.product_id) {
-      alert("❌ Sản phẩm không hợp lệ");
+      toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
       return;
     }
 
     try {
+      // 🟢 KIỂM TRA NẾU ĐÃ CÓ TRONG WISHLIST
+      if (isInWishlist(props.item.product_id)) {
+        toast.add({
+          title: "ℹ️ Sản phẩm đã có trong yêu thích!",
+          color: "info"
+        });
+        return;
+      }
+
       const success = await addToWishlist(props.item.product_id);
 
       if (success) {
-        alert("✅ Đã thêm sản phẩm vào yêu thích!");
+        toast.add({ 
+          title: "✅ Đã thêm sản phẩm vào yêu thích!", 
+          color: "success" 
+        });
       } else {
-        alert("❌ Không thể thêm vào yêu thích!");
+        toast.add({ 
+          title: "❌ Không thể thêm vào yêu thích!", 
+          color: "error" 
+        });
       }
     } catch (error: any) {
-      alert(
-        "❌ Lỗi khi thêm vào yêu thích: " +
-          (error?.message || "Không rõ nguyên nhân")
-      );
+      toast.add({ 
+        title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || "Không rõ nguyên nhân"), 
+        color: "error" 
+      });
     }
   };
 </script>

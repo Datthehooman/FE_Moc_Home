@@ -52,9 +52,8 @@
           <!-- 👁️ Xem sản phẩm -->
           <UTooltip text="Xem sản phẩm">
             <button
-              to="/QuickViewOverlay"
+              @click="$emit('view', item.product)"
               class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
-              :disabled="isDeleting"
             >
               <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
             </button>
@@ -141,6 +140,7 @@ import { useCart } from "~/composables/useCart";
 const props = defineProps<{ item: any; itemWidth: number }>();
 const emit = defineEmits<{
   "wishlist-updated": [];
+  "view": [product: any];
 }>();
 
 const router = useRouter();
