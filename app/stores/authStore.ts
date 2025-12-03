@@ -12,6 +12,7 @@ interface User {
 
 interface AuthState {
   user: User;
+  addresses: any[];
   token: string | null;
   tokenLocal: string | null;
   role: string | number | null; // prod role
@@ -23,16 +24,13 @@ interface AuthState {
 export const useAuthStore = defineStore("auth", {
   state: (): AuthState => ({
     user: {},
-
-    // Real token stored for production
+    addresses: [],
     token: useCookie("token", {
       path: "/",
       domain: ".mocfurni.shop",
       sameSite: "lax",
       secure: true,
     }).value,
-
-    // Local development token
     tokenLocal: useCookie("tokenLocal", {
       path: "/",
       maxAge: 60 * 60 * 24,
@@ -63,7 +61,6 @@ export const useAuthStore = defineStore("auth", {
       const isLocal =
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1";
-
       return isLocal ? state.tokenLocal : state.token;
     },
 
@@ -153,13 +150,16 @@ export const useAuthStore = defineStore("auth", {
       this.role = null;
       this.roleLocal = null;
       this.user = {};
+      this.addresses = [];
       this.isLogged = false;
 
+      // Remove prod token
       useCookie("token", {
         path: "/",
         domain: ".mocfurni.shop",
       }).value = null;
 
+      // Remove local token
       useCookie("tokenLocal", { path: "/" }).value = null;
 
       useCookie("role", {
@@ -173,15 +173,10 @@ export const useAuthStore = defineStore("auth", {
     async fetchUser() {
       const token = this.activeToken;
       if (!token) return;
-
       try {
-        const res = await $fetch(
-          "https://api.mocfurni.shop/api/client/profile",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
+        const res = await $fetch("https://api.mocfurni.shop/api/client/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         this.user = res.user || {};
         this.role = res.user?.role || null;
         this.roleLocal = res.user?.role || null;
@@ -192,6 +187,21 @@ export const useAuthStore = defineStore("auth", {
         this.roleLocal = null;
         this.isLogged = false;
       }
+    },
+
+    // Address
+    setAddresses(addresses: any[]) { this.addresses = addresses; },
+    addAddress(address: any) { this.addresses.push(address); },
+    updateAddressInStore(id: string | number, updated: any) {
+      const index = this.addresses.findIndex(a => a.id === id);
+      if (index !== -1) this.addresses[index] = updated;
+    },
+    removeAddressFromStore(id: string | number) {
+      this.addresses = this.addresses.filter(a => a.id !== id);
+    },
+    setDefaultAddressInStore(id: string | number) {
+      this.addresses = this.addresses.map(a => ({ ...a, is_default: a.id === id ? 1 : 0 }));
+      this.addresses.sort((a, b) => b.is_default - a.is_default);
     },
   },
 });

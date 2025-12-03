@@ -57,11 +57,13 @@ const titles = {
   'user-notifications': 'Thông báo',
   'user-messages': 'Tin nhắn',
   'user-settings': 'Cài đặt',
+  'user-add_address': 'Thêm địa chỉ',
 }
 
 // pageTitle sẽ tự động cập nhật khi route thay đổi
 const pageTitle = computed(() => {
   if (route.path.startsWith('/san-pham/')) return 'Chi tiết sản phẩm'
+  if (route.path.startsWith('/user/edit_address/')) return 'Chỉnh sửa địa chỉ'
   return titles[route.name] || 'Trang'
 })
 </script>

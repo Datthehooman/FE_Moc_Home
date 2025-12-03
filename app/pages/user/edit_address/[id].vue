@@ -2,21 +2,22 @@
 definePageMeta({ middleware: 'auth' })
 
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAddressUser } from '~/composables/useAddressUser'
 import { useAddress } from '~/composables/useAddress'
 
 const router = useRouter()
-const { createAddress } = useAddressUser()
+const route = useRoute()
+const addressId = route.params.id as string
+
+const { addresses, updateAddress, fetchAddresses } = useAddressUser()
 const { provinces, wards, fetchProvinces, fetchWards } = useAddress()
 
 // Form
 const form = ref({
   fullName: '',
   phone: '',
-  address: '',
-  provinceCode: '',
-  wardCode: ''
+  address: ''
 })
 
 const formError = ref('')
@@ -53,8 +54,22 @@ const filteredWards = computed(() => {
 })
 
 // Load provinces on mount
-onMounted(() => {
-  fetchProvinces()
+onMounted(async () => {
+  await fetchProvinces()
+  await fetchAddresses()
+
+  // Load current address data
+  const addr = addresses.value.find(a => a.id === +addressId)
+  if (addr) {
+    form.value.fullName = addr.full_name
+    form.value.phone = addr.phone
+    form.value.address = addr.address_line
+    selectedProvince.value = addr.province_code
+    provinceSearch.value = addr.province?.name || ''
+    await fetchWards(addr.province_code)
+    selectedWard.value = addr.ward_code
+    wardSearch.value = addr.ward?.name || ''
+  }
 })
 
 // Khi chọn tỉnh -> load wards
@@ -91,10 +106,10 @@ const saveAddress = async () => {
 
   formError.value = ''
 
-  const success = await createAddress({
+  const success = await updateAddress(addressId, {
     full_name: form.value.fullName,
     phone: form.value.phone,
-    province_code: selectedProvince.value, // thêm dòng này
+    province_code: selectedProvince.value,
     ward_code: selectedWard.value,
     address_line: form.value.address,
     address_type: 'shipping',
@@ -112,7 +127,7 @@ const saveAddress = async () => {
     <main class="flex-1 p-6">
 
       <section class="bg-white rounded-xl p-5 shadow mb-6">
-        <h3 class="font-semibold text-gray-700 text-[20px]">Thêm địa chỉ mới</h3>
+        <h3 class="font-semibold text-gray-700 text-[20px]">Chỉnh sửa địa chỉ</h3>
         <hr class="border-t border-gray-200 my-4">
 
         <form @submit.prevent="saveAddress" class="space-y-4">
@@ -181,7 +196,7 @@ const saveAddress = async () => {
                 <span class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100"></span>
               </span>
               <span class="relative z-10 group-hover:text-white text-[15px] transition-colors duration-300">
-                Thêm địa chỉ
+                Lưu địa chỉ
               </span>
             </button>
           </div>

@@ -114,117 +114,84 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
-  import { computed, ref, nextTick } from "vue";
-  import { useRouter } from "vue-router";
-  import { useCart } from "~/composables/useCart";
-  import { useWishlist } from "~/composables/useWishlist";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useCart } from "~/composables/useCart";
+import { useWishlist } from "~/composables/useWishlist";
 
-  interface ProductItem {
-    product_id: number;
-    product_name: string;
-    price: number;
-    price_down?: number;
-    badge?: string | null;
-    rating?: number | null;
-    sku?: string;
-    stock_quantity?: number;
-    thumbnail?: string;
-    images?: { image_url: string }[];
-    slug?: string;
+const props = defineProps<{
+  item: any;
+  itemWidth: number;
+}>();
+const emit = defineEmits(["view"]);
+const router = useRouter();
+const { addToCart } = useCart();
+const { addToWishlist, isInWishlist } = useWishlist();
+const toast = useToast();
+const errorImage = ref(false);
+
+const resolvedThumbnail = computed(() => {
+  if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
+  if (props.item.images?.length && props.item.images[0].image_url) {
+    const path = props.item.images[0].image_url.replace(/^\/+/, "");
+    return `https://api.mocfurni.shop/storage/${path}`;
+  }
+});
+
+const onImageError = () => {
+  errorImage.value = true;
+};
+
+const formatPrice = (price: number | undefined) =>
+  price ? price.toLocaleString("vi-VN") + "₫" : "";
+
+let hasViewed = false;
+const goToDetail = () => {
+  if (!hasViewed) hasViewed = true;
+  router.push(`/san-pham/${props.item.slug}`);
+};
+
+const handleAddToCart = async () => {
+  if (!props.item.product_id) {
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
+    return;
+  }
+  try {
+    const result = await addToCart(props.item.product_id, 1);
+    toast.add({
+      title: result ? "✅ Đã thêm vào giỏ hàng!" : "❌ Thêm giỏ hàng thất bại",
+      color: result ? "success" : "error",
+    });
+  } catch (error: any) {
+    toast.add({
+      title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"),
+      color: "error",
+    });
+  }
+};
+
+const handleAddToWishlist = async () => {
+  if (!props.item.product_id) {
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
+    return;
   }
 
-  const props = defineProps<{
-    item: ProductItem;
-    itemWidth: number;
-  }>();
-
-  const emit = defineEmits(["view"]);
-  const router = useRouter();
-  const { addToCart } = useCart();
-  const { addToWishlist, isInWishlist } = useWishlist();
-  const errorImage = ref(false);
-  const toast = useToast();
-
-  const resolvedThumbnail = computed(() => {
-    if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
-
-    if (props.item.images?.length && props.item.images[0].image_url) {
-      const path = props.item.images[0].image_url.replace(/^\/+/, ""); // remove leading slashes
-      return `https://api.mocfurni.shop/storage/${path}`;
-    }
-  });
-
-  const onImageError = () => {
-    errorImage.value = true;
-  };
-  const formatPrice = (price: number | undefined) =>
-    price ? price.toLocaleString("vi-VN") + "₫" : "";
-
-  let hasViewed = false;
-  const goToDetail = () => {
-    if (!hasViewed) hasViewed = true;
-    router.push(`/san-pham/${props.item.slug}`);
-  };
-
-  const handleAddToCart = async () => {
-    if (!props.item.product_id) {
-      toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
+  try {
+    if (isInWishlist(props.item.product_id)) {
+      toast.add({ title: "ℹ️ Sản phẩm đã có trong yêu thích!", color: "info" });
       return;
     }
-
-    try {
-      const result = await addToCart(props.item.product_id, 1);
-
-      if (result) {
-        toast.add({ title: "✅ Đã thêm vào giỏ hàng!", color: "success" });
-      } else {
-        toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "error" });
-      }
-    } catch (error: any) {
-      toast.add({ 
-        title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"), 
-        color: "error" 
-      });
-    }
-  };
-
-  // 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI TOAST
-  const handleAddToWishlist = async () => {
-    if (!props.item.product_id) {
-      toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
-      return;
-    }
-
-    try {
-      // 🟢 KIỂM TRA NẾU ĐÃ CÓ TRONG WISHLIST
-      if (isInWishlist(props.item.product_id)) {
-        toast.add({
-          title: "ℹ️ Sản phẩm đã có trong yêu thích!",
-          color: "info"
-        });
-        return;
-      }
-
-      const success = await addToWishlist(props.item.product_id);
-
-      if (success) {
-        toast.add({ 
-          title: "✅ Đã thêm sản phẩm vào yêu thích!", 
-          color: "success" 
-        });
-      } else {
-        toast.add({ 
-          title: "❌ Không thể thêm vào yêu thích!", 
-          color: "error" 
-        });
-      }
-    } catch (error: any) {
-      toast.add({ 
-        title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || "Không rõ nguyên nhân"), 
-        color: "error" 
-      });
-    }
-  };
+    const success = await addToWishlist(props.item.product_id);
+    toast.add({
+      title: success ? "✅ Đã thêm sản phẩm vào yêu thích!" : "❌ Không thể thêm vào yêu thích!",
+      color: success ? "success" : "error",
+    });
+  } catch (error: any) {
+    toast.add({
+      title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || "Không rõ nguyên nhân"),
+      color: "error",
+    });
+  }
+};
 </script>
