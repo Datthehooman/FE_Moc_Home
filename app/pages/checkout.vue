@@ -461,16 +461,49 @@ const totalAmount = computed(() => {
 // Submit payment
 const submitPayment = async () => {
   const itemsToPay = checkoutItems.value.length ? checkoutItems.value : buyNowItem ? [buyNowItem] : [];
-  if (!itemsToPay.length) { alert("Không có sản phẩm để thanh toán"); router.replace("/error"); return; }
-  if (!validate()) { alert("Vui lòng điền đầy đủ thông tin"); return; }
+  if (!itemsToPay.length) { 
+    alert("Không có sản phẩm để thanh toán"); 
+    router.replace("/error"); 
+    return; 
+  }
+  if (!validate()) { 
+    alert("Vui lòng điền đầy đủ thông tin"); 
+    return; 
+  }
 
-  const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedProvince.value}`;
+  // Tạo shipping_address dùng tên thay vì code
+  const shipping_address = `${form.addressDetail}, ${wardSearch.value}, ${provinceSearch.value}`;
+  
   let order_id = 0;
 
   try {
     const payload = isLoggedIn.value
-      ? { user_id: authStore.user.user_id, shipping_address, note: form.note || "", payment_method_id: paymentMethod.value === "online" ? 2 : 1, items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), voucher_code: form.voucher_code || null }
-      : { customer_name: `${form.firstName} ${form.lastName}`, customer_phone: form.phone, customer_email: form.email, shipping_address, note: form.note || "", payment_method_id: paymentMethod.value === "online" ? 2 : 1, items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), voucher_code: form.voucher_code || null };
+      ? { 
+          user_id: authStore.user.user_id, 
+          shipping_address, 
+          province_code: selectedProvince.value,
+          ward_code: selectedWard.value,
+          province_name: provinceSearch.value,
+          ward_name: wardSearch.value,
+          note: form.note || "", 
+          payment_method_id: paymentMethod.value === "online" ? 2 : 1, 
+          items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
+          voucher_code: form.voucher_code || null 
+        }
+      : { 
+          customer_name: `${form.firstName} ${form.lastName}`, 
+          customer_phone: form.phone, 
+          customer_email: form.email, 
+          shipping_address, 
+          province_code: selectedProvince.value,
+          ward_code: selectedWard.value,
+          province_name: provinceSearch.value,
+          ward_name: wardSearch.value,
+          note: form.note || "", 
+          payment_method_id: paymentMethod.value === "online" ? 2 : 1, 
+          items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
+          voucher_code: form.voucher_code || null 
+        };
 
     const orderData = isLoggedIn.value ? await buyNow(payload) : await buyNowGuest(payload);
     order_id = Number(orderData.order_id);
@@ -489,9 +522,10 @@ const submitPayment = async () => {
   }
 };
 
+
 // On mounted
-onMounted(() => {
-  fetchProvinces();
+onMounted(async () => {
+  await fetchProvinces();
 
   if (isLoggedIn.value && authStore.user) {
     form.firstName = authStore.user.firstName || "";
@@ -499,10 +533,30 @@ onMounted(() => {
     form.full_name = authStore.user.full_name || "";
     form.email = authStore.user.email || "";
     form.phone = authStore.user.phone || "";
+
+    // ✅ Lấy địa chỉ mặc định
+    const defaultAddress = authStore.addresses.find(a => a.is_default);
+    if (defaultAddress) {
+      // Tỉnh
+      selectedProvince.value = defaultAddress.province.code;
+      provinceSearch.value = defaultAddress.province.name;
+
+      // Load wards cho tỉnh
+      await fetchWards(defaultAddress.province.code);
+
+      // Xã
+      selectedWard.value = defaultAddress.ward.code;
+      wardSearch.value = defaultAddress.ward.name;
+
+      // Địa chỉ chi tiết
+      form.addressDetail = defaultAddress.address_line || "";
+    }
   }
 
   if (!checkoutItems.value.length && !buyNowItem) router.replace("/error");
 });
+
+
 
 // Format price
 function formatPrice(value: number | undefined | null) {

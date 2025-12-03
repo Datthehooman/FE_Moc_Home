@@ -134,7 +134,7 @@
                   </div>
                   <div class="flex justify-between">
                     <span>Giảm giá:</span>
-                    <span>{{ order.discount }}</span>
+                    <span>- {{ order.discount }}</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Vận chuyển:</span>
