@@ -118,8 +118,8 @@
 <script setup lang="ts">
   import { computed, ref, nextTick } from "vue";
   import { useRouter } from "vue-router";
-  import { useCart } from "~/composables/useCart";
-  import { useWishlist } from "~/composables/useWishlist"; // Đảm bảo import useWishlist
+  
+  const toast = useToast(); 
 
   interface ProductItem {
     product_id: number;
@@ -167,48 +167,163 @@
     router.push(`/san-pham/${props.item.slug}`);
   };
 
-  const handleAddToCart = async () => {
-    if (!props.item.product_id) {
-      alert("❌ Sản phẩm không hợp lệ");
-      return;
-    }
+const handleAddToCart = async () => {
+  if (!props.item.product_id) {
+    toast.add({
+      title: "Sản phẩm không hợp lệ",
+      color: "error",
+      icon: "i-heroicons-x-circle-solid",
+      ui: {
+        title: "text-white",
+        close: {
+          base: "text-white"
+        },
+        progress: {
+          base: "bg-[#6E4E37]"
+        }
+      },
+      class: "py-4 px-6 text-[17px] bg-red-500 rounded-xl"
+    });
+    return;
+  }
 
-    try {
-      const result = await addToCart(props.item.product_id, 1);
+  try {
+    const result = await addToCart(props.item.product_id, 1);
 
-      if (result) {
-        alert("✅ Đã thêm vào giỏ hàng!");
-      } else {
-        alert("❌ Thêm giỏ hàng thất bại. Vui lòng thử lại.");
-      }
-    } catch (error: any) {
-      alert(
-        "❌ Lỗi khi thêm vào giỏ hàng: " +
-          (error?.message || "Không rõ nguyên nhân")
-      );
+    if (result) {
+      toast.add({
+        title: "Đã thêm vào giỏ hàng!",
+        icon: "i-heroicons-shopping-bag-solid",
+        color: "success",
+        ui: {
+          title: "text-white",
+          close: {
+            base: "text-white"
+          },
+          progress: {
+            base: "bg-[#6E4E37]"
+          }
+        },
+        class:
+          "py-6 px-6 text-[17px] bg-[#11B76B] text-white rounded-xl shadow-lg"
+      });
+    } else {
+      toast.add({
+        title: "Thêm giỏ hàng thất bại!",
+        icon: "i-heroicons-x-circle-solid",
+        color: "error",
+        ui: {
+          title: "text-white",
+          close: {
+            base: "text-white"
+          },
+          progress: {
+            base: "bg-[#6E4E37]"
+          }
+        },
+        class: "py-6 px-6 text-[17px] bg-red-500 text-white rounded-xl"
+      });
     }
-  };
+  } catch (error: any) {
+    toast.add({
+      title: "Lỗi khi thêm vào giỏ hàng",
+      description: error?.message || "Không rõ nguyên nhân",
+      icon: "i-heroicons-exclamation-circle-solid",
+      color: "error",
+      ui: {
+        title: "text-white",
+        description: "text-white",
+        close: {
+          base: "text-white"
+        },
+        progress: {
+          base: "bg-[#6E4E37]"
+        }
+      },
+      class: "py-4 px-6 text-[17px] bg-red-500 text-white rounded-xl"
+    });
+  }
+};
+
+
 
   // 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI ALERT
-  const handleAddToWishlist = async () => {
-    if (!props.item.product_id) {
-      alert("❌ Sản phẩm không hợp lệ");
+const handleAddToWishlist = async () => {
+  if (!props.item.product_id) {
+    toast.add({
+      title: "Sản phẩm không hợp lệ",
+      icon: "i-heroicons-x-circle-solid",
+      color: "error",
+      ui: {
+        title: "text-white",
+        close: { base: "text-white" },
+        progress: { base: "bg-[#6E4E37]" }
+      },
+      class: "py-4 px-6 text-[17px] bg-red-500 text-white rounded-xl"
+    });
+    return;
+  }
+
+  try {
+    // Nếu đã có trong wishlist
+    if (isInWishlist(props.item.product_id)) {
+      toast.add({
+        title: "Sản phẩm đã có trong yêu thích!",
+        icon: "i-heroicons-heart",
+        color: "info",
+        ui: {
+          title: "text-white",
+          close: { base: "text-white" },
+          progress: { base: "bg-[#6E4E37]" }
+        },
+        class: "py-4 px-6 text-[17px] bg-blue-500 text-white rounded-xl"
+      });
       return;
     }
 
-    try {
-      const success = await addToWishlist(props.item.product_id);
+    const success = await addToWishlist(props.item.product_id);
 
-      if (success) {
-        alert("✅ Đã thêm sản phẩm vào yêu thích!");
-      } else {
-        alert("❌ Không thể thêm vào yêu thích!");
-      }
-    } catch (error: any) {
-      alert(
-        "❌ Lỗi khi thêm vào yêu thích: " +
-          (error?.message || "Không rõ nguyên nhân")
-      );
+    if (success) {
+      toast.add({
+        title: "Đã thêm vào yêu thích!",
+        icon: "i-heroicons-heart-solid",
+        color: "success",
+        ui: {
+          title: "text-white",
+          close: { base: "text-white" },
+          progress: { base: "bg-[#6E4E37]" }
+        },
+        class:
+          "py-6 px-6 text-[17px] bg-[#11B76B] text-white rounded-xl shadow-lg"
+      });
+    } else {
+      toast.add({
+        title: "Không thể thêm vào yêu thích!",
+        icon: "i-heroicons-x-circle-solid",
+        color: "error",
+        ui: {
+          title: "text-white",
+          close: { base: "text-white" },
+          progress: { base: "bg-[#6E4E37]" }
+        },
+        class: "py-6 px-6 text-[17px] bg-red-500 text-white rounded-xl"
+      });
     }
-  };
+  } catch (error: any) {
+    toast.add({
+      title: "Lỗi khi thêm vào yêu thích",
+      description: error?.message || "Không rõ nguyên nhân",
+      icon: "i-heroicons-exclamation-circle-solid",
+      color: "error",
+      ui: {
+        title: "text-white",
+        description: "text-white",
+        close: { base: "text-white" },
+        progress: { base: "bg-[#6E4E37]" }
+      },
+      class: "py-4 px-6 text-[17px] bg-red-500 text-white rounded-xl"
+    });
+  }
+};
+
 </script>
