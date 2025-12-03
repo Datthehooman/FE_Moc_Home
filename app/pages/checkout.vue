@@ -110,31 +110,61 @@
             <label class="block font-medium mb-1 text-[#6E4E37]">Địa chỉ</label>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
               <div class="relative">
-                <select
-                  v-model="selectedProvince"
-                  @change="updateWards"
-                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-                >
-                  <option disabled value="">Tỉnh / Thành phố</option>
-                 <option v-for="p in provinces" :key="p.id" :value="p.code">{{ p.name }}</option>
+              <input
+                type="text"
+                v-model="provinceSearch"
+                @focus="showProvinceList = true"
+                placeholder="Tìm tỉnh / thành phố..."
+                class="w-full border border-gray-300 rounded-xl px-3 py-2"
+              />
 
-                </select>
-                <p v-if="errors.province" class="text-red-500 text-xs mt-1">
-                  {{ errors.province }}
-                </p>
-              </div>
-              <div class="relative">
-                <select
-                  v-model="selectedWard"
-                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
+              <!-- LIST TỈNH -->
+              <ul
+                v-if="showProvinceList"
+                class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
+              >
+                <li
+                  v-for="p in filteredProvinces"
+                  :key="p.code"
+                  @click="selectProvince(p)"
+                  class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                 >
-                  <option disabled value="">Xã / Phường</option>
-  <option v-for="w in wards" :key="w.id" :value="w.code">{{ w.name }}</option>
-                </select>
-                <p v-if="errors.ward" class="text-red-500 text-xs mt-1">
-                  {{ errors.ward }}
-                </p>
-              </div>
+                  {{ p.name }}
+                </li>
+              </ul>
+
+              <p v-if="errors.province" class="text-red-500 text-xs mt-1">
+                {{ errors.province }}
+              </p>
+            </div>
+          <div class="relative">
+  <input
+    type="text"
+    v-model="wardSearch"
+    @focus="showWardList = true"
+    placeholder="Tìm xã / phường..."
+    class="w-full border border-gray-300 rounded-xl px-3 py-2"
+  />
+
+  <ul
+    v-if="showWardList"
+    class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
+  >
+    <li
+      v-for="w in filteredWards"
+      :key="w.code"
+      @click="selectWard(w)"
+      class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+    >
+      {{ w.name }}
+    </li>
+  </ul>
+
+  <p v-if="errors.ward" class="text-red-500 text-xs mt-1">
+    {{ errors.ward }}
+  </p>
+</div>
+
             </div>
 
             <div class="mt-3">
@@ -478,4 +508,51 @@ onMounted(() => {
 function formatPrice(value: number | undefined | null) {
   return (Number(value) || 0).toLocaleString("vi-VN") + " đ";
 }
+
+function removeVietnameseTones(str: string) {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+
+const provinceSearch = ref("");
+const showProvinceList = ref(false);
+
+const filteredProvinces = computed(() => {
+  const keyword = removeVietnameseTones(provinceSearch.value);
+  return provinces.value.filter(p => {
+    const name = removeVietnameseTones(p.name);
+    const name_en = removeVietnameseTones(p.name_en || "");
+    return name.includes(keyword) || name_en.includes(keyword);
+  });
+});
+
+const selectProvince = (province: any) => {
+  selectedProvince.value = province.code;
+  provinceSearch.value = province.name;
+  showProvinceList.value = false;
+
+  updateWards(); // load lại xã/phường
+};
+
+const wardSearch = ref("");
+const showWardList = ref(false);
+
+const filteredWards = computed(() => {
+  const keyword = removeVietnameseTones(wardSearch.value);
+  return wards.value.filter(w => {
+    const name = removeVietnameseTones(w.name);
+    const name_en = removeVietnameseTones(w.name_en || "");
+    return name.includes(keyword) || name_en.includes(keyword);
+  });
+});
+
+const selectWard = (ward: any) => {
+  selectedWard.value = ward.code;
+  wardSearch.value = ward.name;
+  showWardList.value = false;
+};
+
 </script>
