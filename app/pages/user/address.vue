@@ -2,8 +2,7 @@
 definePageMeta({ middleware: 'auth' })
 import { ref, computed } from 'vue'
 
-// Sử dụng composable
-const { addresses, loading, error, removeAddress, setDefaultAddress } = useAddressUser()
+const { addresses, loading, removeAddress, setDefaultAddress } = useAddressUser()
 const authStore = useAuthStore()
 
 const currentPage = ref(1)
@@ -27,28 +26,21 @@ const pagesAround = computed(() => {
 const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++ }
 const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
 
-// Xóa theo id thật
 const handleRemove = (id: number | string) => removeAddress(id)
 </script>
->
 
 <template>
   <div class="flex justify-center bg-[#FFFBF8] min-h-screen">
     <div class="flex w-full max-w-[85%]">
-
       <ModulesUserAccountSidebar />
 
       <main class="flex-1 p-6">
         <section class="bg-white rounded-xl p-4 shadow">
           <div class="flex justify-between items-center mb-2">
             <h3 class="font-semibold text-gray-700 text-[20px]">Danh sách địa chỉ</h3>
-            <button
-              class="relative overflow-hidden px-5 py-2 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow flex justify-center items-center group transition-colors duration-500"
-            >
+            <button class="relative overflow-hidden px-5 py-2 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow flex justify-center items-center group transition-colors duration-500">
               <span class="absolute inset-0 flex justify-center items-center">
-                <span
-                  class="w-1 h-1 bg-[#000000] rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100"
-                ></span>
+                <span class="w-1 h-1 bg-[#000] rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100"></span>
               </span>
               <a href="/user/add_address">
                 <span class="relative z-10 text-[15px] group-hover:text-white transition">Thêm địa chỉ</span>
@@ -67,41 +59,26 @@ const handleRemove = (id: number | string) => removeAddress(id)
           </div>
 
           <div class="space-y-2" v-if="!loading">
-            <div
-              v-for="(item, i) in paginatedAddresses"
-              :key="item.id"
-              class="grid grid-cols-5 items-center bg-[#F5F7FA] h-[55px] rounded-[10px] px-3 text-sm hover:bg-[#ECEFF3] transition"
-            >
-<div class="text-[#A77A5D] font-medium">{{ item.full_name }}</div>
-<div>{{ item.address_line }}, {{ item.ward?.name }}, {{ item.province?.name }}</div>
-<div>{{ authStore.user.email || '' }}</div>
-<div>{{ item.phone }}</div>
+            <div v-for="item in paginatedAddresses" :key="item.id" class="grid grid-cols-5 items-center bg-[#F5F7FA] h-[55px] rounded-[10px] px-3 text-sm hover:bg-[#ECEFF3] transition">
+              <div class="text-[#A77A5D] font-medium">{{ item.full_name }}</div>
+              <div>{{ item.address_line }}, {{ item.ward?.name }}, {{ item.province?.name }}</div>
+              <div>{{ authStore.user.email || '' }}</div>
+              <div>{{ item.phone }}</div>
 
+              <div class="flex items-center gap-2">
+                <NuxtLink :to="`/user/edit_address/${item.id}`" class="group w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black">
+                  <UIcon name="heroicons:pencil-square" class="w-5 h-5 text-gray-500 group-hover:text-white transition"/>
+                </NuxtLink>
 
-      <div class="flex items-center gap-2">
-  <!-- Nút sửa -->
-  <NuxtLink :to="`/user/edit_address/${item.id}`" class="group w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black">
-    <UIcon name="heroicons:pencil-square" class="w-5 h-5 text-gray-500 group-hover:text-white transition"/>
-  </NuxtLink>
+                <div @click="handleRemove(item.id)" class="group w-[34px] h-[34px] flex items-center justify-center border border-red-400 rounded-[5px] cursor-pointer transition hover:bg-red-500 hover:border-red-500">
+                  <UIcon name="heroicons:x-mark" class="w-5 h-5 text-red-500 group-hover:text-white transition"/>
+                </div>
 
-  <!-- Nút xóa -->
-  <div @click="handleRemove(item.id)" class="group w-[34px] h-[34px] flex items-center justify-center border border-red-400 rounded-[5px] cursor-pointer transition hover:bg-red-500 hover:border-red-500">
-    <UIcon name="heroicons:x-mark" class="w-5 h-5 text-red-500 group-hover:text-white transition"/>
-  </div>
-
-  <!-- Nút mặc định -->
-  <button
-    v-if="!item.is_default"
-    @click="setDefaultAddress(item.id)"
-    class="px-2 py-1 text-xs bg-yellow-200 text-yellow-800 rounded hover:bg-yellow-300 transition"
-  >
-    Đặt mặc định
-  </button>
-
-  <span v-else class="px-2 py-1 text-xs bg-green-200 text-green-800 rounded">Mặc định</span>
-</div>
-
-
+                <button v-if="!item.is_default" @click="setDefaultAddress(item.id)" class="px-2 py-1 text-xs bg-yellow-200 text-yellow-800 rounded hover:bg-yellow-300 transition">
+                  Đặt mặc định
+                </button>
+                <span v-else class="px-2 py-1 text-xs bg-green-200 text-green-800 rounded">Mặc định</span>
+              </div>
             </div>
           </div>
 
