@@ -114,228 +114,84 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
-  import { computed, ref, nextTick } from "vue";
-  import { useRouter } from "vue-router";
-  
-  const toast = useToast(); 
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useCart } from "~/composables/useCart";
+import { useWishlist } from "~/composables/useWishlist";
 
-  interface ProductItem {
-    product_id: number;
-    product_name: string;
-    price: number;
-    price_down?: number;
-    badge?: string | null;
-    rating?: number | null;
-    sku?: string;
-    stock_quantity?: number;
-    thumbnail?: string;
-    images?: { image_url: string }[];
-    slug?: string;
+const props = defineProps<{
+  item: any;
+  itemWidth: number;
+}>();
+const emit = defineEmits(["view"]);
+const router = useRouter();
+const { addToCart } = useCart();
+const { addToWishlist, isInWishlist } = useWishlist();
+const toast = useToast();
+const errorImage = ref(false);
+
+const resolvedThumbnail = computed(() => {
+  if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
+  if (props.item.images?.length && props.item.images[0].image_url) {
+    const path = props.item.images[0].image_url.replace(/^\/+/, "");
+    return `https://api.mocfurni.shop/storage/${path}`;
   }
+});
 
-  const props = defineProps<{
-    item: ProductItem;
-    itemWidth: number;
-  }>();
+const onImageError = () => {
+  errorImage.value = true;
+};
 
-  const emit = defineEmits(["view"]);
-  const router = useRouter();
-  const { addToCart } = useCart();
-  const { addToWishlist, isInWishlist } = useWishlist();
-  const errorImage = ref(false);
-  const toast = useToast();
+const formatPrice = (price: number | undefined) =>
+  price ? price.toLocaleString("vi-VN") + "₫" : "";
 
-  const resolvedThumbnail = computed(() => {
-    if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
-
-    if (props.item.images?.length && props.item.images[0].image_url) {
-      const path = props.item.images[0].image_url.replace(/^\/+/, ""); // remove leading slashes
-      return `https://api.mocfurni.shop/storage/${path}`;
-    }
-  });
-
-  const onImageError = () => {
-    errorImage.value = true;
-  };
-  const formatPrice = (price: number | undefined) =>
-    price ? price.toLocaleString("vi-VN") + "₫" : "";
-
-  let hasViewed = false;
-  const goToDetail = () => {
-    if (!hasViewed) hasViewed = true;
-    router.push(`/san-pham/${props.item.slug}`);
-  };
+let hasViewed = false;
+const goToDetail = () => {
+  if (!hasViewed) hasViewed = true;
+  router.push(`/san-pham/${props.item.slug}`);
+};
 
 const handleAddToCart = async () => {
   if (!props.item.product_id) {
-    toast.add({
-      title: "Sản phẩm không hợp lệ",
-      color: "error",
-      icon: "i-heroicons-x-circle-solid",
-      ui: {
-        title: "text-white",
-        close: {
-          base: "text-white"
-        },
-        progress: {
-          base: "bg-[#6E4E37]"
-        }
-      },
-      class: "py-4 px-6 text-[17px] bg-red-500 rounded-xl"
-    });
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
     return;
   }
-
   try {
     const result = await addToCart(props.item.product_id, 1);
-
-    if (result) {
-      toast.add({
-        title: "Đã thêm vào giỏ hàng!",
-        icon: "i-heroicons-shopping-bag-solid",
-        color: "success",
-        ui: {
-          title: "text-white",
-          close: {
-            base: "text-white"
-          },
-          progress: {
-            base: "bg-[#6E4E37]"
-          }
-        },
-        class:
-          "py-6 px-6 text-[17px] bg-[#11B76B] text-white rounded-xl shadow-lg"
-      });
-    } else {
-      toast.add({
-        title: "Thêm giỏ hàng thất bại!",
-        icon: "i-heroicons-x-circle-solid",
-        color: "error",
-        ui: {
-          title: "text-white",
-          close: {
-            base: "text-white"
-          },
-          progress: {
-            base: "bg-[#6E4E37]"
-          }
-        },
-        class: "py-6 px-6 text-[17px] bg-red-500 text-white rounded-xl"
-      });
-    }
+    toast.add({
+      title: result ? "✅ Đã thêm vào giỏ hàng!" : "❌ Thêm giỏ hàng thất bại",
+      color: result ? "success" : "error",
+    });
   } catch (error: any) {
     toast.add({
-      title: "Lỗi khi thêm vào giỏ hàng",
-      description: error?.message || "Không rõ nguyên nhân",
-      icon: "i-heroicons-exclamation-circle-solid",
+      title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"),
       color: "error",
-      ui: {
-        title: "text-white",
-        description: "text-white",
-        close: {
-          base: "text-white"
-        },
-        progress: {
-          base: "bg-[#6E4E37]"
-        }
-      },
-      class: "py-4 px-6 text-[17px] bg-red-500 text-white rounded-xl"
     });
   }
 };
 
-
-
-  // 🎯 HÀM THÊM VÀO YÊU THÍCH VỚI ALERT
 const handleAddToWishlist = async () => {
   if (!props.item.product_id) {
-    toast.add({
-      title: "Sản phẩm không hợp lệ",
-      icon: "i-heroicons-x-circle-solid",
-      color: "error",
-      ui: {
-        title: "text-white",
-        close: { base: "text-white" },
-        progress: { base: "bg-[#6E4E37]" }
-      },
-      class: "py-4 px-6 text-[17px] bg-red-500 text-white rounded-xl"
-    });
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
     return;
   }
 
   try {
-    // Nếu đã có trong wishlist
     if (isInWishlist(props.item.product_id)) {
-      toast.add({
-        title: "Sản phẩm đã có trong yêu thích!",
-        icon: "i-heroicons-heart",
-        color: "info",
-        ui: {
-          title: "text-white",
-          close: { base: "text-white" },
-          progress: { base: "bg-[#6E4E37]" }
-        },
-        class: "py-4 px-6 text-[17px] bg-blue-500 text-white rounded-xl"
-      });
+      toast.add({ title: "ℹ️ Sản phẩm đã có trong yêu thích!", color: "info" });
       return;
     }
-
-    try {
-      // 🟢 KIỂM TRA NẾU ĐÃ CÓ TRONG WISHLIST
-      if (isInWishlist(props.item.product_id)) {
-        toast.add({
-          title: "ℹ️ Sản phẩm đã có trong yêu thích!",
-          color: "info"
-        });
-        return;
-      }
-
-      const success = await addToWishlist(props.item.product_id);
     const success = await addToWishlist(props.item.product_id);
-
-    if (success) {
-      toast.add({
-        title: "Đã thêm vào yêu thích!",
-        icon: "i-heroicons-heart-solid",
-        color: "success",
-        ui: {
-          title: "text-white",
-          close: { base: "text-white" },
-          progress: { base: "bg-[#6E4E37]" }
-        },
-        class:
-          "py-6 px-6 text-[17px] bg-[#11B76B] text-white rounded-xl shadow-lg"
-      });
-    } else {
-      toast.add({
-        title: "Không thể thêm vào yêu thích!",
-        icon: "i-heroicons-x-circle-solid",
-        color: "error",
-        ui: {
-          title: "text-white",
-          close: { base: "text-white" },
-          progress: { base: "bg-[#6E4E37]" }
-        },
-        class: "py-6 px-6 text-[17px] bg-red-500 text-white rounded-xl"
-      });
-    }
+    toast.add({
+      title: success ? "✅ Đã thêm sản phẩm vào yêu thích!" : "❌ Không thể thêm vào yêu thích!",
+      color: success ? "success" : "error",
+    });
   } catch (error: any) {
     toast.add({
-      title: "Lỗi khi thêm vào yêu thích",
-      description: error?.message || "Không rõ nguyên nhân",
-      icon: "i-heroicons-exclamation-circle-solid",
+      title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || "Không rõ nguyên nhân"),
       color: "error",
-      ui: {
-        title: "text-white",
-        description: "text-white",
-        close: { base: "text-white" },
-        progress: { base: "bg-[#6E4E37]" }
-      },
-      class: "py-4 px-6 text-[17px] bg-red-500 text-white rounded-xl"
     });
   }
 };
-
 </script>
