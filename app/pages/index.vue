@@ -396,18 +396,20 @@
               <div class="absolute w-10.5 h-0.5 bg-secondary bottom-0" />
             </div>
 
-            <div v-if="isLoadingProducts" class="text-center py-6">
-              Đang tải...
-            </div>
+            <div v-if="isLoading" class="text-center py-6">Đang tải...</div>
             <div v-else class="flex flex-col gap-6.5">
               <ModulesHomeSmallProductCard
-                v-for="product in products.slice(0, 3)"
+                v-for="product in topDiscount.slice(0, 3)"
                 :key="product.product_id"
                 :title="product.product_name"
                 :image="product.thumbnail"
                 :price="Number(product.price).toLocaleString('vi-VN')"
-                :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-                :stars="product.rating || 4"
+                :salePrice="
+                  product.price_down
+                    ? Number(product.price_down).toLocaleString('vi-VN')
+                    : null
+                "
+                :stars="product.rating"
                 :slug="product.slug"
                 :id="product.product_id"
               />
@@ -423,17 +425,19 @@
               <div class="absolute w-10.5 h-0.5 bg-secondary bottom-0" />
             </div>
 
-            <div v-if="isLoadingProducts" class="text-center py-6">
-              Đang tải...
-            </div>
+            <div v-if="isLoading" class="text-center py-6">Đang tải...</div>
             <div v-else class="flex flex-col gap-6.5">
               <ModulesHomeSmallProductCard
-                v-for="product in products.slice(0, 3)"
+                v-for="product in topSelling.slice(0, 3)"
                 :key="product.product_id"
                 :title="product.product_name"
                 :image="product.thumbnail"
                 :price="Number(product.price).toLocaleString('vi-VN')"
-                :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
+                :salePrice="
+                  product.price_down
+                    ? Number(product.price_down).toLocaleString('vi-VN')
+                    : null
+                "
                 :stars="product.rating"
                 :slug="product.slug"
                 :id="product.product_id"
@@ -450,20 +454,22 @@
               <div class="absolute w-10.5 h-0.5 bg-secondary bottom-0" />
             </div>
 
-            <div v-if="isLoadingProducts" class="text-center py-6">
-              Đang tải...
-            </div>
+            <div v-if="isLoading" class="text-center py-6">Đang tải...</div>
             <div v-else class="flex flex-col gap-6.5">
               <ModulesHomeSmallProductCard
-                v-for="product in products.slice(0, 3)"
+                v-for="product in topRated.slice(0, 3)"
                 :key="product.product_id"
                 :title="product.product_name"
                 :image="product.thumbnail"
                 :price="Number(product.price).toLocaleString('vi-VN')"
-                :salePrice="Number(product.price_down).toLocaleString('vi-VN')"
-                :stars="product.rating || 5"
-                :id="product.product_id"
+                :salePrice="
+                  product.price_down
+                    ? Number(product.price_down).toLocaleString('vi-VN')
+                    : null
+                "
+                :stars="product.rating"
                 :slug="product.slug"
+                :id="product.product_id"
               />
             </div>
           </div>
@@ -591,7 +597,7 @@
             </div>
             <div class="col-span-1 rounded-xl overflow-hidden relative group">
               <NuxtImg
-                src="/Rectangle 52.png"
+                src="/Home-GHE-005.jpg"
                 class="h-full object-cover relative z-0"
               />
               <div
@@ -613,7 +619,7 @@
             </div>
             <div class="col-span-1 rounded-xl overflow-hidden relative group">
               <NuxtImg
-                src="/Rectangle 52.png"
+                src="/Home-GHE-004.avif"
                 class="h-full object-cover relative z-0"
               />
               <div
@@ -636,7 +642,7 @@
 
             <div class="col-span-1 rounded-xl overflow-hidden relative group">
               <NuxtImg
-                src="/Rectangle 52.png"
+                src="/Home-GHE-003.jpg"
                 class="h-full object-cover relative z-0"
               />
               <div
@@ -658,7 +664,7 @@
             </div>
             <div class="col-span-1 rounded-xl overflow-hidden relative group">
               <NuxtImg
-                src="/Rectangle 52.png"
+                src="/Home-GHE-002.avif"
                 class="h-full object-cover relative z-0"
               />
               <div
@@ -679,10 +685,13 @@
               </div>
             </div>
             <div class="col-span-2 rounded-xl overflow-hidden relative group">
-              <NuxtImg
-                src="/Rectangle 52.png"
-                class="w-full relative z-0 object-cover"
-              />
+              <div class="h-[400px] w-full relative">
+                <NuxtImg
+                  src="/Home-GHE-011.jpg"
+                  alt="Gallery image"
+                  class="h-full w-full object-cover"
+                />
+              </div>
               <div
                 class="absolute inset-0 h-[200%] -translate-y-full group-hover:translate-y-0 transition-transform duration-1000 z-10"
               >
@@ -722,6 +731,9 @@
     isLoading: isLoadingProducts,
     fetchProducts,
   } = useProducts();
+
+  const { topDiscount, topSelling, topRated, isLoading, error } =
+    useHomeProducts();
 
   const { setBuyNowItem } = useCheckout();
 

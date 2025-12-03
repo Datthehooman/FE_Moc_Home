@@ -14,10 +14,7 @@
       }"
     >
       <div class="size-[250px] rounded-xl overflow-hidden relative group">
-        <NuxtImg
-          src="/blog 1.png"
-          class="w-full h-full object-cover relative z-0"
-        />
+        <NuxtImg :src="item" class="w-full h-full object-cover relative z-0" />
 
         <div
           class="absolute inset-0 -translate-x-full bg-black/25 group-hover:translate-x-0 transition-transform duration-500 z-10"
@@ -41,17 +38,15 @@
 </template>
 <script setup lang="ts">
   const items = [
-    "https://picsum.photos/468/468?random=1",
-    "https://picsum.photos/468/468?random=2",
-    "https://picsum.photos/468/468?random=3",
-    "https://picsum.photos/468/468?random=4",
-    "https://picsum.photos/468/468?random=5",
-    "https://picsum.photos/468/468?random=6",
-    "https://picsum.photos/468/468?random=1",
-    "https://picsum.photos/468/468?random=2",
-    "https://picsum.photos/468/468?random=3",
-    "https://picsum.photos/468/468?random=4",
-    "https://picsum.photos/468/468?random=5",
-    "https://picsum.photos/468/468?random=6",
+    "/Home-GHE-011.jpg",
+    "/Home-GHE-002.avif",
+    "/Home-GHE-003.jpg",
+    "/Home-GHE-004.avif",
+    "/Home-GHE-005.jpg",
+    "/Home-GHE-006.jpg",
+    "/Home-GHE-007.jpg",
+    "/Home-GHE-008.jpg",
+    "/Home-GHE-009.jpg",
+    "/Home-GHE-010.jpg",
   ];
 </script>

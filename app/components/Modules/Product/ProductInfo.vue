@@ -115,16 +115,6 @@
 
       </div>
     </div>
-
-    <!-- Toast thông báo thêm giỏ hàng -->
-    <transition name="slide-fade">
-      <div v-if="showToast" class="fixed bottom-5 right-5 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg flex items-center space-x-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-        <span>Thêm giỏ hàng thành công!</span>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -138,9 +128,11 @@ const slug = route.params.slug as string
 
 // API
 const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()
-const { addToWishlist } = useWishlist()
-onMounted(() => fetchProductDetail(slug))
+// 🟢 SỬA: Thêm isInWishlist từ useWishlist
+const { addToWishlist, isInWishlist } = useWishlist()
+const toast = useToast()
 
+onMounted(() => fetchProductDetail(slug))
 
 // UI
 const quantity = ref(1)
@@ -160,20 +152,29 @@ const discountPercent = computed(() => {
 const checkoutStore = useCheckoutStore()
 const { addToCart } = useCart()
 
-// Toast
-const showToast = ref(false)
-
 const handleAddToCart = async () => {
   if(!productDetail.value) return
-  await addToCart(productDetail.value.product_id, quantity.value)
-
-  // Hiển thị toast
-  showToast.value = true
-  setTimeout(() => showToast.value = false, 2000) // 2s tự ẩn
+  
+  try {
+    const result = await addToCart(productDetail.value.product_id, quantity.value)
+    if (result) {
+      toast.add({ title: "✅ Đã thêm vào giỏ hàng!", color: "success" })
+    } else {
+      toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "error" })
+    }
+  } catch (error: any) {
+    toast.add({ 
+      title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"), 
+      color: "error" 
+    })
+  }
 }
 
 const handleBuyNow = () => {
-  if(!productDetail.value) { alert('❌ Sản phẩm không hợp lệ'); return }
+  if(!productDetail.value) { 
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" })
+    return 
+  }
   checkoutStore.setBuyNowItem({
     product_id: productDetail.value.product_id,
     product_name: productDetail.value.product_name,
@@ -184,23 +185,41 @@ const handleBuyNow = () => {
   router.push('/checkout')
 }
 
-// 🎯 HÀM THÊM VÀO YÊU THÍCH
+// 🟢 SỬA: HÀM THÊM VÀO YÊU THÍCH VỚI TOAST VÀ KIỂM TRA
 const handleAddToWishlist = async () => {
   if (!productDetail.value) {
-    alert('❌ Sản phẩm không hợp lệ')
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" })
     return
   }
 
   try {
+    // 🟢 KIỂM TRA NẾU ĐÃ CÓ TRONG WISHLIST
+    if (isInWishlist(productDetail.value.product_id)) {
+      toast.add({
+        title: "ℹ️ Sản phẩm đã có trong yêu thích!",
+        color: "info"
+      })
+      return
+    }
+
     const success = await addToWishlist(productDetail.value.product_id)
     
     if (success) {
-      alert('✅ Đã thêm sản phẩm vào yêu thích!')
+      toast.add({ 
+        title: "✅ Đã thêm sản phẩm vào yêu thích!", 
+        color: "success" 
+      })
     } else {
-      alert('❌ Không thể thêm vào yêu thích!')
+      toast.add({ 
+        title: "❌ Không thể thêm vào yêu thích!", 
+        color: "error" 
+      })
     }
   } catch (error: any) {
-    alert('❌ Lỗi khi thêm vào yêu thích: ' + (error?.message || 'Không rõ nguyên nhân'))
+    toast.add({ 
+      title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || 'Không rõ nguyên nhân'), 
+      color: "error" 
+    })
   }
 }
 </script>

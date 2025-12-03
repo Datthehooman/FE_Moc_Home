@@ -3,17 +3,14 @@
     <ModulesProductTitle title="Sản phẩm liên quan" />
 
     <div class="relative" ref="containerRef">
-<!-- Nút trái -->
-<button
-  v-if="products.length > visibleCount"
-  @click="prevSlide"
-  class="absolute left-[-18px] top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[#6E4E37] text-white flex justify-center items-center hover:bg-[#8b644a] transition shadow-lg"
->
-  ‹
-</button>
-
-
-
+      <!-- Nút trái -->
+      <button
+        v-if="products.length > visibleCount"
+        @click="prevSlide"
+        class="absolute left-[-18px] top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[#6E4E37] text-white flex justify-center items-center hover:bg-[#8b644a] transition shadow-lg"
+      >
+        ‹
+      </button>
 
       <!-- Khung trượt -->
       <div class="overflow-hidden">
@@ -64,12 +61,11 @@
                 >
                   <UTooltip text="Xem sản phẩm">
                     <button
-  @click="viewProduct(item)"
-  class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
->
-  <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
-</button>
-
+                      @click="viewProduct(item)"
+                      class="w-[38px] h-[38px] rounded-full bg-[#6E4E37] flex justify-center items-center text-white shadow-md hover:bg-[#8b644a] transition"
+                    >
+                      <UIcon name="i-heroicons-eye-solid" class="w-5 h-5 text-white" />
+                    </button>
                   </UTooltip>
 
                   <UTooltip text="Thêm yêu thích">
@@ -125,14 +121,14 @@
         </div>
       </div>
 
-<!-- Nút phải -->
-<button
-  v-if="products.length > visibleCount"
-  @click="nextSlide"
-  class="absolute right-[-25px] top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#6E4E37] text-white flex justify-center items-center hover:bg-[#8b644a] transition"
->
-  ›
-</button>
+      <!-- Nút phải -->
+      <button
+        v-if="products.length > visibleCount"
+        @click="nextSlide"
+        class="absolute right-[-25px] top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#6E4E37] text-white flex justify-center items-center hover:bg-[#8b644a] transition"
+      >
+        ›
+      </button>
     </div>
 
     <ModulesProductQuickViewOverlay
@@ -173,7 +169,9 @@ const router = useRouter()
 const slug = ref(route.params.slug as string)
 const { fetchProductDetail, productDetail } = useProduct()
 const { addToCart } = useCart()
-const { postWishlist } = useWishlist()
+// 🟢 SỬA: Dùng hàm mới từ useWishlist
+const { addToWishlist, isInWishlist } = useWishlist()
+const toast = useToast()
 
 const updateItemWidth = () => {
   if (!containerRef.value) return
@@ -187,7 +185,6 @@ const updateItemWidth = () => {
   const count = Math.min(products.value.length, visibleCount.value)
   itemWidth.value = (containerWidth - (count - 1) * gap) / count
 }
-
 
 const nextSlide = () => {
   relatedIndex.value = Math.min(relatedIndex.value + 1, Math.max(0, products.value.length - visibleCount.value))
@@ -228,22 +225,59 @@ const goToDetail = (item: ProductItem) => {
 }
 
 const handleAddToCart = async (item: ProductItem) => {
-  if (!item.product_id) return alert('❌ Sản phẩm không hợp lệ')
+  if (!item.product_id) {
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" })
+    return
+  }
   try {
     const result = await addToCart(item.product_id, 1)
-    alert(result ? '✅ Đã thêm vào giỏ hàng!' : '❌ Thêm giỏ hàng thất bại')
+    if (result) {
+      toast.add({ title: "✅ Đã thêm vào giỏ hàng!", color: "success" })
+    } else {
+      toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "error" })
+    }
   } catch (error: any) {
-    alert('❌ Lỗi khi thêm vào giỏ hàng: ' + (error?.message || 'Không rõ nguyên nhân'))
+    toast.add({ 
+      title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || 'Không rõ nguyên nhân'), 
+      color: "error" 
+    })
   }
 }
 
+// 🟢 SỬA: Hàm thêm vào yêu thích với kiểm tra isInWishlist
 const handleAddToWishlist = async (item: ProductItem) => {
-  if (!item.product_id) return alert('❌ Sản phẩm không hợp lệ')
+  if (!item.product_id) {
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" })
+    return
+  }
+
   try {
-    const success = await postWishlist(item.product_id)
-    alert(success ? '✅ Đã thêm sản phẩm vào yêu thích!' : '❌ Không thể thêm vào yêu thích!')
+    // 🟢 KIỂM TRA NẾU ĐÃ CÓ TRONG WISHLIST
+    if (isInWishlist(item.product_id)) {
+      toast.add({
+        title: "ℹ️ Sản phẩm đã có trong yêu thích!",
+        color: "info"
+      })
+      return
+    }
+
+    const success = await addToWishlist(item.product_id)
+    if (success) {
+      toast.add({
+        title: "✅ Đã thêm sản phẩm vào yêu thích!",
+        color: "success"
+      })
+    } else {
+      toast.add({
+        title: "❌ Không thể thêm vào yêu thích!",
+        color: "error"
+      })
+    }
   } catch (error: any) {
-    alert('❌ Lỗi khi thêm vào yêu thích: ' + (error?.message || 'Không rõ nguyên nhân'))
+    toast.add({ 
+      title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || 'Không rõ nguyên nhân'), 
+      color: "error" 
+    })
   }
 }
 
@@ -252,67 +286,57 @@ const { categories } = useCategories()
 
 const fetchRelatedProducts = async () => {
   if (!productDetail.value?.category?.slug) {
-  console.warn('❌ Category slug chưa có trong productDetail:', productDetail.value)
-  products.value = [] // fallback
-  return
-  }
-
-  try {
-  const url = `https://api.mocfurni.shop/api/client/category-by-product?slug=${productDetail.value.category.slug}`
-  console.log('➡️ Fetching related products from:', url)
-
-
-  const res = await fetch(url)
-  const json = await res.json()
-  console.log('📦 API response:', json)
-
-  const data = json?.result?.data
-  if (!data || !data.length) {
-    console.warn('⚠️ API trả về rỗng hoặc không hợp lệ:', data)
-    products.value = []
+    console.warn('❌ Category slug chưa có trong productDetail:', productDetail.value)
+    products.value = [] // fallback
     return
   }
 
-  // Mapping sản phẩm
-  products.value = data.map((p: any) => {
-    const category = categories.value.find(c => c.id === p.category_id)
-    return {
-      product_id: p.product_id,
-      product_name: p.product_name,
-      slug: p.slug,
-      thumbnail: p.thumbnail,
-      images: p.images,
-      price: Number(p.price),
-      price_down: Number(p.price_down || p.price),
-      badge: p.badge,
-      rating: Number(p.rating || 0),
-      brand: p.brand,
-      sku: p.sku,
-      stock_quantity: p.stock_quantity,
-      category: { category_name: category?.category_name || 'N/A' }
+  try {
+    const url = `https://api.mocfurni.shop/api/client/category-by-product?slug=${productDetail.value.category.slug}`
+    console.log('➡️ Fetching related products from:', url)
+
+    const res = await fetch(url)
+    const json = await res.json()
+    console.log('📦 API response:', json)
+
+    const data = json?.result?.data
+    if (!data || !data.length) {
+      console.warn('⚠️ API trả về rỗng hoặc không hợp lệ:', data)
+      products.value = []
+      return
     }
-  })
 
-  console.log('✅ Related products mapped:', products.value)
+    // Mapping sản phẩm
+    products.value = data.map((p: any) => {
+      const category = categories.value.find(c => c.id === p.category_id)
+      return {
+        product_id: p.product_id,
+        product_name: p.product_name,
+        slug: p.slug,
+        thumbnail: p.thumbnail,
+        images: p.images,
+        price: Number(p.price),
+        price_down: Number(p.price_down || p.price),
+        badge: p.badge,
+        rating: Number(p.rating || 0),
+        brand: p.brand,
+        sku: p.sku,
+        stock_quantity: p.stock_quantity,
+        category: { category_name: category?.category_name || 'N/A' }
+      }
+    })
 
-  relatedIndex.value = 0
-  await nextTick()
-  updateItemWidth()
+    console.log('✅ Related products mapped:', products.value)
 
+    relatedIndex.value = 0
+    await nextTick()
+    updateItemWidth()
 
   } catch (err) {
-  console.error('❌ Lỗi fetch sản phẩm liên quan:', err)
-  products.value = []
+    console.error('❌ Lỗi fetch sản phẩm liên quan:', err)
+    products.value = []
   }
 }
-
-// Fallback test nếu API rỗng
-// Uncomment để test slider hiển thị
-// products.value = [
-//   { product_id: 1, product_name: 'Test 1', price: 10000, slug: 'test-1', rating: 4, thumbnail: '' },
-//   { product_id: 2, product_name: 'Test 2', price: 20000, slug: 'test-2', rating: 5, thumbnail: '' }
-// ]
-
 
 const loadProducts = async () => {
   // 1) Lấy chi tiết sản phẩm theo slug
@@ -344,7 +368,6 @@ const loadProducts = async () => {
   await fetchRelatedProducts()
 }
 
-
 onMounted(async () => {
   await nextTick()
 
@@ -370,5 +393,4 @@ watch(
   },
   { immediate: true }
 )
-
 </script>

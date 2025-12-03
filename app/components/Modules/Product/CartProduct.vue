@@ -145,6 +145,7 @@
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
   const errorImage = ref(false);
+  const toast = useToast();
 
   const resolvedThumbnail = computed(() => {
     if (props.item.thumbnail?.startsWith("http")) return props.item.thumbnail;
@@ -281,6 +282,17 @@ const handleAddToWishlist = async () => {
       return;
     }
 
+    try {
+      // 🟢 KIỂM TRA NẾU ĐÃ CÓ TRONG WISHLIST
+      if (isInWishlist(props.item.product_id)) {
+        toast.add({
+          title: "ℹ️ Sản phẩm đã có trong yêu thích!",
+          color: "info"
+        });
+        return;
+      }
+
+      const success = await addToWishlist(props.item.product_id);
     const success = await addToWishlist(props.item.product_id);
 
     if (success) {

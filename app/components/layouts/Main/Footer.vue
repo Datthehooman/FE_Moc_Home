@@ -181,9 +181,11 @@
 </template>
 
 <script setup lang="ts">
+  import type { RouteLocationRaw } from "vue-router";
+
   interface Link {
     label: string;
-    to?: string;
+    to?: string | RouteLocationRaw;
   }
 
   interface Column {
@@ -191,30 +193,29 @@
     children: Link[];
   }
 
-  const columns: Column[] = [
+  // call composable
+  const { rooms, isLoading, error } = useRooms();
+
+  // build columns dynamically
+  const columns = computed<Column[]>(() => [
     {
       label: "Liên kết nhanh",
       children: [
-        { label: "Giới thiệu", to: "/gioi-thieu" },
+        { label: "Giới thiệu", to: "/about" },
         { label: "Thông tin giao hàng", to: "/thong-tin-giao-hang" },
-        { label: "Liên hệ", to: "/lien-he" },
-        { label: "Cập nhật tin tức", to: "/tin-tuc" },
-        { label: "Lời chứng thực", to: "/loi-chung-thuc" },
+        { label: "Liên hệ", to: "/contact" },
+        { label: "Cập nhật tin tức", to: "/blog" },
+        { label: "Lời chứng thực", to: "/review" },
         { label: "Điều khoản dịch vụ", to: "/dieu-khoan" },
         { label: "Chính sách bảo mật", to: "/chinh-sach-bao-mat" },
       ],
     },
     {
       label: "Duyệt danh mục",
-      children: [
-        { label: "Phòng ngủ", to: "/phong-ngu" },
-        { label: "Văn phòng", to: "/van-phong" },
-        { label: "Phòng khách", to: "/phong-khach" },
-        { label: "Phòng tắm", to: "/phong-tam" },
-        { label: "Trang trí", to: "/trang-tri" },
-        { label: "Nhà bếp", to: "/nha-bep" },
-        { label: "Ghế bành", to: "/ghe-banh" },
-      ],
+      children: rooms.value.map((room) => ({
+        label: room.room_name,
+        to: { name: "ProductList", query: { room_id: room.id } },
+      })),
     },
     {
       label: "Trung tâm Hỗ trợ",
@@ -231,11 +232,9 @@
     {
       label: "Các hình thức thanh toán",
       children: [
-        {
-          label: "Bạn có thể dễ dàng thanh toán khi đặt hàng",
-        },
+        { label: "Bạn có thể dễ dàng thanh toán khi đặt hàng" },
         { label: "Chúng tôi chấp nhận:" },
       ],
     },
-  ];
+  ]);
 </script>

@@ -1,4 +1,3 @@
-// app/composables/useOrder.ts
 import { ref } from "vue";
 import { useCookie } from "#app";
 
@@ -51,22 +50,26 @@ const fetchOrders = async () => {
       total_amount: o.total_amount
         ? Number(o.total_amount).toLocaleString("vi-VN")
         : 0,
+      // Mapping trạng thái theo logic hiện tại của bạn:
       order_status:
         o.order_status === "pending"
-          ? "Đang chờ"
-          : o.order_status === "processing"
-          ? "Đang xử lý"
-          : o.order_status === "completed"
-          ? "Hoàn thành"
-          : o.order_status === "cancelled"
-          ? "Đã hủy"
-          : o.order_status,
+        ? "Chờ xác nhận"
+        : o.order_status === "confirmed"
+        ? "Đã xác nhận"
+        : o.order_status === "processing"
+        ? "Đang xử lý"
+        : o.order_status === "completed"
+        ? "Hoàn tất"
+        : o.order_status === "cancelled"
+        ? "Đã hủy"
+        : o.order_status,
+      // 🔥 ĐÃ THÊM: Đảm bảo order_details có sẵn (cần cho việc kiểm tra review)
+      order_details: o.order_details || [],
     }));
 
     console.log("Mapped orders:", orders.value);
   } catch (err: any) {
-    error.value = err?.data?.message || "Lỗi khi lấy danh sách đơn hàng";
-    console.error("Order error:", err);
+    error.value = err?.data?.message || "Không lấy được danh sách đơn hàng";
   } finally {
     loading.value = false;
   }
