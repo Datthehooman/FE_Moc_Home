@@ -6,6 +6,7 @@ export const useWishlist = () => {
   const wishlists = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const toast = useToast();
   let tokenCookie = useCookie("tokenLocal");
 
   if (!tokenCookie.value) {
@@ -45,7 +46,10 @@ export const useWishlist = () => {
   // 🟢 Thêm sản phẩm vào wishlist
   const addToWishlist = async (product_id: number) => {
     if (!tokenCookie.value) {
-      alert("⚠️ Vui lòng đăng nhập để thêm vào yêu thích");
+      toast.add({
+        title: "⚠️ Vui lòng đăng nhập để thêm vào yêu thích",
+        color: "error",
+      });
       return false;
     }
     isLoading.value = true;

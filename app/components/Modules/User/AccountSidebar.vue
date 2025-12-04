@@ -3,22 +3,21 @@
     class="w-64 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6"
   >
     <!-- Avatar -->
-<div class="flex flex-col items-center mb-4 relative">
-  <div class="relative">
-    <img
-      src="https://live.themewild.com/fameo/assets/img/account/02.jpg"
-      alt="Avatar"
-      class="w-20 h-20 rounded-full border-2 border-gray-200"
-    />
-  </div>
-  <h2 class="mt-2 font-semibold text-gray-800">
-    {{ authStore.user.full_name || 'Người dùng' }}
-  </h2>
-  <p class="text-sm text-gray-400">
-    {{ authStore.user.email || 'Chưa có email' }}
-  </p>
-</div>
-
+    <div class="flex flex-col items-center mb-4 relative">
+      <div class="relative">
+        <img
+          src="https://live.themewild.com/fameo/assets/img/account/02.jpg"
+          alt="Avatar"
+          class="w-20 h-20 rounded-full border-2 border-gray-200"
+        />
+      </div>
+      <h2 class="mt-2 font-semibold text-gray-800">
+        {{ authStore.user.full_name || "Người dùng" }}
+      </h2>
+      <p class="text-sm text-gray-400">
+        {{ authStore.user.email || "Chưa có email" }}
+      </p>
+    </div>
 
     <hr class="border-t border-gray-200 mb-4" />
 
@@ -54,39 +53,72 @@
   const router = useRouter();
   const route = useRoute();
   const authStore = useAuthStore(); // <-- use store instance
+  const toast = useToast();
 
   const navigate = async (path: string) => {
     if (path === "/logout") {
-      await authStore.logout(); // call store logout
-      router.push("/"); // redirect after logout
-      alert("Đăng xuất thành công 🎉");
+      await authStore.logout();
+      router.push("/");
+
+      toast.add({
+        title: "Đăng xuất thành công 🎉",
+        color: "success",
+      });
     } else {
       router.push(path);
     }
   };
 
-// const navigate = async (path: string) => {
-//   if (path === '/logout') {
-//     auth.logout()              // xóa token
-//     router.push('/')           // chuyển về trang chủ hoặc login
-//     alert('Đăng xuất thành công 🎉')
-//   } else {
-//     router.push(path)
-//   }
-// }
+  // const navigate = async (path: string) => {
+  //   if (path === '/logout') {
+  //     auth.logout()              // xóa token
+  //     router.push('/')           // chuyển về trang chủ hoặc login
+  //     alert('Đăng xuất thành công 🎉')
+  //   } else {
+  //     router.push(path)
+  //   }
+  // }
 
-const menuItems = [
-  { name: 'Thống kê', path: '/user/dashboard', icon: 'heroicons:chart-bar' },
-  { name: 'Hồ sơ của tôi', path: '/user/profile', icon: 'heroicons:user' },
-  { name: 'Danh sách đơn hàng', path: '/user/orders/list', icon: 'heroicons:list-bullet' },
-  { name: 'Danh sách yêu thích', path: '/user/wishlist', icon: 'heroicons:heart' },
-  { name: 'Danh sách địa chỉ', path: '/user/address', icon: 'heroicons:map-pin' },
-  { name: 'Hỗ trợ', path: '/user/support', icon: 'heroicons:lifebuoy' },
-  { name: 'Theo dõi đơn hàng', path: '/user/track-order', icon: 'heroicons:truck' },
-  { name: 'Phương thức thanh toán', path: '/user/payment', icon: 'heroicons:credit-card' },
-  { name: 'Thông báo', path: '/user/notifications', icon: 'heroicons:bell' },
-  { name: 'Tin nhắn', path: '/user/messages', icon: 'heroicons:chat-bubble-left-right' },
-  { name: 'Cài đặt', path: '/user/settings', icon: 'heroicons:cog-6-tooth' },
-  { name: 'Đăng xuất', path: '/logout', icon: 'heroicons:arrow-right-on-rectangle' },
-]
+  const menuItems = [
+    { name: "Thống kê", path: "/user/dashboard", icon: "heroicons:chart-bar" },
+    { name: "Hồ sơ của tôi", path: "/user/profile", icon: "heroicons:user" },
+    {
+      name: "Danh sách đơn hàng",
+      path: "/user/orders/list",
+      icon: "heroicons:list-bullet",
+    },
+    {
+      name: "Danh sách yêu thích",
+      path: "/user/wishlist",
+      icon: "heroicons:heart",
+    },
+    {
+      name: "Danh sách địa chỉ",
+      path: "/user/address",
+      icon: "heroicons:map-pin",
+    },
+    { name: "Hỗ trợ", path: "/user/support", icon: "heroicons:lifebuoy" },
+    {
+      name: "Theo dõi đơn hàng",
+      path: "/user/track-order",
+      icon: "heroicons:truck",
+    },
+    {
+      name: "Phương thức thanh toán",
+      path: "/user/payment",
+      icon: "heroicons:credit-card",
+    },
+    { name: "Thông báo", path: "/user/notifications", icon: "heroicons:bell" },
+    {
+      name: "Tin nhắn",
+      path: "/user/messages",
+      icon: "heroicons:chat-bubble-left-right",
+    },
+    { name: "Cài đặt", path: "/user/settings", icon: "heroicons:cog-6-tooth" },
+    {
+      name: "Đăng xuất",
+      path: "/logout",
+      icon: "heroicons:arrow-right-on-rectangle",
+    },
+  ];
 </script>

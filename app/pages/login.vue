@@ -141,6 +141,7 @@
 </template>
 <script setup lang="ts">
   const auth = useAuthStore();
+  const toast = useToast();
 
   const email = ref("");
   const password = ref("");
@@ -169,18 +170,23 @@
     isSubmitting.value = false;
 
     if (error) {
-  if (error.statusCode === 422) {
-    errors.email = error.data?.email?.[0] || "";
-    errors.password = error.data?.password_hash?.[0] || "";
-  } else if (error.statusCode === 401) {
-    errors.email = "Email hoặc mật khẩu không đúng";
-    errors.password = "Email hoặc mật khẩu không đúng";
-  } else {
-    alert(error.message || "Lỗi không xác định");
-  }
-}
- else {
-      alert("Đăng nhập thành công!");
+      if (error.statusCode === 422) {
+        errors.email = error.data?.email?.[0] || "";
+        errors.password = error.data?.password_hash?.[0] || "";
+      } else if (error.statusCode === 401) {
+        errors.email = "Email hoặc mật khẩu không đúng";
+        errors.password = "Email hoặc mật khẩu không đúng";
+      } else {
+        toast.add({
+          title: error.message || "Lỗi không xác định",
+          color: "error",
+        });
+      }
+    } else {
+      toast.add({
+        title: "Đăng nhập thành công!",
+        color: "success",
+      });
       console.log("User info:", auth.user);
       navigateTo("/"); // redirect về trang chủ
     }

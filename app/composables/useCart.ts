@@ -5,6 +5,7 @@ export const useCart = () => {
   const cart = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const toast = useToast();
 
   // Get the ref object, don't destructure the value
   let tokenCookie = useCookie("tokenLocal");
@@ -35,7 +36,13 @@ export const useCart = () => {
       return res.result.data;
     } catch (err: any) {
       error.value = err?.message || "Lỗi lấy giỏ hàng";
-      alert("❌ " + error.value);
+
+      toast.add({
+        title: "Lỗi",
+        description: error.value,
+        color: "error",
+      });
+
       return null;
     } finally {
       isLoading.value = false;
@@ -44,22 +51,42 @@ export const useCart = () => {
 
   const addToCart = async (product_id: number, quantity = 1) => {
     if (!tokenCookie.value) {
-      alert("⚠️ Vui lòng đăng nhập để thêm giỏ hàng");
+      toast.add({
+        title: "Cần đăng nhập",
+        description: "Vui lòng đăng nhập để thêm vào giỏ hàng",
+        color: "warning",
+      });
       return false;
     }
+
     isLoading.value = true;
     error.value = null;
+
     try {
       await $fetch("https://api.mocfurni.shop/api/client/cart/add", {
         method: "POST",
         query: { product_id, quantity },
         headers: getAuthHeader(),
       });
+
       await getCart();
+
+      toast.add({
+        title: "Thành công",
+        description: "Đã thêm sản phẩm vào giỏ hàng",
+        color: "green",
+      });
+
       return true;
     } catch (err: any) {
       error.value = err?.data?.message || "Thêm giỏ hàng thất bại";
-      alert("❌ " + error.value);
+
+      toast.add({
+        title: "Lỗi",
+        description: error.value,
+        color: "error",
+      });
+
       return false;
     } finally {
       isLoading.value = false;
@@ -68,24 +95,39 @@ export const useCart = () => {
 
   const removeItem = async (cart_id: number) => {
     if (!tokenCookie.value) return false;
+
     try {
       await $fetch(`https://api.mocfurni.shop/api/client/cart/remove-item`, {
         method: "DELETE",
         query: { cart_id },
         headers: getAuthHeader(),
       });
+
       await getCart();
-      alert("✅ Đã xóa sản phẩm khỏi giỏ hàng!");
+
+      toast.add({
+        title: "Đã xóa",
+        description: "Sản phẩm đã được xóa khỏi giỏ hàng",
+        color: "green",
+      });
+
       return true;
     } catch (err: any) {
       error.value = err?.data?.message || "Xóa sản phẩm thất bại";
-      alert("❌ " + error.value);
+
+      toast.add({
+        title: "Lỗi",
+        description: error.value,
+        color: "error",
+      });
+
       return false;
     }
   };
 
   const updateQuantity = async (product_id: number, quantity: number) => {
     if (!tokenCookie.value) return false;
+
     try {
       await $fetch(
         `https://api.mocfurni.shop/api/client/cart/update-quantity`,
@@ -95,11 +137,25 @@ export const useCart = () => {
           headers: getAuthHeader(),
         }
       );
+
       await getCart();
+
+      toast.add({
+        title: "Cập nhật",
+        description: "Đã cập nhật số lượng sản phẩm",
+        color: "green",
+      });
+
       return true;
     } catch (err: any) {
       error.value = err?.data?.message || "Cập nhật số lượng thất bại";
-      alert("❌ " + error.value);
+
+      toast.add({
+        title: "Lỗi",
+        description: error.value,
+        color: "error",
+      });
+
       return false;
     }
   };

@@ -148,6 +148,7 @@
 
   const props = defineProps<{ show: boolean; product: Product }>();
   const emit = defineEmits<{ (e: "close"): void }>();
+  const toast = useToast();
 
   const { addToCart } = useCart();
 
@@ -163,22 +164,34 @@
 
   const handleAddToCart = async () => {
     if (!props.product.product_id) {
-      alert("❌ Sản phẩm không hợp lệ");
+      toast.add({
+        title: "Sản phẩm không hợp lệ",
+        color: "warning",
+      });
       return;
     }
 
     try {
       const result = await addToCart(props.product.product_id, 1);
+
       if (result) {
-        alert("✅ Đã thêm vào giỏ hàng!");
+        toast.add({
+          title: "Đã thêm vào giỏ hàng!",
+          color: "success",
+        });
       } else {
-        alert("❌ Thêm giỏ hàng thất bại!");
+        toast.add({
+          title: "Thêm giỏ hàng thất bại!",
+          color: "error",
+        });
       }
     } catch (error: any) {
-      alert(
-        "❌ Lỗi khi thêm vào giỏ hàng: " +
-          (error?.message || "Không rõ nguyên nhân")
-      );
+      toast.add({
+        title:
+          "Lỗi khi thêm vào giỏ hàng: " +
+          (error?.message || "Không rõ nguyên nhân"),
+        color: "error",
+      });
     }
   };
 </script>

@@ -335,6 +335,7 @@
 <script setup lang="ts">
   const authStore = useAuthStore();
   const router = useRouter();
+  const toast = useToast();
 
   // Scroll header
   const isScrolled = ref(false);
@@ -371,12 +372,21 @@
   const logout = async () => {
     await authStore.logout();
     closeUserDropdown();
-    alert("Đăng xuất thành công 🎉");
+
+    toast.add({
+      title: "Đăng xuất thành công 🎉",
+      color: "success",
+    });
+
     router.push("/");
   };
   const goWishlist = () => {
     if (!authStore.isLogged) {
-      alert("Vui lòng đăng nhập để xem danh sách yêu thích 🎯");
+      toast.add({
+        title: "Vui lòng đăng nhập để xem danh sách yêu thích 🎯",
+        color: "error",
+      });
+
       router.push("/login");
     } else {
       router.push("/user/wishlist");

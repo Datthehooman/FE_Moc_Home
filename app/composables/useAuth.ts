@@ -1,9 +1,10 @@
 // composables/useAuth.ts
 import { useCookie } from "#app";
 import { ref, computed } from "vue";
-  
+
 export const useAuth = () => {
   const user = ref<any>({});
+  const toast = useToast();
 
   // ===================== TOKEN PRIORITY =====================
   let tokenCookie = useCookie("tokenLocal");
@@ -119,7 +120,10 @@ export const useAuth = () => {
         ? Object.values(error.data.errors)[0][0]
         : error?.data?.message || "Không thể gửi mã OTP";
 
-      alert(msg);
+      toast.add({
+        title: msg,
+        color: "error",
+      });
       throw error.data || { message: "Không thể gửi mã OTP" };
     }
   };
@@ -191,24 +195,29 @@ export const useAuth = () => {
   };
 
   // ===================== VERIFY OTP =====================
-const verifyOtp = async (otp: string): Promise<{ success: boolean; message: string; data?: any }> => {
-  try {
-    const res = await $fetch("https://api.mocfurni.shop/api/client/verify-otp", {
-      method: "POST",
-      body: { otp },
-    });
+  const verifyOtp = async (
+    otp: string
+  ): Promise<{ success: boolean; message: string; data?: any }> => {
+    try {
+      const res = await $fetch(
+        "https://api.mocfurni.shop/api/client/verify-otp",
+        {
+          method: "POST",
+          body: { otp },
+        }
+      );
 
-    // Giả sử API trả về success/false và message
-    return {
-      success: res.success ?? true,
-      message: res.message || "Xác thực OTP thành công",
-      data: res.data || null,
-    };
-  } catch (error: any) {
-    const msg = error?.data?.message || "Xác thực OTP thất bại";
-    return { success: false, message: msg };
-  }
-};
+      // Giả sử API trả về success/false và message
+      return {
+        success: res.success ?? true,
+        message: res.message || "Xác thực OTP thành công",
+        data: res.data || null,
+      };
+    } catch (error: any) {
+      const msg = error?.data?.message || "Xác thực OTP thất bại";
+      return { success: false, message: msg };
+    }
+  };
 
   // ===================== LOGOUT =====================
   const logout = () => {
@@ -225,7 +234,7 @@ const verifyOtp = async (otp: string): Promise<{ success: boolean; message: stri
     checkEmailAvailable,
     checkPhoneAvailable,
     updateUserProfile,
-    verifyOtp, 
+    verifyOtp,
     tokenCookie,
     isLogged,
     user,

@@ -13,103 +13,109 @@
 
         <form class="space-y-6 text-[14px]" @submit.prevent="submitPayment">
           <!-- Họ và tên, email, phone (chỉ hiển thị khi guest) -->
-<!-- Họ và tên -->
-<!-- Nếu đã đăng nhập -->
-<div v-if="isLoggedIn">
-  <div>
-    <label class="block font-medium mb-1 text-[#6E4E37]">Họ và tên</label>
-    <input
-      v-model="form.full_name"
-      placeholder="Nhập họ và tên"
-      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-[#A77A5D]"
-    />
-    <p v-if="errors.full_name" class="text-red-500 text-xs mt-1">
-      {{ errors.full_name }}
-    </p>
-  </div>
+          <!-- Họ và tên -->
+          <!-- Nếu đã đăng nhập -->
+          <div v-if="isLoggedIn">
+            <div>
+              <label class="block font-medium mb-1 text-[#6E4E37]"
+                >Họ và tên</label
+              >
+              <input
+                v-model="form.full_name"
+                placeholder="Nhập họ và tên"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-[#A77A5D]"
+              />
+              <p v-if="errors.full_name" class="text-red-500 text-xs mt-1">
+                {{ errors.full_name }}
+              </p>
+            </div>
 
-   <div class="grid grid-cols-2 gap-4 mt-3">
-    <div>
-      <label class="block font-medium mb-1 text-[#6E4E37]">Email</label>
-      <input
-        v-model="form.email"
-        placeholder="Nhập email"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2"
-      />
-      <p v-if="errors.email" class="text-red-500 text-xs mt-1">
-        {{ errors.email }}
-      </p>
-    </div>
-    <div>
-      <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại</label>
-      <input
-        v-model="form.phone"
-        placeholder="Nhập số điện thoại"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2"
-      />
-      <p v-if="errors.phone" class="text-red-500 text-xs mt-1">
-        {{ errors.phone }}
-      </p>
-    </div>
-  </div>
-</div>
+            <div class="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <label class="block font-medium mb-1 text-[#6E4E37]"
+                  >Email</label
+                >
+                <input
+                  v-model="form.email"
+                  placeholder="Nhập email"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+                <p v-if="errors.email" class="text-red-500 text-xs mt-1">
+                  {{ errors.email }}
+                </p>
+              </div>
+              <div>
+                <label class="block font-medium mb-1 text-[#6E4E37]"
+                  >Số điện thoại</label
+                >
+                <input
+                  v-model="form.phone"
+                  placeholder="Nhập số điện thoại"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+                <p v-if="errors.phone" class="text-red-500 text-xs mt-1">
+                  {{ errors.phone }}
+                </p>
+              </div>
+            </div>
+          </div>
 
-<!-- Nếu chưa đăng nhập -->
-<div v-else>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <label class="block font-medium mb-1 text-[#6E4E37]">Họ</label>
-      <input
-        v-model="form.firstName"
-        placeholder="Nhập họ"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2"
-      />
-      <p v-if="errors.firstName" class="text-red-500 text-xs mt-1">
-        {{ errors.firstName }}
-      </p>
-    </div>
-    <div>
-      <label class="block font-medium mb-1 text-[#6E4E37]">Tên</label>
-      <input
-        v-model="form.lastName"
-        placeholder="Nhập tên"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2"
-      />
-      <p v-if="errors.lastName" class="text-red-500 text-xs mt-1">
-        {{ errors.lastName }}
-      </p>
-    </div>
-  </div>
+          <!-- Nếu chưa đăng nhập -->
+          <div v-else>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-medium mb-1 text-[#6E4E37]">Họ</label>
+                <input
+                  v-model="form.firstName"
+                  placeholder="Nhập họ"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+                <p v-if="errors.firstName" class="text-red-500 text-xs mt-1">
+                  {{ errors.firstName }}
+                </p>
+              </div>
+              <div>
+                <label class="block font-medium mb-1 text-[#6E4E37]">Tên</label>
+                <input
+                  v-model="form.lastName"
+                  placeholder="Nhập tên"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+                <p v-if="errors.lastName" class="text-red-500 text-xs mt-1">
+                  {{ errors.lastName }}
+                </p>
+              </div>
+            </div>
 
-  <div class="grid grid-cols-2 gap-4 mt-3">
-    <div>
-      <label class="block font-medium mb-1 text-[#6E4E37]">Email</label>
-      <input
-        v-model="form.email"
-        placeholder="Nhập email"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2"
-      />
-      <p v-if="errors.email" class="text-red-500 text-xs mt-1">
-        {{ errors.email }}
-      </p>
-    </div>
-    <div>
-      <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại</label>
-      <input
-        v-model="form.phone"
-        placeholder="Nhập số điện thoại"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2"
-      />
-      <p v-if="errors.phone" class="text-red-500 text-xs mt-1">
-        {{ errors.phone }}
-      </p>
-    </div>
-  </div>
-</div>
-
-
-
-
+            <div class="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <label class="block font-medium mb-1 text-[#6E4E37]"
+                  >Email</label
+                >
+                <input
+                  v-model="form.email"
+                  placeholder="Nhập email"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+                <p v-if="errors.email" class="text-red-500 text-xs mt-1">
+                  {{ errors.email }}
+                </p>
+              </div>
+              <div>
+                <label class="block font-medium mb-1 text-[#6E4E37]"
+                  >Số điện thoại</label
+                >
+                <input
+                  v-model="form.phone"
+                  placeholder="Nhập số điện thoại"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+                <p v-if="errors.phone" class="text-red-500 text-xs mt-1">
+                  {{ errors.phone }}
+                </p>
+              </div>
+            </div>
+          </div>
 
           <!-- Địa chỉ -->
           <div>
@@ -256,7 +262,7 @@
               Phương thức thanh toán
             </h3>
             <div class="flex flex-col gap-3">
-                <label class="flex items-center gap-3 cursor-pointer">
+              <label class="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
                   name="payment"
@@ -358,15 +364,15 @@
         <div v-else class="text-center text-red-500">
           Không có sản phẩm để thanh toán, quay lại sản phẩm để mua
         </div>
-<div class="mt-4">
-  <label class="text-sm font-medium">Mã giảm giá</label>
-  <input
-    v-model="form.voucher_code"
-    type="text"
-    placeholder="Nhập mã giảm giá"
-    class="w-full mt-1 px-3 py-2 border rounded-lg"
-  />
-</div>
+        <div class="mt-4">
+          <label class="text-sm font-medium">Mã giảm giá</label>
+          <input
+            v-model="form.voucher_code"
+            type="text"
+            placeholder="Nhập mã giảm giá"
+            class="w-full mt-1 px-3 py-2 border rounded-lg"
+          />
+        </div>
 
         <a
           href="/cart"
@@ -387,6 +393,7 @@
   import { useCookie } from "#app";
 
   const router = useRouter();
+  const toast = useToast();
   const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
   const checkoutStore = useCheckoutStore();
   const buyNowItem = checkoutStore.buyNowItem;
@@ -405,33 +412,32 @@
   const checkoutItems = computed(() => checkoutStore.cartItems || []);
 
   // Nếu không có sản phẩm => redirect /error
-onMounted(() => {
-  // Nếu đã login thì điền sẵn thông tin
-  if (isLoggedIn.value && authStore.user) {
-    form.firstName = authStore.user.firstName || "";
-    form.lastName = authStore.user.lastName || "";
+  onMounted(() => {
+    // Nếu đã login thì điền sẵn thông tin
+    if (isLoggedIn.value && authStore.user) {
+      form.firstName = authStore.user.firstName || "";
+      form.lastName = authStore.user.lastName || "";
       form.full_name = authStore.user.full_name || "";
-    form.email = authStore.user.email || "";
-    form.phone = authStore.user.phone || "";
-  }
+      form.email = authStore.user.email || "";
+      form.phone = authStore.user.phone || "";
+    }
 
-  // Nếu không có sản phẩm => redirect /error
-  if (!checkoutItems.value.length && !buyNowItem) {
-    router.replace("/error");
-  }
-});
-
+    // Nếu không có sản phẩm => redirect /error
+    if (!checkoutItems.value.length && !buyNowItem) {
+      router.replace("/error");
+    }
+  });
 
   // Form
   const form = reactive({
     firstName: "",
     lastName: "",
-    full_name:"",
+    full_name: "",
     email: "",
     phone: "",
     addressDetail: "",
     note: "",
-    voucher_code: ""   // <<< THÊM DÒNG NÀY
+    voucher_code: "", // <<< THÊM DÒNG NÀY
   });
 
   // Payment & shipping
@@ -483,99 +489,93 @@ onMounted(() => {
 
   const errors = reactive({});
 
-function validate() {
-// Reset errors
-Object.keys(errors).forEach((key) => (errors[key] = ""));
-let valid = true;
+  function validate() {
+    // Reset errors
+    Object.keys(errors).forEach((key) => (errors[key] = ""));
+    let valid = true;
 
-// Regex
-const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
-const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
+    // Regex
+    const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
+    const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
 
+    if (isLoggedIn.value) {
+      // User đã đăng nhập
+      if (!form.full_name) {
+        errors.full_name = "Họ và tên không được để trống";
+        valid = false;
+      }
 
-if (isLoggedIn.value) {
-// User đã đăng nhập
-if (!form.full_name) {
-errors.full_name = "Họ và tên không được để trống";
-valid = false;
-}
+      if (!form.email) {
+        errors.email = "Email không được để trống";
+        valid = false;
+      } else if (!emailRegex.test(form.email)) {
+        errors.email = "Email không đúng định dạng";
+        valid = false;
+      }
 
+      if (!form.phone) {
+        errors.phone = "SĐT không được để trống";
+        valid = false;
+      } else if (!phoneRegex.test(form.phone)) {
+        errors.phone = "Số điện thoại không đúng định dạng";
+        valid = false;
+      }
+    } else {
+      // Guest
+      if (!form.firstName) {
+        errors.firstName = "Họ không được để trống";
+        valid = false;
+      }
+      if (!form.lastName) {
+        errors.lastName = "Tên không được để trống";
+        valid = false;
+      }
+      if (!form.email) {
+        errors.email = "Email không được để trống";
+        valid = false;
+      } else if (!emailRegex.test(form.email)) {
+        errors.email = "Email không đúng định dạng";
+        valid = false;
+      }
+      if (!form.phone) {
+        errors.phone = "SĐT không được để trống";
+        valid = false;
+      } else if (!phoneRegex.test(form.phone)) {
+        errors.phone = "Số điện thoại không đúng định dạng";
+        valid = false;
+      }
+    }
 
-if (!form.email) {
-  errors.email = "Email không được để trống";
-  valid = false;
-} else if (!emailRegex.test(form.email)) {
-  errors.email = "Email không đúng định dạng";
-  valid = false;
-}
+    // Địa chỉ
+    if (!selectedProvince.value) {
+      errors.province = "Chọn tỉnh/thành phố";
+      valid = false;
+    }
+    if (!selectedDistrict.value) {
+      errors.district = "Chọn quận/huyện";
+      valid = false;
+    }
+    if (!selectedWard.value) {
+      errors.ward = "Chọn xã/phường";
+      valid = false;
+    }
+    if (!form.addressDetail) {
+      errors.addressDetail = "Nhập địa chỉ cụ thể";
+      valid = false;
+    }
 
-if (!form.phone) {
-  errors.phone = "SĐT không được để trống";
-  valid = false;
-} else if (!phoneRegex.test(form.phone)) {
-  errors.phone = "Số điện thoại không đúng định dạng";
-  valid = false;
-}
+    // Vận chuyển & thanh toán
+    if (!selectedShipping.value) {
+      errors.shipping = "Chọn hình thức vận chuyển";
+      valid = false;
+    }
+    if (!paymentMethod.value) {
+      errors.paymentMethod = "Chọn phương thức thanh toán";
+      valid = false;
+    }
 
-
-} else {
-// Guest
-if (!form.firstName) {
-errors.firstName = "Họ không được để trống";
-valid = false;
-}
-if (!form.lastName) {
-errors.lastName = "Tên không được để trống";
-valid = false;
-}
-if (!form.email) {
-errors.email = "Email không được để trống";
-valid = false;
-} else if (!emailRegex.test(form.email)) {
-errors.email = "Email không đúng định dạng";
-valid = false;
-}
-if (!form.phone) {
-errors.phone = "SĐT không được để trống";
-valid = false;
-} else if (!phoneRegex.test(form.phone)) {
-errors.phone = "Số điện thoại không đúng định dạng";
-valid = false;
-}
-}
-
-// Địa chỉ
-if (!selectedProvince.value) {
-errors.province = "Chọn tỉnh/thành phố";
-valid = false;
-}
-if (!selectedDistrict.value) {
-errors.district = "Chọn quận/huyện";
-valid = false;
-}
-if (!selectedWard.value) {
-errors.ward = "Chọn xã/phường";
-valid = false;
-}
-if (!form.addressDetail) {
-errors.addressDetail = "Nhập địa chỉ cụ thể";
-valid = false;
-}
-
-// Vận chuyển & thanh toán
-if (!selectedShipping.value) {
-errors.shipping = "Chọn hình thức vận chuyển";
-valid = false;
-}
-if (!paymentMethod.value) {
-errors.paymentMethod = "Chọn phương thức thanh toán";
-valid = false;
-}
-
-return valid;
-}
-
-
+    return valid;
+  }
 
   const totalAmount = computed(() => {
     const items = checkoutItems.value.length
@@ -592,109 +592,131 @@ return valid;
   });
 
   async function submitPayment() {
-  const itemsToPay = checkoutItems.value.length
-    ? checkoutItems.value
-    : buyNowItem
-    ? [buyNowItem]
-    : [];
+    const itemsToPay = checkoutItems.value.length
+      ? checkoutItems.value
+      : buyNowItem
+      ? [buyNowItem]
+      : [];
 
-  if (!itemsToPay.length) {
-    alert("Không có sản phẩm để thanh toán");
-    router.replace("/error");
-    return;
-  }
-
-  if (!validate()) {
-    alert("Vui lòng điền đầy đủ thông tin");
-    return;
-  }
-
-  const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
-  let order_id: number = 0;
-
-  try {
-    // Nếu chọn thanh toán online VNPAY
-    if (paymentMethod.value === "online") {
-      let orderData: any;
-
-      if (isLoggedIn.value) {
-        const payloadUser = {
-          user_id: authStore.user.user_id,
-          shipping_address,
-          note: form.note || "",
-          payment_method_id: 2, // 2 = VNPAY
-          items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
-          voucher_code: form.voucher_code || null
-        };
-        orderData = await buyNow(payloadUser);
-      } else {
-        const payloadGuest = {
-          customer_name: `${form.firstName} ${form.lastName}`,
-          customer_phone: form.phone,
-          customer_email: form.email,
-          shipping_address,
-          note: form.note || "",
-          payment_method_id: 2,
-          items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
-          voucher_code: form.voucher_code || null
-        };
-        orderData = await buyNowGuest(payloadGuest);
-      }
-
-      order_id = Number(orderData.order_id); // Ép sang number
-
-      // Chỉ gửi order_id cho VNPAY
-      await payWithVNPAY({ order_id });
-
-      return; // redirect sang VNPAY xong
+    if (!itemsToPay.length) {
+      toast.add({
+        title: "Không có sản phẩm để thanh toán",
+        color: "error",
+      });
+      router.replace("/error");
+      return;
     }
 
-    // Nếu thanh toán offline (COD)
-    if (paymentMethod.value === "offline") {
-      let orderData: any;
-      if (isLoggedIn.value) {
-        const payloadUser = {
-          user_id: authStore.user.user_id,
-          shipping_address,
-          note: form.note || "",
-          payment_method_id: 1, // offline
-          items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
-          voucher_code: form.voucher_code || null
-        };
-        orderData = await buyNow(payloadUser);
-      } else {
-        const payloadGuest = {
-          customer_name: `${form.firstName} ${form.lastName}`,
-          customer_phone: form.phone,
-          customer_email: form.email,
-          shipping_address,
-          note: form.note || "",
-          payment_method_id: 1,
-          items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
-          voucher_code: form.voucher_code || null
-        };
-        orderData = await buyNowGuest(payloadGuest);
+    if (!validate()) {
+      toast.add({
+        title: "Vui lòng điền đầy đủ thông tin",
+        color: "error",
+      });
+      return;
+    }
+
+    const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
+    let order_id: number = 0;
+
+    try {
+      // Nếu chọn thanh toán online VNPAY
+      if (paymentMethod.value === "online") {
+        let orderData: any;
+
+        if (isLoggedIn.value) {
+          const payloadUser = {
+            user_id: authStore.user.user_id,
+            shipping_address,
+            note: form.note || "",
+            payment_method_id: 2, // 2 = VNPAY
+            items: itemsToPay.map((i) => ({
+              product_id: i.product_id,
+              quantity: i.quantity,
+            })),
+            voucher_code: form.voucher_code || null,
+          };
+          orderData = await buyNow(payloadUser);
+        } else {
+          const payloadGuest = {
+            customer_name: `${form.firstName} ${form.lastName}`,
+            customer_phone: form.phone,
+            customer_email: form.email,
+            shipping_address,
+            note: form.note || "",
+            payment_method_id: 2,
+            items: itemsToPay.map((i) => ({
+              product_id: i.product_id,
+              quantity: i.quantity,
+            })),
+            voucher_code: form.voucher_code || null,
+          };
+          orderData = await buyNowGuest(payloadGuest);
+        }
+
+        order_id = Number(orderData.order_id); // Ép sang number
+
+        // Chỉ gửi order_id cho VNPAY
+        await payWithVNPAY({ order_id });
+
+        return; // redirect sang VNPAY xong
       }
 
-      alert("Thanh toán thành công! 🎉");
-      checkoutStore.clearCheckout();
-      router.push({ 
-          path: "/thanks", 
-          query: { 
-              order_code: orderData.order_code 
-          } 
+      // Nếu thanh toán offline (COD)
+      if (paymentMethod.value === "offline") {
+        let orderData: any;
+        if (isLoggedIn.value) {
+          const payloadUser = {
+            user_id: authStore.user.user_id,
+            shipping_address,
+            note: form.note || "",
+            payment_method_id: 1, // offline
+            items: itemsToPay.map((i) => ({
+              product_id: i.product_id,
+              quantity: i.quantity,
+            })),
+            voucher_code: form.voucher_code || null,
+          };
+          orderData = await buyNow(payloadUser);
+        } else {
+          const payloadGuest = {
+            customer_name: `${form.firstName} ${form.lastName}`,
+            customer_phone: form.phone,
+            customer_email: form.email,
+            shipping_address,
+            note: form.note || "",
+            payment_method_id: 1,
+            items: itemsToPay.map((i) => ({
+              product_id: i.product_id,
+              quantity: i.quantity,
+            })),
+            voucher_code: form.voucher_code || null,
+          };
+          orderData = await buyNowGuest(payloadGuest);
+        }
+
+        toast.add({
+          title: "Thanh toán thành công! 🎉",
+          color: "success",
+        });
+        checkoutStore.clearCheckout();
+        router.push({
+          path: "/thanks",
+          query: {
+            order_code: orderData.order_code,
+          },
+        });
+      }
+    } catch (err: any) {
+      console.error("❌ Lỗi khi tạo order:", err);
+      toast.add({
+        title: err?.message || "Thanh toán thất bại, vui lòng thử lại sau",
+        color: "error",
       });
     }
-  } catch (err: any) {
-    console.error("❌ Lỗi khi tạo order:", err);
-    alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
   }
-}
 
-
-function formatPrice(value: number | undefined | null) {
-  const v = Number(value) || 0;
-  return v.toLocaleString("vi-VN") + " đ";
-}
-
+  function formatPrice(value: number | undefined | null) {
+    const v = Number(value) || 0;
+    return v.toLocaleString("vi-VN") + " đ";
+  }
 </script>
