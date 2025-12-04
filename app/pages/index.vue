@@ -21,6 +21,7 @@
       <div class="block md:hidden">
         <UCarousel
           v-slot="{ item }"
+          :duration="50"
           :items="products.slice(0, 5)"
           arrows
           class="w-full overflow-visible"
@@ -86,6 +87,7 @@
         <UCarousel
           v-slot="{ item }"
           :items="products.slice(5, 8)"
+          :duration="50"
           arrows
           class="w-full overflow-visible"
           :prev="{
