@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center mt-5 gap-2">
+  <div v-if="totalPages > 1" class="flex justify-center mt-5 gap-2">
 
     <!-- Prev -->
     <button 
@@ -34,6 +34,7 @@
 
   </div>
 </template>
+
 
 <script setup>
 import { computed } from 'vue'

@@ -214,10 +214,8 @@
                     </dd>
                   </div>
                   <div class="flex justify-between">
-                    <dt class="text-gray-600">Giảm giá (Discount):</dt>
-                    <dd class="font-medium text-red-500">
-                      - {{ order.discount }}
-                    </dd>
+                    <span>Giảm giá:</span>
+                    <span>- {{ order.discount }}</span>
                   </div>
                   <div class="flex justify-between">
                     <dt class="text-gray-600">Phí vận chuyển (Shipping):</dt>
