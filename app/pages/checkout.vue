@@ -375,6 +375,7 @@
   const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
   const checkoutStore = useCheckoutStore();
   const authStore = useAuthStore();
+  const toast = useToast();
 
   // Token
   let tokenCookie = useCookie("tokenLocal");
@@ -524,12 +525,22 @@
       ? [buyNowItem]
       : [];
     if (!itemsToPay.length) {
-      alert("Không có sản phẩm để thanh toán");
+      toast.add({
+        title: "Không có sản phẩm để thanh toán",
+        color: "error",
+      });
       router.replace("/error");
       return;
     }
     if (!validate()) {
-      alert("Vui lòng điền đầy đủ thông tin");
+      toast.add({
+        title: "Vui lòng điền đầy đủ thông tin",
+        color: "error",
+      });
+      toast.add({
+        title: "Vui lòng điền đầy đủ thông tin",
+        color: "error",
+      });
       return;
     }
 
@@ -583,7 +594,10 @@
         return;
       }
 
-      alert("Thanh toán thành công! 🎉");
+      toast.add({
+        title: "Thanh toán thành công! 🎉",
+        color: "success",
+      });
       checkoutStore.clearCheckout();
       router.push({
         path: "/thanks",
@@ -591,7 +605,10 @@
       });
     } catch (err: any) {
       console.error("❌ Lỗi khi tạo order:", err);
-      alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
+      toast.add({
+        title: err?.message || "Thanh toán thất bại, vui lòng thử lại sau",
+        color: "error",
+      });
     }
   };
 
