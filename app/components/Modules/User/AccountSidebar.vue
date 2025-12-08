@@ -80,7 +80,7 @@
   // }
 
   const menuItems = [
-    { name: "Thống kê", path: "/user/dashboard", icon: "heroicons:chart-bar" },
+    // { name: "Thống kê", path: "/user/dashboard", icon: "heroicons:chart-bar" },
     { name: "Hồ sơ của tôi", path: "/user/profile", icon: "heroicons:user" },
     {
       name: "Danh sách đơn hàng",
@@ -97,24 +97,24 @@
       path: "/user/address",
       icon: "heroicons:map-pin",
     },
-    { name: "Hỗ trợ", path: "/user/support", icon: "heroicons:lifebuoy" },
+    // { name: "Hỗ trợ", path: "/user/support", icon: "heroicons:lifebuoy" },
     {
       name: "Theo dõi đơn hàng",
       path: "/user/track-order",
       icon: "heroicons:truck",
     },
-    {
-      name: "Phương thức thanh toán",
-      path: "/user/payment",
-      icon: "heroicons:credit-card",
-    },
+    // {
+    //   name: "Phương thức thanh toán",
+    //   path: "/user/payment",
+    //   icon: "heroicons:credit-card",
+    // },
     { name: "Thông báo", path: "/user/notifications", icon: "heroicons:bell" },
     {
       name: "Tin nhắn",
       path: "/user/messages",
       icon: "heroicons:chat-bubble-left-right",
     },
-    { name: "Cài đặt", path: "/user/settings", icon: "heroicons:cog-6-tooth" },
+    // { name: "Cài đặt", path: "/user/settings", icon: "heroicons:cog-6-tooth" },
     {
       name: "Đăng xuất",
       path: "/logout",
