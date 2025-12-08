@@ -122,8 +122,14 @@ export const useAuth = () => {
 
       toast.add({
         title: msg,
-        color: "error",
+        icon: "heroicons:exclamation-circle",
+        timeout: 3000,
+        position: "bottom-right",
+        style:
+          "color:white; font-weight:600; background-color:#dc3545; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+        iconColor: "#ffffff",
       });
+
       throw error.data || { message: "Không thể gửi mã OTP" };
     }
   };
@@ -207,7 +213,6 @@ export const useAuth = () => {
         }
       );
 
-      // Giả sử API trả về success/false và message
       return {
         success: res.success ?? true,
         message: res.message || "Xác thực OTP thành công",

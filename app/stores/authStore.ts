@@ -1,4 +1,3 @@
-// stores/auth.ts
 import { defineStore } from "pinia";
 import { useCookie } from "#app";
 
@@ -6,7 +5,8 @@ interface User {
   user_id?: number;
   full_name?: string;
   email?: string;
-  role?: string | number; // role can be string or number
+  role?: string | number;
+  google_id?: string | null;
   [key: string]: any;
 }
 
@@ -15,8 +15,8 @@ interface AuthState {
   addresses: any[];
   token: string | null;
   tokenLocal: string | null;
-  role: string | number | null; // prod role
-  roleLocal: string | number | null; // local role
+  role: string | number | null;
+  roleLocal: string | number | null;
   isLogged: boolean;
   isSubmitting: boolean;
 }
@@ -25,18 +25,19 @@ export const useAuthStore = defineStore("auth", {
   state: (): AuthState => ({
     user: {},
     addresses: [],
+
     token: useCookie("token", {
       path: "/",
       domain: ".mocfurni.shop",
       sameSite: "lax",
       secure: true,
     }).value,
+
     tokenLocal: useCookie("tokenLocal", {
       path: "/",
-      maxAge: 60 * 60 * 24,
+      maxAge: 86400,
     }).value,
 
-    // Role for production
     role: useCookie("role", {
       path: "/",
       domain: ".mocfurni.shop",
@@ -44,10 +45,9 @@ export const useAuthStore = defineStore("auth", {
       secure: true,
     }).value,
 
-    // Role for local development
     roleLocal: useCookie("roleLocal", {
       path: "/",
-      maxAge: 60 * 60 * 24,
+      maxAge: 86400,
     }).value,
 
     isLogged: false,
@@ -68,12 +68,14 @@ export const useAuthStore = defineStore("auth", {
       const isLocal =
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1";
-
       return isLocal ? state.roleLocal : state.role;
     },
   },
 
   actions: {
+    // ============================
+    // NORMAL LOGIN
+    // ============================
     async login(data: { email: string; password_hash: string }) {
       this.isSubmitting = true;
 
@@ -89,15 +91,17 @@ export const useAuthStore = defineStore("auth", {
         if (response.success && accessToken) {
           this.user = response.data.user;
           this.isLogged = true;
+
           this.token = accessToken;
           this.tokenLocal = accessToken;
+
           this.role = userRole;
           this.roleLocal = userRole;
 
           // Save cookies
           useCookie("token", {
             path: "/",
-            maxAge: 60 * 60 * 24,
+            maxAge: 86400,
             domain: ".mocfurni.shop",
             sameSite: "lax",
             secure: true,
@@ -105,12 +109,12 @@ export const useAuthStore = defineStore("auth", {
 
           useCookie("tokenLocal", {
             path: "/",
-            maxAge: 60 * 60 * 24,
+            maxAge: 86400,
           }).value = accessToken;
 
           useCookie("role", {
             path: "/",
-            maxAge: 60 * 60 * 24,
+            maxAge: 86400,
             domain: ".mocfurni.shop",
             sameSite: "lax",
             secure: true,
@@ -118,7 +122,7 @@ export const useAuthStore = defineStore("auth", {
 
           useCookie("roleLocal", {
             path: "/",
-            maxAge: 60 * 60 * 24,
+            maxAge: 86400,
           }).value = userRole;
         }
 
@@ -129,37 +133,39 @@ export const useAuthStore = defineStore("auth", {
           error: null,
         };
       } catch (err: any) {
-        const status = err?.response?.status || 500;
-        const msg = err?.response?.data?.message || "Lỗi kết nối server";
-        const errors = err?.response?.data?.errors || null;
-
         return {
           data: null,
           token: null,
           role: null,
-          error: { statusCode: status, message: msg, data: errors },
+          error: {
+            statusCode: err?.response?.status || 500,
+            message: err?.response?.data?.message || "Lỗi kết nối server",
+          },
         };
       } finally {
         this.isSubmitting = false;
       }
     },
 
+    // ============================
+    // LOGOUT
+    // ============================
     async logout() {
       this.token = null;
       this.tokenLocal = null;
+
       this.role = null;
       this.roleLocal = null;
+
       this.user = {};
       this.addresses = [];
       this.isLogged = false;
 
-      // Remove prod token
       useCookie("token", {
         path: "/",
         domain: ".mocfurni.shop",
       }).value = null;
 
-      // Remove local token
       useCookie("tokenLocal", { path: "/" }).value = null;
 
       useCookie("role", {
@@ -170,13 +176,63 @@ export const useAuthStore = defineStore("auth", {
       useCookie("roleLocal", { path: "/" }).value = null;
     },
 
+    // ============================
+    // GOOGLE LOGIN (REDIRECT)
+    // ============================
+    async loginGoogle() {
+      try {
+        const res = await $fetch(
+          "https://api.mocfurni.shop/api/client/login/google",
+          { method: "GET" }
+        );
+
+        if (res?.redirect_url) {
+          window.location.href = res.redirect_url;
+        }
+      } catch (err) {
+        console.error("Google login error:", err);
+      }
+    },
+
+    // ============================
+    // GOOGLE TOKEN SAVE (CÁCH 2)
+    // ============================
+    saveGoogleToken(token: string) {
+      this.token = token;
+      this.tokenLocal = token;
+      this.isLogged = true;
+
+      useCookie("token", {
+        path: "/",
+        maxAge: 86400,
+        domain: ".mocfurni.shop",
+        sameSite: "lax",
+        secure: true,
+      }).value = token;
+
+      useCookie("tokenLocal", {
+        path: "/",
+        maxAge: 86400,
+      }).value = token;
+
+      this.fetchUser(); // Lấy thông tin user sau khi có token
+    },
+
+    // ============================
+    // GET USER PROFILE
+    // ============================
     async fetchUser() {
       const token = this.activeToken;
       if (!token) return;
+
       try {
-        const res = await $fetch("https://api.mocfurni.shop/api/client/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await $fetch(
+          "https://api.mocfurni.shop/api/client/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
         this.user = res.user || {};
         this.role = res.user?.role || null;
         this.roleLocal = res.user?.role || null;
@@ -189,18 +245,31 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-    // Address
-    setAddresses(addresses: any[]) { this.addresses = addresses; },
-    addAddress(address: any) { this.addresses.push(address); },
+    // ============================
+    // ADDRESS METHODS
+    // ============================
+    setAddresses(addresses: any[]) {
+      this.addresses = addresses;
+    },
+
+    addAddress(address: any) {
+      this.addresses.push(address);
+    },
+
     updateAddressInStore(id: string | number, updated: any) {
-      const index = this.addresses.findIndex(a => a.id === id);
+      const index = this.addresses.findIndex((a) => a.id === id);
       if (index !== -1) this.addresses[index] = updated;
     },
+
     removeAddressFromStore(id: string | number) {
-      this.addresses = this.addresses.filter(a => a.id !== id);
+      this.addresses = this.addresses.filter((a) => a.id !== id);
     },
+
     setDefaultAddressInStore(id: string | number) {
-      this.addresses = this.addresses.map(a => ({ ...a, is_default: a.id === id ? 1 : 0 }));
+      this.addresses = this.addresses.map((a) => ({
+        ...a,
+        is_default: a.id === id ? 1 : 0,
+      }));
       this.addresses.sort((a, b) => b.is_default - a.is_default);
     },
   },

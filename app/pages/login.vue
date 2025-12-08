@@ -130,6 +130,7 @@
             Facebook
           </button>
           <button
+            @click="auth.loginGoogle()"
             class="w-full py-2 border border-red-500 text-red-500 rounded-md flex justify-center items-center space-x-2 hover:bg-red-50 transition"
           >
             Google
@@ -140,55 +141,87 @@
   </div>
 </template>
 <script setup lang="ts">
-  const auth = useAuthStore();
-  const toast = useToast();
+const auth = useAuthStore();
+const toast = useToast();
 
-  const email = ref("");
-  const password = ref("");
-  const remember = ref(false);
-  const errors = reactive({ email: "", password: "" });
-  const isSubmitting = ref(false);
+const email = ref("");
+const password = ref("");
+const remember = ref(false);
+const errors = reactive({ email: "", password: "" });
+const isSubmitting = ref(false);
 
-  const handleLogin = async () => {
-    // reset errors
-    errors.email = "";
-    errors.password = "";
+const handleLogin = async () => {
+  // Reset error messages
+  errors.email = "";
+  errors.password = "";
 
-    if (!email.value) errors.email = "Vui lòng nhập email";
-    if (!password.value) errors.password = "Vui lòng nhập mật khẩu";
+  if (!email.value) {
+    toast.add({ title: "Vui lòng nhập email", color: "error" });
+    return;
+  }
+  if (!password.value) {
+    toast.add({ title: "Vui lòng nhập mật khẩu", color: "error" });
+    return;
+  }
 
-    if (errors.email || errors.password) return;
+  isSubmitting.value = true;
 
-    isSubmitting.value = true;
+  const { error, data } = await auth.login({
+    email: email.value,
+    password_hash: password.value,
+    remember: remember.value,
+  });
 
-    const { error, data } = await auth.login({
-      email: email.value,
-      password_hash: password.value,
-      remember: remember.value,
-    });
+  isSubmitting.value = false;
 
-    isSubmitting.value = false;
+  /* ---------------------------------------------------------
+   * MERGED ERROR HANDLING (safe + beautiful)
+   * --------------------------------------------------------- */
+  if (error) {
+    if (error.statusCode === 422) {
+      // backend validation error
+      errors.email = error.data?.email?.[0] || "";
+      errors.password = error.data?.password_hash?.[0] || "";
 
-    if (error) {
-      if (error.statusCode === 422) {
-        errors.email = error.data?.email?.[0] || "";
-        errors.password = error.data?.password_hash?.[0] || "";
-      } else if (error.statusCode === 401) {
-        errors.email = "Email hoặc mật khẩu không đúng";
-        errors.password = "Email hoặc mật khẩu không đúng";
-      } else {
-        toast.add({
-          title: error.message || "Lỗi không xác định",
-          color: "error",
-        });
-      }
+      toast.add({
+        title:
+          error.data?.email?.[0] ||
+          error.data?.password_hash?.[0] ||
+          "Dữ liệu không hợp lệ",
+        color: "error",
+      });
+    } else if (error.statusCode === 401) {
+      errors.email = "Email hoặc mật khẩu không đúng";
+      errors.password = "Email hoặc mật khẩu không đúng";
+
+      toast.add({
+        title: "Email hoặc mật khẩu không đúng",
+        color: "error",
+      });
     } else {
       toast.add({
-        title: "Đăng nhập thành công!",
-        color: "success",
+        title: error.message || "Lỗi không xác định",
+        color: "error",
       });
-      console.log("User info:", auth.user);
-      navigateTo("/"); // redirect về trang chủ
     }
-  };
+
+    return;
+  }
+
+  /* ---------------------------------------------------------
+   * SUCCESS (merged beautiful toast from Tien-Quan)
+   * --------------------------------------------------------- */
+  toast.add({
+    title: "Đăng nhập thành công!",
+    icon: "heroicons:check-circle",
+    timeout: 3000,
+    position: "top-right",
+    style:
+      "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+    iconColor: "#ffffff",
+    color: "success",
+  });
+
+  navigateTo("/");
+};
 </script>

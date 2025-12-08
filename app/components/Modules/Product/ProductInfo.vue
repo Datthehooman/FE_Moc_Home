@@ -78,7 +78,8 @@
       <ul class="text-sm text-gray-600 space-y-3 text-[15px]">
         <li><b>Tình trạng hàng:</b> {{ productDetail.stock_quantity > 0 ? 'Sẵn sàng giao' : 'Hết hàng' }}</li>
         <li><b>Mã sản phẩm:</b> {{ productDetail.sku || 'Không có' }}</li>
-        <li><b>Danh mục:</b> {{ productDetail.category_name }}</li>
+<li><b>Danh mục:</b> {{ categoryName }}</li>
+
         <li><b>Thương hiệu:</b> {{ productDetail.brand }}</li>
       </ul>
 
@@ -125,6 +126,19 @@ import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const slug = route.params.slug as string
+const { categories, isLoading, error } = useCategories()
+const categoryName = computed(() => {
+  if (!productDetail.value || categories.value.length === 0) return "Không có";
+
+  const cat = categories.value.find(
+    c => Number(c.id) === Number(productDetail.value.category_id)
+  );
+
+  return cat ? cat.category_name : "Không có";
+});
+
+
+
 
 // API
 const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()

@@ -364,334 +364,193 @@
   </section>
 </template>
 <script setup lang="ts">
-  import { reactive, ref, computed, onMounted } from "vue";
-  import { useRouter } from "vue-router";
-  import { useCheckoutStore } from "@/stores/checkout";
-  import { useCheckout } from "@/composables/useCheckout";
-  import { useAddress } from "@/composables/useAddress";
-  import { useCookie } from "#app";
+import { reactive, ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useCheckoutStore } from "@/stores/checkout";
+import { useCheckout } from "@/composables/useCheckout";
+import { useAddress } from "@/composables/useAddress";
+import { useCookie } from "#app";
 
-  const router = useRouter();
-  const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
-  const checkoutStore = useCheckoutStore();
-  const authStore = useAuthStore();
-  const toast = useToast();
+const router = useRouter();
+const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
+const checkoutStore = useCheckoutStore();
+const authStore = useAuthStore();
+const toast = useToast();
 
-  // Token
-  let tokenCookie = useCookie("tokenLocal");
-  if (!tokenCookie.value) {
-    tokenCookie = useCookie("token", { path: "/", domain: ".mocfurni.shop" });
-  }
-  const isLoggedIn = computed(() => !!tokenCookie.value);
+/* ------------------ LOGIN CHECK ------------------ */
+let tokenCookie = useCookie("tokenLocal");
+if (!tokenCookie.value) {
+  tokenCookie = useCookie("token", { path: "/", domain: ".mocfurni.shop" });
+}
+const isLoggedIn = computed(() => !!tokenCookie.value);
 
-  // Checkout items
-  const checkoutItems = computed(() => checkoutStore.cartItems || []);
-  const buyNowItem = checkoutStore.buyNowItem;
+/* ------------------ CART DATA ------------------ */
+const checkoutItems = computed(() => checkoutStore.cartItems || []);
+const buyNowItem = checkoutStore.buyNowItem;
 
-  // Form
-  const form = reactive({
-    firstName: "",
-    lastName: "",
-    full_name: "",
-    email: "",
-    phone: "",
-    addressDetail: "",
-    note: "",
-    voucher_code: "",
-  });
+/* ------------------ FORM DATA ------------------ */
+const form = reactive({
+  firstName: "",
+  lastName: "",
+  full_name: "",
+  email: "",
+  phone: "",
+  addressDetail: "",
+  note: "",
+  voucher_code: "",
+});
 
-  // Payment & shipping
-  const paymentMethod = ref("offline");
-  const selectedShipping = ref("Tiêu chuẩn");
-  const shippingMethods = [
-    { name: "Tiêu chuẩn", desc: "6–7 ngày", price: "Miễn phí" },
-  ];
+/* ------------------ SHIPPING ------------------ */
+const paymentMethod = ref("offline");
+const selectedShipping = ref("Tiêu chuẩn");
+const shippingMethods = [{ name: "Tiêu chuẩn", desc: "6–7 ngày", price: "Miễn phí" }];
 
-  // Address
-  const { provinces, wards, fetchProvinces, fetchWards } = useAddress();
-  const selectedProvince = ref("");
-  const selectedWard = ref("");
+/* ------------------ ADDRESS ------------------ */
+const { provinces, wards, fetchProvinces, fetchWards } = useAddress();
+const selectedProvince = ref("");
+const selectedWard = ref("");
+const provinceSearch = ref("");
+const wardSearch = ref("");
+const showProvinceList = ref(false);
+const showWardList = ref(false);
 
-  // Update wards khi chọn province
-  const updateWards = async () => {
-    if (!selectedProvince.value) {
-      wards.value = [];
-      selectedWard.value = "";
-      return;
-    }
-    await fetchWards(selectedProvince.value);
-    selectedWard.value = "";
-  };
+/* Filter for autocomplete */
+const filteredProvinces = computed(() =>
+  provinces.value.filter((p) =>
+    p.name.toLowerCase().includes(provinceSearch.value.toLowerCase())
+  )
+);
 
-  // Errors
-  const errors = reactive<any>({});
+const filteredWards = computed(() =>
+  wards.value.filter((w) =>
+    w.name.toLowerCase().includes(wardSearch.value.toLowerCase())
+  )
+);
 
-  // Validate form
-  const validate = () => {
-    Object.keys(errors).forEach((key) => (errors[key] = ""));
-    let valid = true;
+const selectProvince = (p: any) => {
+  provinceSearch.value = p.name;
+  selectedProvince.value = p.code;
+  showProvinceList.value = false;
+  fetchWards(p.code);
+};
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
+const selectWard = (w: any) => {
+  wardSearch.value = w.name;
+  selectedWard.value = w.code;
+  showWardList.value = false;
+};
 
-    if (isLoggedIn.value) {
-      if (!form.full_name) {
-        errors.full_name = "Họ và tên không được để trống";
-        valid = false;
-      }
-      if (!form.email) {
-        errors.email = "Email không được để trống";
-        valid = false;
-      } else if (!emailRegex.test(form.email)) {
-        errors.email = "Email không đúng định dạng";
-        valid = false;
-      }
-      if (!form.phone) {
-        errors.phone = "SĐT không được để trống";
-        valid = false;
-      } else if (!phoneRegex.test(form.phone)) {
-        errors.phone = "SĐT không đúng định dạng";
-        valid = false;
-      }
-    } else {
-      if (!form.firstName) {
-        errors.firstName = "Họ không được để trống";
-        valid = false;
-      }
-      if (!form.lastName) {
-        errors.lastName = "Tên không được để trống";
-        valid = false;
-      }
-      if (!form.email) {
-        errors.email = "Email không được để trống";
-        valid = false;
-      } else if (!emailRegex.test(form.email)) {
-        errors.email = "Email không đúng định dạng";
-        valid = false;
-      }
-      if (!form.phone) {
-        errors.phone = "SĐT không được để trống";
-        valid = false;
-      } else if (!phoneRegex.test(form.phone)) {
-        errors.phone = "SĐT không đúng định dạng";
-        valid = false;
-      }
-    }
+/* ------------------ ERRORS ------------------ */
+const errors = reactive<any>({});
 
-    if (!selectedProvince.value) {
-      errors.province = "Chọn tỉnh/thành phố";
-      valid = false;
-    }
-    if (!selectedWard.value) {
-      errors.ward = "Chọn xã/phường";
-      valid = false;
-    }
-    if (!form.addressDetail) {
-      errors.addressDetail = "Nhập địa chỉ cụ thể";
-      valid = false;
-    }
-    if (!selectedShipping.value) {
-      errors.shipping = "Chọn hình thức vận chuyển";
-      valid = false;
-    }
-    if (!paymentMethod.value) {
-      errors.paymentMethod = "Chọn phương thức thanh toán";
-      valid = false;
-    }
+/* ------------------ VALIDATION ------------------ */
+const validate = () => {
+  Object.keys(errors).forEach((k) => (errors[k] = ""));
+  let valid = true;
 
-    return valid;
-  };
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
 
-  // Total amount
-  const totalAmount = computed(() => {
-    const items = checkoutItems.value.length
-      ? checkoutItems.value
-      : buyNowItem
-      ? [buyNowItem]
-      : [];
-    const total = items.reduce(
-      (acc, i) =>
-        acc + (i.product_sale || i.product_price || i.price) * i.quantity,
-      0
-    );
-    return total + (selectedShipping.value === "Nhanh" ? 30000 : 0);
-  });
-
-  // Submit payment
-  const submitPayment = async () => {
-    const itemsToPay = checkoutItems.value.length
-      ? checkoutItems.value
-      : buyNowItem
-      ? [buyNowItem]
-      : [];
-    if (!itemsToPay.length) {
-      toast.add({
-        title: "Không có sản phẩm để thanh toán",
-        color: "error",
-      });
-      router.replace("/error");
-      return;
-    }
-    if (!validate()) {
-      toast.add({
-        title: "Vui lòng điền đầy đủ thông tin",
-        color: "error",
-      });
-      toast.add({
-        title: "Vui lòng điền đầy đủ thông tin",
-        color: "error",
-      });
-      return;
-    }
-
-    // Tạo shipping_address dùng tên thay vì code
-    const shipping_address = `${form.addressDetail}, ${wardSearch.value}, ${provinceSearch.value}`;
-
-    let order_id = 0;
-
-    try {
-      const payload = isLoggedIn.value
-        ? {
-            user_id: authStore.user.user_id,
-            shipping_address,
-            province_code: selectedProvince.value,
-            ward_code: selectedWard.value,
-            province_name: provinceSearch.value,
-            ward_name: wardSearch.value,
-            note: form.note || "",
-            payment_method_id: paymentMethod.value === "online" ? 2 : 1,
-            items: itemsToPay.map((i) => ({
-              product_id: i.product_id,
-              quantity: i.quantity,
-            })),
-            voucher_code: form.voucher_code || null,
-          }
-        : {
-            customer_name: `${form.firstName} ${form.lastName}`,
-            customer_phone: form.phone,
-            customer_email: form.email,
-            shipping_address,
-            province_code: selectedProvince.value,
-            ward_code: selectedWard.value,
-            province_name: provinceSearch.value,
-            ward_name: wardSearch.value,
-            note: form.note || "",
-            payment_method_id: paymentMethod.value === "online" ? 2 : 1,
-            items: itemsToPay.map((i) => ({
-              product_id: i.product_id,
-              quantity: i.quantity,
-            })),
-            voucher_code: form.voucher_code || null,
-          };
-
-      const orderData = isLoggedIn.value
-        ? await buyNow(payload)
-        : await buyNowGuest(payload);
-      order_id = Number(orderData.order_id);
-
-      if (paymentMethod.value === "online") {
-        await payWithVNPAY({ order_id });
-        return;
-      }
-
-      toast.add({
-        title: "Thanh toán thành công! 🎉",
-        color: "success",
-      });
-      checkoutStore.clearCheckout();
-      router.push({
-        path: "/thanks",
-        query: { order_code: Number(orderData.order_code) },
-      });
-    } catch (err: any) {
-      console.error("❌ Lỗi khi tạo order:", err);
-      toast.add({
-        title: err?.message || "Thanh toán thất bại, vui lòng thử lại sau",
-        color: "error",
-      });
-    }
-  };
-
-  // On mounted
-  onMounted(async () => {
-    await fetchProvinces();
-
-    if (isLoggedIn.value && authStore.user) {
-      form.firstName = authStore.user.firstName || "";
-      form.lastName = authStore.user.lastName || "";
-      form.full_name = authStore.user.full_name || "";
-      form.email = authStore.user.email || "";
-      form.phone = authStore.user.phone || "";
-
-      // ✅ Lấy địa chỉ mặc định
-      const defaultAddress = authStore.addresses.find((a) => a.is_default);
-      if (defaultAddress) {
-        // Tỉnh
-        selectedProvince.value = defaultAddress.province.code;
-        provinceSearch.value = defaultAddress.province.name;
-
-        // Load wards cho tỉnh
-        await fetchWards(defaultAddress.province.code);
-
-        // Xã
-        selectedWard.value = defaultAddress.ward.code;
-        wardSearch.value = defaultAddress.ward.name;
-
-        // Địa chỉ chi tiết
-        form.addressDetail = defaultAddress.address_line || "";
-      }
-    }
-
-    if (!checkoutItems.value.length && !buyNowItem) router.replace("/error");
-  });
-
-  // Format price
-  function formatPrice(value: number | undefined | null) {
-    return (Number(value) || 0).toLocaleString("vi-VN") + " đ";
+  if (isLoggedIn.value) {
+    if (!form.full_name) { errors.full_name = "Họ và tên không được để trống"; valid = false; }
+  } else {
+    if (!form.firstName) { errors.firstName = "Họ không được để trống"; valid = false; }
+    if (!form.lastName) { errors.lastName = "Tên không được để trống"; valid = false; }
   }
 
-  function removeVietnameseTones(str: string) {
-    return str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-  }
+  if (!form.email) { errors.email = "Email không được để trống"; valid = false; }
+  else if (!emailRegex.test(form.email)) { errors.email = "Email không đúng định dạng"; valid = false; }
 
-  const provinceSearch = ref("");
-  const showProvinceList = ref(false);
+  if (!form.phone) { errors.phone = "SĐT không được để trống"; valid = false; }
+  else if (!phoneRegex.test(form.phone)) { errors.phone = "SĐT không đúng định dạng"; valid = false; }
 
-  const filteredProvinces = computed(() => {
-    const keyword = removeVietnameseTones(provinceSearch.value);
-    return provinces.value.filter((p) => {
-      const name = removeVietnameseTones(p.name);
-      const name_en = removeVietnameseTones(p.name_en || "");
-      return name.includes(keyword) || name_en.includes(keyword);
+  if (!selectedProvince.value) { errors.province = "Chọn tỉnh/thành phố"; valid = false; }
+  if (!selectedWard.value) { errors.ward = "Chọn xã/phường"; valid = false; }
+  if (!form.addressDetail) { errors.addressDetail = "Nhập địa chỉ cụ thể"; valid = false; }
+
+  if (!paymentMethod.value) { errors.paymentMethod = "Chọn phương thức thanh toán"; valid = false; }
+
+  return valid;
+};
+
+/* ------------------ TOTAL AMOUNT ------------------ */
+const totalAmount = computed(() => {
+  const items = checkoutItems.value.length
+    ? checkoutItems.value
+    : buyNowItem ? [buyNowItem] : [];
+
+  const base = items.reduce(
+    (acc, i) => acc + (i.product_sale || i.product_price || i.price) * i.quantity,
+    0
+  );
+
+  return base + (selectedShipping.value === "Nhanh" ? 30000 : 0);
+});
+
+/* ------------------ SUBMIT PAYMENT ------------------ */
+const submitPayment = async () => {
+  const itemsToPay = checkoutItems.value.length
+    ? checkoutItems.value
+    : buyNowItem ? [buyNowItem] : [];
+
+  if (!itemsToPay.length) {
+    toast.add({
+      title: "Không có sản phẩm để thanh toán",
+      color: "error",
     });
-  });
+    router.replace("/error");
+    return;
+  }
 
-  const selectProvince = (province: any) => {
-    selectedProvince.value = province.code;
-    provinceSearch.value = province.name;
-    showProvinceList.value = false;
-
-    updateWards(); // load lại xã/phường
-  };
-
-  const wardSearch = ref("");
-  const showWardList = ref(false);
-
-  const filteredWards = computed(() => {
-    const keyword = removeVietnameseTones(wardSearch.value);
-    return wards.value.filter((w) => {
-      const name = removeVietnameseTones(w.name);
-      const name_en = removeVietnameseTones(w.name_en || "");
-      return name.includes(keyword) || name_en.includes(keyword);
+  if (!validate()) {
+    toast.add({
+      title: "Vui lòng điền đầy đủ thông tin",
+      color: "error",
     });
-  });
+    return;
+  }
 
-  const selectWard = (ward: any) => {
-    selectedWard.value = ward.code;
-    wardSearch.value = ward.name;
-    showWardList.value = false;
-  };
+  const shipping_address = `${form.addressDetail}, ${wardSearch.value}, ${provinceSearch.value}`;
+
+  const payload = isLoggedIn.value
+    ? {
+        user_id: authStore.user.user_id,
+        shipping_address,
+        province_code: selectedProvince.value,
+        ward_code: selectedWard.value,
+        province_name: provinceSearch.value,
+        ward_name: wardSearch.value,
+        note: form.note || "",
+        payment_method_id: paymentMethod.value === "online" ? 2 : 1,
+        items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
+        voucher_code: form.voucher_code || null,
+      }
+    : {
+        customer_name: `${form.firstName} ${form.lastName}`,
+        customer_phone: form.phone,
+        customer_email: form.email,
+        shipping_address,
+        province_code: selectedProvince.value,
+        ward_code: selectedWard.value,
+        province_name: provinceSearch.value,
+        ward_name: wardSearch.value,
+        note: form.note || "",
+        payment_method_id: paymentMethod.value === "online" ? 2 : 1,
+        items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
+        voucher_code: form.voucher_code || null,
+      };
+
+  const orderData = isLoggedIn.value
+    ? await buyNow(payload)
+    : await buyNowGuest(payload);
+
+  const order_id = Number(orderData.order_id);
+
+  if (paymentMethod.value === "online") {
+    await payWithVNPAY({ order_id });
+    return;
+  }
+
+  router.replace(`/payment-success?order_id=${order_id}`);
+};
 </script>

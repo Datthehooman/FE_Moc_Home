@@ -159,10 +159,7 @@ const handleAddToCart = async () => {
   }
   try {
     const result = await addToCart(props.item.product_id, 1);
-    toast.add({
-      title: result ? "✅ Đã thêm vào giỏ hàng!" : "❌ Thêm giỏ hàng thất bại",
-      color: result ? "success" : "error",
-    });
+   
   } catch (error: any) {
     toast.add({
       title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"),
