@@ -1,21 +1,23 @@
 <script setup lang="ts">
-  const route = useRoute();
-  const router = useRouter();
-  const auth = useAuthStore();
+import { onMounted } from "vue";
+const router = useRouter();
+const auth = useAuthStore();
 
-  // FE nhận token do BE redirect về: ?token=xxxx
-  const token = route.query.token as string;
+onMounted(() => {
+  // Chuẩn hoá URL: đổi "/?" thành "?"
+  let href = window.location.href.replace('/?', '?');
+
+  // Tạo URL object sau khi sửa
+  const url = new URL(href);
+  const token = url.searchParams.get("token");
 
   if (token) {
-    // Lưu token vào store + cookie
     auth.saveGoogleToken(token);
-
-    // Điều hướng về trang chủ
     router.push("/");
   } else {
-    // Không có token => lỗi
     router.push("/login?error=google_failed");
   }
+});
 </script>
 
 <template>
