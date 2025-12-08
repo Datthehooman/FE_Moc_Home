@@ -6,9 +6,7 @@
 
       <main class="flex-1 p-6">
 
-        <section class="bg-white rounded-xl p-5 shadow mb-6">
-          </section>
-
+        
         <section class="bg-white rounded-xl p-5 shadow">
 
           <div class="flex justify-between items-center mb-2">
