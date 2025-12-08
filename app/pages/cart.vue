@@ -123,6 +123,7 @@ const { products, fetchProducts } = useProduct() // danh sách sản phẩm
 const discount = ref(0)
 const discountCode = ref('')
 const apiTotal = ref(0)
+const toast = useToast();
 
 async function fetchCartData() {
 const data = await getCart()
@@ -176,10 +177,23 @@ function formatPrice(num: number) {
 }
 
 function goCheckout() {
-  if (!cart.value.length) return alert('Giỏ hàng trống')
-  setCartItems(cart.value)
-  router.push('/checkout')
+  if (!cart.value.length) {
+    toast.add({
+      title: "Giỏ hàng trống! Vui lòng thêm sản phẩm để tiếp tục.",
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      color: "error",
+      iconColor: "#ffffff",
+      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+    });
+    return;
+  }
+
+  setCartItems(cart.value);
+  router.push("/checkout");
 }
+
 
 </script>
 

@@ -120,7 +120,9 @@
         <!-- Social buttons -->
         <div class="flex space-x-3">
           <button class="w-full py-2 border border-blue-600 text-blue-600 rounded-md flex justify-center items-center space-x-2 hover:bg-blue-50 transition">Facebook</button>
-          <button class="w-full py-2 border border-red-500 text-red-500 rounded-md flex justify-center items-center space-x-2 hover:bg-red-50 transition">Google</button>
+          <button 
+           @click="auth.loginGoogle()"
+          class="w-full py-2 border border-red-500 text-red-500 rounded-md flex justify-center items-center space-x-2 hover:bg-red-50 transition">Google</button>
         </div>
       </div>
     </div>
@@ -128,6 +130,8 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+
+  const auth = useAuthStore();
 
 // IMPORT ĐỦ 3 HÀM TỪ useAuth
 const { 
@@ -142,6 +146,7 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const loading = ref(false)
+const toast = useToast();
 
 const errors = reactive({
   fullName: '',
@@ -193,28 +198,28 @@ const checkEmail = async () => {
 // ================= REGISTER =================
 const register = async () => {
   // Reset lỗi
-  Object.keys(errors).forEach(key => (errors[key] = ''))
+  Object.keys(errors).forEach(key => (errors[key] = ''));
 
   // Validate frontend
-  if (!fullName.value) errors.fullName = 'Tên không được để trống'
-  else if (/\d/.test(fullName.value)) errors.fullName = 'Tên không được chứa số'
+  if (!fullName.value) errors.fullName = 'Tên không được để trống';
+  else if (/\d/.test(fullName.value)) errors.fullName = 'Tên không được chứa số';
 
-  if (!phone.value) errors.phone = 'Số điện thoại không được để trống'
-  else if (!/^0\d{9}$/.test(phone.value)) errors.phone = 'Số điện thoại không hợp lệ (bắt đầu 0, 10 số)'
-  else if (phone.value.length > 20) errors.phone = 'Số điện thoại quá dài'
+  if (!phone.value) errors.phone = 'Số điện thoại không được để trống';
+  else if (!/^0\d{9}$/.test(phone.value)) errors.phone = 'Số điện thoại không hợp lệ (bắt đầu 0, 10 số)';
+  else if (phone.value.length > 20) errors.phone = 'Số điện thoại quá dài';
 
-  if (!email.value) errors.email = 'Email không được để trống'
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errors.email = 'Email không đúng định dạng'
+  if (!email.value) errors.email = 'Email không được để trống';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errors.email = 'Email không đúng định dạng';
 
-  if (!password.value) errors.password = 'Mật khẩu không được để trống'
-  else if (password.value.length < 8) errors.password = 'Mật khẩu phải có ít nhất 8 ký tự'
+  if (!password.value) errors.password = 'Mật khẩu không được để trống';
+  else if (password.value.length < 8) errors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
 
-  if (!confirmPassword.value) errors.confirmPassword = 'Vui lòng nhập lại mật khẩu'
-  else if (password.value !== confirmPassword.value) errors.confirmPassword = 'Xác nhận mật khẩu không khớp'
+  if (!confirmPassword.value) errors.confirmPassword = 'Vui lòng nhập lại mật khẩu';
+  else if (password.value !== confirmPassword.value) errors.confirmPassword = 'Xác nhận mật khẩu không khớp';
 
-  if (Object.values(errors).some(e => e)) return
+  if (Object.values(errors).some(e => e)) return;
 
-  loading.value = true
+  loading.value = true;
 
   try {
     const res = await registerApi({
@@ -223,26 +228,46 @@ const register = async () => {
       email: email.value,
       password_hash: password.value,
       password_hash_confirmation: confirmPassword.value
-    })
+    });
 
     if (res.errors) {
-      if (res.errors.full_name) errors.fullName = res.errors.full_name[0]
-      if (res.errors.email) errors.email = res.errors.email[0]
-      if (res.errors.password_hash) errors.password = res.errors.password_hash[0]
-      if (res.errors.phone) errors.phone = res.errors.phone[0]
-      return
+      if (res.errors.full_name) errors.fullName = res.errors.full_name[0];
+      if (res.errors.email) errors.email = res.errors.email[0];
+      if (res.errors.password_hash) errors.password = res.errors.password_hash[0];
+      if (res.errors.phone) errors.phone = res.errors.phone[0];
+      return;
     }
 
     if (res.success) {
-      alert('Đăng ký thành công!')
-      navigateTo('/login')
+      toast.add({
+        title: "Đăng ký thành công! 🎉",
+        icon: "heroicons:check-circle",
+        timeout: 3000,
+        position: "bottom-right",
+        color: "success",
+        iconColor: "#ffffff",
+        style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+      });
+
+      navigateTo('/login');
     }
 
   } catch (err) {
-    console.error('❌ Lỗi đăng ký:', err)
-    alert('Có lỗi xảy ra, vui lòng thử lại!')
+    console.error('❌ Lỗi đăng ký:', err);
+
+    toast.add({
+      title: "Có lỗi xảy ra, vui lòng thử lại!",
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      color: "error",
+      iconColor: "#ffffff",
+      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+    });
+
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
+
 </script>

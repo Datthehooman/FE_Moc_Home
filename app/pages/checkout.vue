@@ -369,6 +369,8 @@ const router = useRouter();
 const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
 const checkoutStore = useCheckoutStore();
 const authStore = useAuthStore();
+  const toast = useToast();
+
 
 // Token
 let tokenCookie = useCookie("tokenLocal");
@@ -460,52 +462,75 @@ const totalAmount = computed(() => {
 
 // Submit payment
 const submitPayment = async () => {
-  const itemsToPay = checkoutItems.value.length ? checkoutItems.value : buyNowItem ? [buyNowItem] : [];
-  if (!itemsToPay.length) { 
-    alert("Không có sản phẩm để thanh toán"); 
-    router.replace("/error"); 
-    return; 
-  }
-  if (!validate()) { 
-    alert("Vui lòng điền đầy đủ thông tin"); 
-    return; 
+  const itemsToPay = checkoutItems.value.length
+    ? checkoutItems.value
+    : buyNowItem
+    ? [buyNowItem]
+    : [];
+
+  if (!itemsToPay.length) {
+    toast.add({
+      title: "Không có sản phẩm để thanh toán",
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      color: "error",
+      iconColor: "#ffffff",
+      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+    });
+    router.replace("/error");
+    return;
   }
 
-  // Tạo shipping_address dùng tên thay vì code
+  if (!validate()) {
+    toast.add({
+      title: "Vui lòng điền đầy đủ thông tin",
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      color: "error",
+      iconColor: "#ffffff",
+      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+    });
+    return;
+  }
+
   const shipping_address = `${form.addressDetail}, ${wardSearch.value}, ${provinceSearch.value}`;
-  
   let order_id = 0;
 
   try {
     const payload = isLoggedIn.value
-      ? { 
-          user_id: authStore.user.user_id, 
-          shipping_address, 
+      ? {
+          user_id: authStore.user.user_id,
+          shipping_address,
           province_code: selectedProvince.value,
           ward_code: selectedWard.value,
           province_name: provinceSearch.value,
           ward_name: wardSearch.value,
-          note: form.note || "", 
-          payment_method_id: paymentMethod.value === "online" ? 2 : 1, 
-          items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
-          voucher_code: form.voucher_code || null 
+          note: form.note || "",
+          payment_method_id: paymentMethod.value === "online" ? 2 : 1,
+          items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+          voucher_code: form.voucher_code || null,
         }
-      : { 
-          customer_name: `${form.firstName} ${form.lastName}`, 
-          customer_phone: form.phone, 
-          customer_email: form.email, 
-          shipping_address, 
+      : {
+          customer_name: `${form.firstName} ${form.lastName}`,
+          customer_phone: form.phone,
+          customer_email: form.email,
+          shipping_address,
           province_code: selectedProvince.value,
           ward_code: selectedWard.value,
           province_name: provinceSearch.value,
           ward_name: wardSearch.value,
-          note: form.note || "", 
-          payment_method_id: paymentMethod.value === "online" ? 2 : 1, 
-          items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
-          voucher_code: form.voucher_code || null 
+          note: form.note || "",
+          payment_method_id: paymentMethod.value === "online" ? 2 : 1,
+          items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+          voucher_code: form.voucher_code || null,
         };
 
-    const orderData = isLoggedIn.value ? await buyNow(payload) : await buyNowGuest(payload);
+    const orderData = isLoggedIn.value
+      ? await buyNow(payload)
+      : await buyNowGuest(payload);
+
     order_id = Number(orderData.order_id);
 
     if (paymentMethod.value === "online") {
@@ -513,14 +538,34 @@ const submitPayment = async () => {
       return;
     }
 
-    alert("Thanh toán thành công! 🎉");
+    toast.add({
+      title: "Thanh toán thành công! 🎉",
+      icon: "heroicons:check-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      color: "success",
+      iconColor: "#ffffff",
+      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+    });
+
     checkoutStore.clearCheckout();
     router.push({ path: "/thanks", query: { order_code: Number(orderData.order_code) } });
+
   } catch (err: any) {
-    console.error("❌ Lỗi khi tạo order:", err);
-    alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");
+    console.error("❌ Lỗi tạo order:", err);
+
+    toast.add({
+      title: err?.message || "Thanh toán thất bại, vui lòng thử lại",
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      color: "error",
+      iconColor: "#ffffff",
+      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+    });
   }
 };
+
 
 
 // On mounted

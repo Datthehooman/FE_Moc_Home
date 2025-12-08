@@ -335,7 +335,7 @@
 <script setup lang="ts">
   const authStore = useAuthStore();
   const router = useRouter();
-
+const toast = useToast();
   // Scroll header
   const isScrolled = ref(false);
   const handleScroll = () => {
@@ -368,20 +368,39 @@
   const closeUserDropdown = () => {
     isUserDropdownOpen.value = false;
   };
-  const logout = async () => {
-    await authStore.logout();
-    closeUserDropdown();
-    alert("Đăng xuất thành công 🎉");
-    router.push("/");
-  };
-  const goWishlist = () => {
-    if (!authStore.isLogged) {
-      alert("Vui lòng đăng nhập để xem danh sách yêu thích 🎯");
-      router.push("/login");
-    } else {
-      router.push("/user/wishlist");
-    }
-  };
+const logout = async () => {
+  await authStore.logout();
+  closeUserDropdown();
+
+  toast.add({
+    title: "🎉 Đăng xuất thành công!",
+    icon: "heroicons:check-circle",
+    timeout: 3000,
+    position: "top-right",
+    style: "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+    iconColor: "#ffffff", // icon màu trắng
+  });
+
+  router.push("/");
+};
+
+const goWishlist = () => {
+  if (!authStore.isLogged) {
+    toast.add({
+      title: "Vui lòng đăng nhập để xem danh sách yêu thích",
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "top-right",
+      style: "color:white; font-weight:600;",
+      iconColor: "#ffffff",
+      color: "error",
+    });
+    router.push("/login");
+  } else {
+    router.push("/user/wishlist");
+  }
+};
+
 
   // Click ngoài dropdown
   const handleClickOutside = (e: MouseEvent) => {

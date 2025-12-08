@@ -1,6 +1,7 @@
 // useWishlist.ts
 import { ref } from "vue";
 import { useCookie } from "#app";
+  const toast = useToast()
 
 export const useWishlist = () => {
   const wishlists = ref<any[]>([]);
@@ -44,28 +45,55 @@ export const useWishlist = () => {
 
   // 🟢 Thêm sản phẩm vào wishlist
   const addToWishlist = async (product_id: number) => {
-    if (!tokenCookie.value) {
-      alert("⚠️ Vui lòng đăng nhập để thêm vào yêu thích");
-      return false;
-    }
-    isLoading.value = true;
-    error.value = null;
-    try {
-      await $fetch("https://api.mocfurni.shop/api/client/wishlists", {
-        method: "POST",
-        body: { product_id },
-        headers: getAuthHeader(),
-      });
-      await fetchWishlist(); // Fetch lại danh sách
-      return true;
-    } catch (err: any) {
-      error.value = err?.data?.message || "Thêm vào yêu thích thất bại";
-      console.error("❌ Error adding to wishlist:", error.value);
-      return false;
-    } finally {
-      isLoading.value = false;
-    }
-  };
+  if (!tokenCookie.value) {
+    toast.add({
+      title: "Vui lòng đăng nhập để thêm vào yêu thích",
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      style: "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+      color: "error",
+      iconColor: "#ffffff",
+    });
+    return false;
+  }
+  isLoading.value = true;
+  error.value = null;
+  try {
+    await $fetch("https://api.mocfurni.shop/api/client/wishlists", {
+      method: "POST",
+      body: { product_id },
+      headers: getAuthHeader(),
+    });
+    await fetchWishlist(); // Fetch lại danh sách
+    toast.add({
+      title: "Thêm vào danh sách yêu thích thành công!",
+      icon: "heroicons:check-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      style: "color:white; font-weight:600;  box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+      iconColor: "#ffffff",
+      color: "success",
+
+    });
+    return true;
+  } catch (err: any) {
+    error.value = err?.data?.message || "Thêm vào yêu thích thất bại";
+    toast.add({
+      title: "❌ " + error.value,
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      style: "color:white; font-weight:600; ox-shadow:0 4px 10px rgba(0,0,0,0.2);",
+      iconColor: "#ffffff",
+      color: "error",
+    });
+    return false;
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 
   // 🔴 Xóa sản phẩm khỏi wishlist
   const removeFromWishlist = async (product_id: number) => {

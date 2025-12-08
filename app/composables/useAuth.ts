@@ -105,24 +105,35 @@ export const useAuth = () => {
   };
 
   // ===================== SEND RESET PASSWORD OTP =====================
-  const sendResetPasswordOtp = async (email: string): Promise<ApiResponse> => {
-    try {
-      return await $fetch<ApiResponse>(
-        "https://api.mocfurni.shop/api/client/sendOtp-password-v1",
-        {
-          method: "POST",
-          body: { email },
-        }
-      );
-    } catch (error: any) {
-      const msg = error?.data?.errors
-        ? Object.values(error.data.errors)[0][0]
-        : error?.data?.message || "Không thể gửi mã OTP";
+const sendResetPasswordOtp = async (email: string): Promise<ApiResponse> => {
+  const toast = useToast(); // nhớ import useToast từ PrimeVue
 
-      alert(msg);
-      throw error.data || { message: "Không thể gửi mã OTP" };
-    }
-  };
+  try {
+    return await $fetch<ApiResponse>(
+      "https://api.mocfurni.shop/api/client/sendOtp-password-v1",
+      {
+        method: "POST",
+        body: { email },
+      }
+    );
+  } catch (error: any) {
+    const msg = error?.data?.errors
+      ? Object.values(error.data.errors)[0][0]
+      : error?.data?.message || "Không thể gửi mã OTP";
+
+    toast.add({
+      title: msg,
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      style: "color:white; font-weight:600; background-color:#dc3545; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+      iconColor: "#ffffff",
+    });
+
+    throw error.data || { message: "Không thể gửi mã OTP" };
+  }
+};
+
 
   // ===================== FETCH USER PROFILE =====================
   const fetchUserProfile = async () => {
