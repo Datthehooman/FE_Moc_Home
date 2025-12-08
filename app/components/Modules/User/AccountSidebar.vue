@@ -97,7 +97,7 @@
       path: "/user/address",
       icon: "heroicons:map-pin",
     },
-    { name: "Hỗ trợ", path: "/user/support", icon: "heroicons:lifebuoy" },
+    // { name: "Hỗ trợ", path: "/user/support", icon: "heroicons:lifebuoy" },
     {
       name: "Theo dõi đơn hàng",
       path: "/user/track-order",
