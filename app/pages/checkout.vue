@@ -4,7 +4,7 @@
       class="max-w-[90%] mx-auto flex flex-col lg:flex-row gap-8 justify-between"
     >
       <!-- FORM THANH TOÁN -->
-     <!-- FORM THANH TOÁN -->
+      <!-- FORM THANH TOÁN -->
       <div
         class="flex-[2.3] bg-white rounded-2xl border border-gray-200 p-6 shadow-sm w-full"
       >
@@ -16,7 +16,9 @@
           <!-- Họ và tên, email, phone (chỉ hiển thị khi guest) -->
           <div v-if="isLoggedIn">
             <div>
-              <label class="block font-medium mb-1 text-[#6E4E37]">Họ và tên</label>
+              <label class="block font-medium mb-1 text-[#6E4E37]"
+                >Họ và tên</label
+              >
               <input
                 v-model="form.full_name"
                 placeholder="Nhập họ và tên"
@@ -29,7 +31,9 @@
 
             <div class="grid grid-cols-2 gap-4 mt-3">
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Email</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]"
+                  >Email</label
+                >
                 <input
                   v-model="form.email"
                   placeholder="Nhập email"
@@ -40,7 +44,9 @@
                 </p>
               </div>
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]"
+                  >Số điện thoại</label
+                >
                 <input
                   v-model="form.phone"
                   placeholder="Nhập số điện thoại"
@@ -81,7 +87,9 @@
 
             <div class="grid grid-cols-2 gap-4 mt-3">
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Email</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]"
+                  >Email</label
+                >
                 <input
                   v-model="form.email"
                   placeholder="Nhập email"
@@ -92,7 +100,9 @@
                 </p>
               </div>
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]"
+                  >Số điện thoại</label
+                >
                 <input
                   v-model="form.phone"
                   placeholder="Nhập số điện thoại"
@@ -110,61 +120,60 @@
             <label class="block font-medium mb-1 text-[#6E4E37]">Địa chỉ</label>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
               <div class="relative">
-              <input
-                type="text"
-                v-model="provinceSearch"
-                @focus="showProvinceList = true"
-                placeholder="Tìm tỉnh / thành phố..."
-                class="w-full border border-gray-300 rounded-xl px-3 py-2"
-              />
+                <input
+                  type="text"
+                  v-model="provinceSearch"
+                  @focus="showProvinceList = true"
+                  placeholder="Tìm tỉnh / thành phố..."
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2"
+                />
 
-              <!-- LIST TỈNH -->
-              <ul
-                v-if="showProvinceList"
-                class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
-              >
-                <li
-                  v-for="p in filteredProvinces"
-                  :key="p.code"
-                  @click="selectProvince(p)"
-                  class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                <!-- LIST TỈNH -->
+                <ul
+                  v-if="showProvinceList"
+                  class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
                 >
-                  {{ p.name }}
-                </li>
-              </ul>
+                  <li
+                    v-for="p in filteredProvinces"
+                    :key="p.code"
+                    @click="selectProvince(p)"
+                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    {{ p.name }}
+                  </li>
+                </ul>
 
-              <p v-if="errors.province" class="text-red-500 text-xs mt-1">
-                {{ errors.province }}
-              </p>
-            </div>
-          <div class="relative">
-  <input
-    type="text"
-    v-model="wardSearch"
-    @focus="showWardList = true"
-    placeholder="Tìm xã / phường..."
-    class="w-full border border-gray-300 rounded-xl px-3 py-2"
-  />
+                <p v-if="errors.province" class="text-red-500 text-xs mt-1">
+                  {{ errors.province }}
+                </p>
+              </div>
+              <div class="relative">
+                <input
+                  type="text"
+                  v-model="wardSearch"
+                  @focus="showWardList = true"
+                  placeholder="Tìm xã / phường..."
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2"
+                />
 
-  <ul
-    v-if="showWardList"
-    class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
-  >
-    <li
-      v-for="w in filteredWards"
-      :key="w.code"
-      @click="selectWard(w)"
-      class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-    >
-      {{ w.name }}
-    </li>
-  </ul>
+                <ul
+                  v-if="showWardList"
+                  class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
+                >
+                  <li
+                    v-for="w in filteredWards"
+                    :key="w.code"
+                    @click="selectWard(w)"
+                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    {{ w.name }}
+                  </li>
+                </ul>
 
-  <p v-if="errors.ward" class="text-red-500 text-xs mt-1">
-    {{ errors.ward }}
-  </p>
-</div>
-
+                <p v-if="errors.ward" class="text-red-500 text-xs mt-1">
+                  {{ errors.ward }}
+                </p>
+              </div>
             </div>
 
             <div class="mt-3">
@@ -174,10 +183,7 @@
                 placeholder="Địa chỉ cụ thể"
                 class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
               />
-              <p
-                v-if="errors.addressDetail"
-                class="text-red-500 text-xs mt-1"
-              >
+              <p v-if="errors.addressDetail" class="text-red-500 text-xs mt-1">
                 {{ errors.addressDetail }}
               </p>
             </div>
@@ -235,7 +241,7 @@
               Phương thức thanh toán
             </h3>
             <div class="flex flex-col gap-3">
-                <label class="flex items-center gap-3 cursor-pointer">
+              <label class="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
                   name="payment"
@@ -337,15 +343,15 @@
         <div v-else class="text-center text-red-500">
           Không có sản phẩm để thanh toán, quay lại sản phẩm để mua
         </div>
-<div class="mt-4">
-  <label class="text-sm font-medium">Mã giảm giá</label>
-  <input
-    v-model="form.voucher_code"
-    type="text"
-    placeholder="Nhập mã giảm giá"
-    class="w-full mt-1 px-3 py-2 border rounded-lg"
-  />
-</div>
+        <div class="mt-4">
+          <label class="text-sm font-medium">Mã giảm giá</label>
+          <input
+            v-model="form.voucher_code"
+            type="text"
+            placeholder="Nhập mã giảm giá"
+            class="w-full mt-1 px-3 py-2 border rounded-lg"
+          />
+        </div>
 
         <a
           href="/cart"
@@ -369,21 +375,20 @@ const router = useRouter();
 const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
 const checkoutStore = useCheckoutStore();
 const authStore = useAuthStore();
-  const toast = useToast();
+const toast = useToast();
 
-
-// Token
+/* ------------------ LOGIN CHECK ------------------ */
 let tokenCookie = useCookie("tokenLocal");
 if (!tokenCookie.value) {
   tokenCookie = useCookie("token", { path: "/", domain: ".mocfurni.shop" });
 }
 const isLoggedIn = computed(() => !!tokenCookie.value);
 
-// Checkout items
+/* ------------------ CART DATA ------------------ */
 const checkoutItems = computed(() => checkoutStore.cartItems || []);
 const buyNowItem = checkoutStore.buyNowItem;
 
-// Form
+/* ------------------ FORM DATA ------------------ */
 const form = reactive({
   firstName: "",
   lastName: "",
@@ -395,35 +400,52 @@ const form = reactive({
   voucher_code: "",
 });
 
-// Payment & shipping
+/* ------------------ SHIPPING ------------------ */
 const paymentMethod = ref("offline");
 const selectedShipping = ref("Tiêu chuẩn");
-const shippingMethods = [
-  { name: "Tiêu chuẩn", desc: "6–7 ngày", price: "Miễn phí" },
-];
+const shippingMethods = [{ name: "Tiêu chuẩn", desc: "6–7 ngày", price: "Miễn phí" }];
 
-// Address
+/* ------------------ ADDRESS ------------------ */
 const { provinces, wards, fetchProvinces, fetchWards } = useAddress();
 const selectedProvince = ref("");
 const selectedWard = ref("");
+const provinceSearch = ref("");
+const wardSearch = ref("");
+const showProvinceList = ref(false);
+const showWardList = ref(false);
 
-// Update wards khi chọn province
-const updateWards = async () => {
-  if (!selectedProvince.value) {
-    wards.value = [];
-    selectedWard.value = "";
-    return;
-  }
-  await fetchWards(selectedProvince.value);
-  selectedWard.value = "";
+/* Filter for autocomplete */
+const filteredProvinces = computed(() =>
+  provinces.value.filter((p) =>
+    p.name.toLowerCase().includes(provinceSearch.value.toLowerCase())
+  )
+);
+
+const filteredWards = computed(() =>
+  wards.value.filter((w) =>
+    w.name.toLowerCase().includes(wardSearch.value.toLowerCase())
+  )
+);
+
+const selectProvince = (p: any) => {
+  provinceSearch.value = p.name;
+  selectedProvince.value = p.code;
+  showProvinceList.value = false;
+  fetchWards(p.code);
 };
 
-// Errors
+const selectWard = (w: any) => {
+  wardSearch.value = w.name;
+  selectedWard.value = w.code;
+  showWardList.value = false;
+};
+
+/* ------------------ ERRORS ------------------ */
 const errors = reactive<any>({});
 
-// Validate form
+/* ------------------ VALIDATION ------------------ */
 const validate = () => {
-  Object.keys(errors).forEach((key) => (errors[key] = ""));
+  Object.keys(errors).forEach((k) => (errors[k] = ""));
   let valid = true;
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -431,52 +453,50 @@ const validate = () => {
 
   if (isLoggedIn.value) {
     if (!form.full_name) { errors.full_name = "Họ và tên không được để trống"; valid = false; }
-    if (!form.email) { errors.email = "Email không được để trống"; valid = false; }
-    else if (!emailRegex.test(form.email)) { errors.email = "Email không đúng định dạng"; valid = false; }
-    if (!form.phone) { errors.phone = "SĐT không được để trống"; valid = false; }
-    else if (!phoneRegex.test(form.phone)) { errors.phone = "SĐT không đúng định dạng"; valid = false; }
   } else {
     if (!form.firstName) { errors.firstName = "Họ không được để trống"; valid = false; }
     if (!form.lastName) { errors.lastName = "Tên không được để trống"; valid = false; }
-    if (!form.email) { errors.email = "Email không được để trống"; valid = false; }
-    else if (!emailRegex.test(form.email)) { errors.email = "Email không đúng định dạng"; valid = false; }
-    if (!form.phone) { errors.phone = "SĐT không được để trống"; valid = false; }
-    else if (!phoneRegex.test(form.phone)) { errors.phone = "SĐT không đúng định dạng"; valid = false; }
   }
+
+  if (!form.email) { errors.email = "Email không được để trống"; valid = false; }
+  else if (!emailRegex.test(form.email)) { errors.email = "Email không đúng định dạng"; valid = false; }
+
+  if (!form.phone) { errors.phone = "SĐT không được để trống"; valid = false; }
+  else if (!phoneRegex.test(form.phone)) { errors.phone = "SĐT không đúng định dạng"; valid = false; }
 
   if (!selectedProvince.value) { errors.province = "Chọn tỉnh/thành phố"; valid = false; }
   if (!selectedWard.value) { errors.ward = "Chọn xã/phường"; valid = false; }
   if (!form.addressDetail) { errors.addressDetail = "Nhập địa chỉ cụ thể"; valid = false; }
-  if (!selectedShipping.value) { errors.shipping = "Chọn hình thức vận chuyển"; valid = false; }
+
   if (!paymentMethod.value) { errors.paymentMethod = "Chọn phương thức thanh toán"; valid = false; }
 
   return valid;
 };
 
-// Total amount
+/* ------------------ TOTAL AMOUNT ------------------ */
 const totalAmount = computed(() => {
-  const items = checkoutItems.value.length ? checkoutItems.value : buyNowItem ? [buyNowItem] : [];
-  const total = items.reduce((acc, i) => acc + (i.product_sale || i.product_price || i.price) * i.quantity, 0);
-  return total + (selectedShipping.value === "Nhanh" ? 30000 : 0);
+  const items = checkoutItems.value.length
+    ? checkoutItems.value
+    : buyNowItem ? [buyNowItem] : [];
+
+  const base = items.reduce(
+    (acc, i) => acc + (i.product_sale || i.product_price || i.price) * i.quantity,
+    0
+  );
+
+  return base + (selectedShipping.value === "Nhanh" ? 30000 : 0);
 });
 
-// Submit payment
+/* ------------------ SUBMIT PAYMENT ------------------ */
 const submitPayment = async () => {
   const itemsToPay = checkoutItems.value.length
     ? checkoutItems.value
-    : buyNowItem
-    ? [buyNowItem]
-    : [];
+    : buyNowItem ? [buyNowItem] : [];
 
   if (!itemsToPay.length) {
     toast.add({
       title: "Không có sản phẩm để thanh toán",
-      icon: "heroicons:exclamation-circle",
-      timeout: 3000,
-      position: "bottom-right",
       color: "error",
-      iconColor: "#ffffff",
-      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
     });
     router.replace("/error");
     return;
@@ -485,173 +505,52 @@ const submitPayment = async () => {
   if (!validate()) {
     toast.add({
       title: "Vui lòng điền đầy đủ thông tin",
-      icon: "heroicons:exclamation-circle",
-      timeout: 3000,
-      position: "bottom-right",
       color: "error",
-      iconColor: "#ffffff",
-      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
     });
     return;
   }
 
   const shipping_address = `${form.addressDetail}, ${wardSearch.value}, ${provinceSearch.value}`;
-  let order_id = 0;
 
-  try {
-    const payload = isLoggedIn.value
-      ? {
-          user_id: authStore.user.user_id,
-          shipping_address,
-          province_code: selectedProvince.value,
-          ward_code: selectedWard.value,
-          province_name: provinceSearch.value,
-          ward_name: wardSearch.value,
-          note: form.note || "",
-          payment_method_id: paymentMethod.value === "online" ? 2 : 1,
-          items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
-          voucher_code: form.voucher_code || null,
-        }
-      : {
-          customer_name: `${form.firstName} ${form.lastName}`,
-          customer_phone: form.phone,
-          customer_email: form.email,
-          shipping_address,
-          province_code: selectedProvince.value,
-          ward_code: selectedWard.value,
-          province_name: provinceSearch.value,
-          ward_name: wardSearch.value,
-          note: form.note || "",
-          payment_method_id: paymentMethod.value === "online" ? 2 : 1,
-          items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
-          voucher_code: form.voucher_code || null,
-        };
+  const payload = isLoggedIn.value
+    ? {
+        user_id: authStore.user.user_id,
+        shipping_address,
+        province_code: selectedProvince.value,
+        ward_code: selectedWard.value,
+        province_name: provinceSearch.value,
+        ward_name: wardSearch.value,
+        note: form.note || "",
+        payment_method_id: paymentMethod.value === "online" ? 2 : 1,
+        items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
+        voucher_code: form.voucher_code || null,
+      }
+    : {
+        customer_name: `${form.firstName} ${form.lastName}`,
+        customer_phone: form.phone,
+        customer_email: form.email,
+        shipping_address,
+        province_code: selectedProvince.value,
+        ward_code: selectedWard.value,
+        province_name: provinceSearch.value,
+        ward_name: wardSearch.value,
+        note: form.note || "",
+        payment_method_id: paymentMethod.value === "online" ? 2 : 1,
+        items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
+        voucher_code: form.voucher_code || null,
+      };
 
-    const orderData = isLoggedIn.value
-      ? await buyNow(payload)
-      : await buyNowGuest(payload);
+  const orderData = isLoggedIn.value
+    ? await buyNow(payload)
+    : await buyNowGuest(payload);
 
-    order_id = Number(orderData.order_id);
+  const order_id = Number(orderData.order_id);
 
-    if (paymentMethod.value === "online") {
-      await payWithVNPAY({ order_id });
-      return;
-    }
-
-    toast.add({
-      title: "Thanh toán thành công! 🎉",
-      icon: "heroicons:check-circle",
-      timeout: 3000,
-      position: "bottom-right",
-      color: "success",
-      iconColor: "#ffffff",
-      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
-    });
-
-    checkoutStore.clearCheckout();
-    router.push({ path: "/thanks", query: { order_code: Number(orderData.order_code) } });
-
-  } catch (err: any) {
-    console.error("❌ Lỗi tạo order:", err);
-
-    toast.add({
-      title: err?.message || "Thanh toán thất bại, vui lòng thử lại",
-      icon: "heroicons:exclamation-circle",
-      timeout: 3000,
-      position: "bottom-right",
-      color: "error",
-      iconColor: "#ffffff",
-      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
-    });
-  }
-};
-
-
-
-// On mounted
-onMounted(async () => {
-  await fetchProvinces();
-
-  if (isLoggedIn.value && authStore.user) {
-    form.firstName = authStore.user.firstName || "";
-    form.lastName = authStore.user.lastName || "";
-    form.full_name = authStore.user.full_name || "";
-    form.email = authStore.user.email || "";
-    form.phone = authStore.user.phone || "";
-
-    // ✅ Lấy địa chỉ mặc định
-    const defaultAddress = authStore.addresses.find(a => a.is_default);
-    if (defaultAddress) {
-      // Tỉnh
-      selectedProvince.value = defaultAddress.province.code;
-      provinceSearch.value = defaultAddress.province.name;
-
-      // Load wards cho tỉnh
-      await fetchWards(defaultAddress.province.code);
-
-      // Xã
-      selectedWard.value = defaultAddress.ward.code;
-      wardSearch.value = defaultAddress.ward.name;
-
-      // Địa chỉ chi tiết
-      form.addressDetail = defaultAddress.address_line || "";
-    }
+  if (paymentMethod.value === "online") {
+    await payWithVNPAY({ order_id });
+    return;
   }
 
-  if (!checkoutItems.value.length && !buyNowItem) router.replace("/error");
-});
-
-
-
-// Format price
-function formatPrice(value: number | undefined | null) {
-  return (Number(value) || 0).toLocaleString("vi-VN") + " đ";
-}
-
-function removeVietnameseTones(str: string) {
-  return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
-
-
-const provinceSearch = ref("");
-const showProvinceList = ref(false);
-
-const filteredProvinces = computed(() => {
-  const keyword = removeVietnameseTones(provinceSearch.value);
-  return provinces.value.filter(p => {
-    const name = removeVietnameseTones(p.name);
-    const name_en = removeVietnameseTones(p.name_en || "");
-    return name.includes(keyword) || name_en.includes(keyword);
-  });
-});
-
-const selectProvince = (province: any) => {
-  selectedProvince.value = province.code;
-  provinceSearch.value = province.name;
-  showProvinceList.value = false;
-
-  updateWards(); // load lại xã/phường
+  router.replace(`/payment-success?order_id=${order_id}`);
 };
-
-const wardSearch = ref("");
-const showWardList = ref(false);
-
-const filteredWards = computed(() => {
-  const keyword = removeVietnameseTones(wardSearch.value);
-  return wards.value.filter(w => {
-    const name = removeVietnameseTones(w.name);
-    const name_en = removeVietnameseTones(w.name_en || "");
-    return name.includes(keyword) || name_en.includes(keyword);
-  });
-});
-
-const selectWard = (ward: any) => {
-  selectedWard.value = ward.code;
-  wardSearch.value = ward.name;
-  showWardList.value = false;
-};
-
 </script>

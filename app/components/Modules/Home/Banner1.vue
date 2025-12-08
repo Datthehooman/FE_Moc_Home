@@ -5,6 +5,7 @@
 
     <UCarousel
       v-slot="{ item }"
+      :duration="50"
       :items="items"
       dots
       loop

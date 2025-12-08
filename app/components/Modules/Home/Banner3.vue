@@ -4,6 +4,7 @@
     <div class="absolute inset-0 flex justify-center top-[51px]">
       <UCarousel
         v-slot="{ item }"
+        :duration="50"
         :items="items"
         dots
         :autoplay="{ delay: 2000 }"

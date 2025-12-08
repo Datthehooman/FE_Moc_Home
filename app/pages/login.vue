@@ -141,17 +141,17 @@
   </div>
 </template>
 <script setup lang="ts">
-  const auth = useAuthStore();
-  const toast = useToast();
+const auth = useAuthStore();
+const toast = useToast();
 
-  const email = ref("");
-  const password = ref("");
-  const remember = ref(false);
-  const errors = reactive({ email: "", password: "" });
-  const isSubmitting = ref(false);
+const email = ref("");
+const password = ref("");
+const remember = ref(false);
+const errors = reactive({ email: "", password: "" });
+const isSubmitting = ref(false);
 
-  const handleLogin = async () => {
-  // reset errors
+const handleLogin = async () => {
+  // Reset error messages
   errors.email = "";
   errors.password = "";
 
@@ -174,30 +174,54 @@
 
   isSubmitting.value = false;
 
+  /* ---------------------------------------------------------
+   * MERGED ERROR HANDLING (safe + beautiful)
+   * --------------------------------------------------------- */
   if (error) {
     if (error.statusCode === 422) {
+      // backend validation error
+      errors.email = error.data?.email?.[0] || "";
+      errors.password = error.data?.password_hash?.[0] || "";
+
       toast.add({
-        title: error.data?.email?.[0] || error.data?.password_hash?.[0] || "Dữ liệu không hợp lệ",
+        title:
+          error.data?.email?.[0] ||
+          error.data?.password_hash?.[0] ||
+          "Dữ liệu không hợp lệ",
         color: "error",
       });
     } else if (error.statusCode === 401) {
-      toast.add({ title: "Email hoặc mật khẩu không đúng", color: "error" });
+      errors.email = "Email hoặc mật khẩu không đúng";
+      errors.password = "Email hoặc mật khẩu không đúng";
+
+      toast.add({
+        title: "Email hoặc mật khẩu không đúng",
+        color: "error",
+      });
     } else {
-      toast.add({ title: error.message || "Lỗi không xác định", color: "error" });
+      toast.add({
+        title: error.message || "Lỗi không xác định",
+        color: "error",
+      });
     }
-  } else {
-    // ✅ Toast thành công custom sang hơn
-   toast.add({
-  title: "Đăng nhập thành công!",
-  icon: "heroicons:check-circle",
-  timeout: 3000,
-  position: "top-right",
-  style: " color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
-  iconColor: "#ffffff", // icon màu trắng
-});
 
-    navigateTo("/"); // redirect về trang chủ
+    return;
   }
-};
 
+  /* ---------------------------------------------------------
+   * SUCCESS (merged beautiful toast from Tien-Quan)
+   * --------------------------------------------------------- */
+  toast.add({
+    title: "Đăng nhập thành công!",
+    icon: "heroicons:check-circle",
+    timeout: 3000,
+    position: "top-right",
+    style:
+      "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+    iconColor: "#ffffff",
+    color: "success",
+  });
+
+  navigateTo("/");
+};
 </script>

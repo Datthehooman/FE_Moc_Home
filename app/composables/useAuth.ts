@@ -1,9 +1,10 @@
 // composables/useAuth.ts
 import { useCookie } from "#app";
 import { ref, computed } from "vue";
-  
+
 export const useAuth = () => {
   const user = ref<any>({});
+  const toast = useToast();
 
   // ===================== TOKEN PRIORITY =====================
   let tokenCookie = useCookie("tokenLocal");
@@ -105,35 +106,33 @@ export const useAuth = () => {
   };
 
   // ===================== SEND RESET PASSWORD OTP =====================
-const sendResetPasswordOtp = async (email: string): Promise<ApiResponse> => {
-  const toast = useToast(); // nhớ import useToast từ PrimeVue
+  const sendResetPasswordOtp = async (email: string): Promise<ApiResponse> => {
+    try {
+      return await $fetch<ApiResponse>(
+        "https://api.mocfurni.shop/api/client/sendOtp-password-v1",
+        {
+          method: "POST",
+          body: { email },
+        }
+      );
+    } catch (error: any) {
+      const msg = error?.data?.errors
+        ? Object.values(error.data.errors)[0][0]
+        : error?.data?.message || "Không thể gửi mã OTP";
 
-  try {
-    return await $fetch<ApiResponse>(
-      "https://api.mocfurni.shop/api/client/sendOtp-password-v1",
-      {
-        method: "POST",
-        body: { email },
-      }
-    );
-  } catch (error: any) {
-    const msg = error?.data?.errors
-      ? Object.values(error.data.errors)[0][0]
-      : error?.data?.message || "Không thể gửi mã OTP";
+      toast.add({
+        title: msg,
+        icon: "heroicons:exclamation-circle",
+        timeout: 3000,
+        position: "bottom-right",
+        style:
+          "color:white; font-weight:600; background-color:#dc3545; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+        iconColor: "#ffffff",
+      });
 
-    toast.add({
-      title: msg,
-      icon: "heroicons:exclamation-circle",
-      timeout: 3000,
-      position: "bottom-right",
-      style: "color:white; font-weight:600; background-color:#dc3545; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
-      iconColor: "#ffffff",
-    });
-
-    throw error.data || { message: "Không thể gửi mã OTP" };
-  }
-};
-
+      throw error.data || { message: "Không thể gửi mã OTP" };
+    }
+  };
 
   // ===================== FETCH USER PROFILE =====================
   const fetchUserProfile = async () => {
@@ -202,24 +201,28 @@ const sendResetPasswordOtp = async (email: string): Promise<ApiResponse> => {
   };
 
   // ===================== VERIFY OTP =====================
-const verifyOtp = async (otp: string): Promise<{ success: boolean; message: string; data?: any }> => {
-  try {
-    const res = await $fetch("https://api.mocfurni.shop/api/client/verify-otp", {
-      method: "POST",
-      body: { otp },
-    });
+  const verifyOtp = async (
+    otp: string
+  ): Promise<{ success: boolean; message: string; data?: any }> => {
+    try {
+      const res = await $fetch(
+        "https://api.mocfurni.shop/api/client/verify-otp",
+        {
+          method: "POST",
+          body: { otp },
+        }
+      );
 
-    // Giả sử API trả về success/false và message
-    return {
-      success: res.success ?? true,
-      message: res.message || "Xác thực OTP thành công",
-      data: res.data || null,
-    };
-  } catch (error: any) {
-    const msg = error?.data?.message || "Xác thực OTP thất bại";
-    return { success: false, message: msg };
-  }
-};
+      return {
+        success: res.success ?? true,
+        message: res.message || "Xác thực OTP thành công",
+        data: res.data || null,
+      };
+    } catch (error: any) {
+      const msg = error?.data?.message || "Xác thực OTP thất bại";
+      return { success: false, message: msg };
+    }
+  };
 
   // ===================== LOGOUT =====================
   const logout = () => {
@@ -236,7 +239,7 @@ const verifyOtp = async (otp: string): Promise<{ success: boolean; message: stri
     checkEmailAvailable,
     checkPhoneAvailable,
     updateUserProfile,
-    verifyOtp, 
+    verifyOtp,
     tokenCookie,
     isLogged,
     user,

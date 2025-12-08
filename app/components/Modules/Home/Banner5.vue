@@ -13,6 +13,7 @@
     <div class="absolute inset-0 flex justify-center top-[159px]">
       <UCarousel
         v-slot="{ item }"
+        :duration="50"
         :items="items"
         dots
         :slides-to-scroll="2"

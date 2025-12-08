@@ -333,41 +333,45 @@
 </template>
 
 <script setup lang="ts">
-  const authStore = useAuthStore();
-  const router = useRouter();
+const authStore = useAuthStore();
+const router = useRouter();
 const toast = useToast();
-  // Scroll header
-  const isScrolled = ref(false);
-  const handleScroll = () => {
-    isScrolled.value = window.scrollY > 50;
-  };
 
-  // Search toggle (mobile only)
-  const isSearchOpen = ref(false);
-  const searchInputRef = ref<HTMLInputElement | null>(null);
-  const toggleSearch = () => {
-    isSearchOpen.value = !isSearchOpen.value;
-    if (isSearchOpen.value) {
-      nextTick(() => {
-        searchInputRef.value?.focus();
-      });
-    } else {
-      searchQuery.value = "";
-    }
-  };
+// Scroll header
+const isScrolled = ref(false);
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 50;
+};
 
-  // Mobile menu
-  const isMobileMenuOpen = ref(false);
+// Search toggle (mobile only)
+const isSearchOpen = ref(false);
+const searchInputRef = ref<HTMLInputElement | null>(null);
+const toggleSearch = () => {
+  isSearchOpen.value = !isSearchOpen.value;
+  if (isSearchOpen.value) {
+    nextTick(() => {
+      searchInputRef.value?.focus();
+    });
+  } else {
+    searchQuery.value = "";
+  }
+};
 
-  // User dropdown
-  const isUserDropdownOpen = ref(false);
-  const userDropdownRef = ref<HTMLElement | null>(null);
-  const toggleUserDropdown = () => {
-    isUserDropdownOpen.value = !isUserDropdownOpen.value;
-  };
-  const closeUserDropdown = () => {
-    isUserDropdownOpen.value = false;
-  };
+// Mobile menu
+const isMobileMenuOpen = ref(false);
+
+// User dropdown
+const isUserDropdownOpen = ref(false);
+const userDropdownRef = ref<HTMLElement | null>(null);
+
+const toggleUserDropdown = () => {
+  isUserDropdownOpen.value = !isUserDropdownOpen.value;
+};
+const closeUserDropdown = () => {
+  isUserDropdownOpen.value = false;
+};
+
+// 🔥 Final merged logout
 const logout = async () => {
   await authStore.logout();
   closeUserDropdown();
@@ -378,12 +382,13 @@ const logout = async () => {
     timeout: 3000,
     position: "top-right",
     style: "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
-    iconColor: "#ffffff", // icon màu trắng
+    iconColor: "#ffffff",
   });
 
   router.push("/");
 };
 
+// 🔥 Final merged wishlist handler
 const goWishlist = () => {
   if (!authStore.isLogged) {
     toast.add({
@@ -395,85 +400,85 @@ const goWishlist = () => {
       iconColor: "#ffffff",
       color: "error",
     });
+
     router.push("/login");
   } else {
     router.push("/user/wishlist");
   }
 };
 
-
-  // Click ngoài dropdown
-  const handleClickOutside = (e: MouseEvent) => {
-    if (
-      userDropdownRef.value &&
-      !userDropdownRef.value.contains(e.target as Node)
-    ) {
-      closeUserDropdown();
-    }
-  };
-
-  // Categories + products
-  interface Category {
-    title: string;
-    items: { id: number; name: string; slug: string }[];
+// Click outside dropdown
+const handleClickOutside = (e: MouseEvent) => {
+  if (userDropdownRef.value && !userDropdownRef.value.contains(e.target as Node)) {
+    closeUserDropdown();
   }
-  const categories = ref<Category[]>([]);
-  const fetchCategoriesAndProducts = async () => {
-    try {
-      const [catRes, prodRes] = await Promise.all([
-        fetch("https://api.mocfurni.shop/api/client/category"),
-        fetch("https://api.mocfurni.shop/api/client/products"),
-      ]);
+};
 
-      const catJson = await catRes.json();
-      const prodJson = await prodRes.json();
+// Categories + products
+interface Category {
+  title: string;
+  items: { id: number; name: string; slug: string }[];
+}
 
-      const categoriesData = catJson?.result?.data || [];
-      const productsData = prodJson?.result?.data || [];
+const categories = ref<Category[]>([]);
 
-      categories.value = categoriesData
-        .map((cat) => {
-          const items = productsData
-            .filter((p) => Number(p.category_id) === cat.id)
-            .slice(0, 4)
-            .map((p) => ({
-              id: p.product_id,
-              name: p.product_name,
-              slug: p.slug,
-            }));
+const fetchCategoriesAndProducts = async () => {
+  try {
+    const [catRes, prodRes] = await Promise.all([
+      fetch("https://api.mocfurni.shop/api/client/category"),
+      fetch("https://api.mocfurni.shop/api/client/products"),
+    ]);
 
-          return {
-            title: cat.category_name,
-            items,
-          };
-        })
-        .filter((c) => c.items.length > 0)
-        .slice(0, 3);
-    } catch (error) {
-      console.error("❌ Error fetching categories/products:", error);
-    }
-  };
+    const catJson = await catRes.json();
+    const prodJson = await prodRes.json();
 
-  // Search
-  const searchQuery = ref("");
-  const goSearch = () => {
-    if (searchQuery.value.trim()) {
-      router.push({
-        path: "/ProductList",
-        query: { search: searchQuery.value.trim() },
-      });
-      isSearchOpen.value = false;
-    }
-  };
+    const categoriesData = catJson?.result?.data || [];
+    const productsData = prodJson?.result?.data || [];
 
-  // Mounted / unmounted
-  onMounted(() => {
-    fetchCategoriesAndProducts();
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("click", handleClickOutside);
-  });
-  onUnmounted(() => {
-    window.removeEventListener("scroll", handleScroll);
-    window.removeEventListener("click", handleClickOutside);
-  });
+    categories.value = categoriesData
+      .map((cat) => {
+        const items = productsData
+          .filter((p) => Number(p.category_id) === cat.id)
+          .slice(0, 4)
+          .map((p) => ({
+            id: p.product_id,
+            name: p.product_name,
+            slug: p.slug,
+          }));
+
+        return {
+          title: cat.category_name,
+          items,
+        };
+      })
+      .filter((c) => c.items.length > 0)
+      .slice(0, 3);
+  } catch (error) {
+    console.error("❌ Error fetching categories/products:", error);
+  }
+};
+
+// Search
+const searchQuery = ref("");
+const goSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({
+      path: "/ProductList",
+      query: { search: searchQuery.value.trim() },
+    });
+    isSearchOpen.value = false;
+  }
+};
+
+// Mounted / unmounted
+onMounted(() => {
+  fetchCategoriesAndProducts();
+  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("click", handleClickOutside);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener("click", handleClickOutside);
+});
 </script>

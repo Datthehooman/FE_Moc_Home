@@ -1,12 +1,14 @@
 // useWishlist.ts
 import { ref } from "vue";
 import { useCookie } from "#app";
-  const toast = useToast()
 
 export const useWishlist = () => {
+  const toast = useToast();
   const wishlists = ref<any[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+
+  // ================= TOKEN =================
   let tokenCookie = useCookie("tokenLocal");
 
   if (!tokenCookie.value) {
@@ -20,84 +22,87 @@ export const useWishlist = () => {
     Authorization: `Bearer ${tokenCookie.value}`,
   });
 
-  // 🟢 Lấy danh sách wishlist
+  // ================= TOAST HELPERS =================
+  const showErrorToast = (msg: string) => {
+    toast.add({
+      title: msg,
+      icon: "heroicons:exclamation-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      style:
+        "color:white; font-weight:600; background-color:#dc3545; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+      iconColor: "#ffffff",
+    });
+  };
+
+  const showSuccessToast = (msg: string) => {
+    toast.add({
+      title: msg,
+      icon: "heroicons:check-circle",
+      timeout: 3000,
+      position: "bottom-right",
+      style:
+        "color:white; font-weight:600; background-color:#28a745; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+      iconColor: "#ffffff",
+    });
+  };
+
+  // ================= FETCH WISHLIST =================
   const fetchWishlist = async () => {
     if (!tokenCookie.value) return null;
     isLoading.value = true;
     error.value = null;
+
     try {
       const res: any = await $fetch(
         "https://api.mocfurni.shop/api/client/wishlists",
-        {
-          headers: getAuthHeader(),
-        }
+        { headers: getAuthHeader() }
       );
+
       wishlists.value = res.result.data;
       return res.result.data;
     } catch (err: any) {
       error.value = err?.message || "Lỗi lấy danh sách yêu thích";
-      console.error("❌ Error fetching wishlist:", error.value);
+      showErrorToast(error.value);
       return null;
     } finally {
       isLoading.value = false;
     }
   };
 
-  // 🟢 Thêm sản phẩm vào wishlist
+  // ================= ADD TO WISHLIST =================
   const addToWishlist = async (product_id: number) => {
-  if (!tokenCookie.value) {
-    toast.add({
-      title: "Vui lòng đăng nhập để thêm vào yêu thích",
-      icon: "heroicons:exclamation-circle",
-      timeout: 3000,
-      position: "bottom-right",
-      style: "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
-      color: "error",
-      iconColor: "#ffffff",
-    });
-    return false;
-  }
-  isLoading.value = true;
-  error.value = null;
-  try {
-    await $fetch("https://api.mocfurni.shop/api/client/wishlists", {
-      method: "POST",
-      body: { product_id },
-      headers: getAuthHeader(),
-    });
-    await fetchWishlist(); // Fetch lại danh sách
-    toast.add({
-      title: "Thêm vào danh sách yêu thích thành công!",
-      icon: "heroicons:check-circle",
-      timeout: 3000,
-      position: "bottom-right",
-      style: "color:white; font-weight:600;  box-shadow:0 4px 10px rgba(0,0,0,0.2);",
-      iconColor: "#ffffff",
-      color: "success",
+    if (!tokenCookie.value) {
+      showErrorToast("Vui lòng đăng nhập để thêm vào yêu thích");
+      return false;
+    }
 
-    });
-    return true;
-  } catch (err: any) {
-    error.value = err?.data?.message || "Thêm vào yêu thích thất bại";
-    toast.add({
-      title: "❌ " + error.value,
-      icon: "heroicons:exclamation-circle",
-      timeout: 3000,
-      position: "bottom-right",
-      style: "color:white; font-weight:600; ox-shadow:0 4px 10px rgba(0,0,0,0.2);",
-      iconColor: "#ffffff",
-      color: "error",
-    });
-    return false;
-  } finally {
-    isLoading.value = false;
-  }
-};
+    isLoading.value = true;
+    error.value = null;
 
+    try {
+      await $fetch("https://api.mocfurni.shop/api/client/wishlists", {
+        method: "POST",
+        body: { product_id },
+        headers: getAuthHeader(),
+      });
 
-  // 🔴 Xóa sản phẩm khỏi wishlist
+      await fetchWishlist();
+      showSuccessToast("Thêm vào danh sách yêu thích thành công!");
+      return true;
+    } catch (err: any) {
+      error.value = err?.data?.message || "Thêm vào yêu thích thất bại";
+      showErrorToast(error.value);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  // ================= REMOVE ONE =================
   const removeFromWishlist = async (product_id: number) => {
     if (!tokenCookie.value) return false;
+
     try {
       await $fetch(
         `https://api.mocfurni.shop/api/client/wishlists/${product_id}`,
@@ -106,18 +111,21 @@ export const useWishlist = () => {
           headers: getAuthHeader(),
         }
       );
-      await fetchWishlist(); // Fetch lại danh sách
+
+      await fetchWishlist();
+      showSuccessToast("Đã xóa khỏi yêu thích!");
       return true;
     } catch (err: any) {
       error.value = err?.data?.message || "Xóa khỏi yêu thích thất bại";
-      console.error("❌ Error removing from wishlist:", error.value);
+      showErrorToast(error.value);
       return false;
     }
   };
 
-  // 🔴 Xóa nhiều sản phẩm khỏi wishlist
+  // ================= REMOVE MULTIPLE =================
   const removeMultipleFromWishlist = async (product_ids: number[]) => {
     if (!tokenCookie.value) return false;
+
     try {
       await $fetch(
         "https://api.mocfurni.shop/api/client/wishlists/remove-multiple",
@@ -127,38 +135,42 @@ export const useWishlist = () => {
           headers: getAuthHeader(),
         }
       );
-      await fetchWishlist(); // Fetch lại danh sách
+
+      await fetchWishlist();
+      showSuccessToast("Đã xóa nhiều sản phẩm khỏi yêu thích!");
       return true;
     } catch (err: any) {
       error.value = err?.data?.message || "Xóa nhiều sản phẩm thất bại";
-      console.error("❌ Error removing multiple from wishlist:", error.value);
+      showErrorToast(error.value);
       return false;
     }
   };
 
-  // 🔴 Xóa toàn bộ wishlist
+  // ================= CLEAR ALL =================
   const clearWishlist = async () => {
     if (!tokenCookie.value) return false;
+
     try {
       await $fetch("https://api.mocfurni.shop/api/client/wishlists", {
         method: "DELETE",
         headers: getAuthHeader(),
       });
-      await fetchWishlist(); // Fetch lại danh sách
+
+      await fetchWishlist();
+      showSuccessToast("Đã xóa toàn bộ danh sách yêu thích!");
       return true;
     } catch (err: any) {
       error.value = err?.data?.message || "Xóa toàn bộ yêu thích thất bại";
-      console.error("❌ Error clearing wishlist:", error.value);
+      showErrorToast(error.value);
       return false;
     }
   };
 
-  // 🟢 Kiểm tra sản phẩm có trong wishlist không
+  // ================= HELPERS =================
   const isInWishlist = (product_id: number): boolean => {
     return wishlists.value.some((item) => item.product_id === product_id);
   };
 
-  // 🟢 Lấy số lượng wishlist
   const getWishlistCount = () => {
     return wishlists.value.length;
   };

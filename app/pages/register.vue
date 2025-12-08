@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-[#FFFBF8] flex flex-col">
     <div class="flex-grow flex items-center justify-center p-4 mt-[50px]">
       <div class="w-full max-w-[540px] bg-white rounded-xl shadow-lg p-8 space-y-6">
-
+        
         <!-- Logo -->
         <div class="text-center">
           <div class="text-2xl font-bold text-[#6E4E37] mb-1 flex justify-center items-center space-x-2">
@@ -16,6 +16,7 @@
 
         <!-- Form -->
         <form @submit.prevent="register" novalidate class="space-y-4">
+          
           <!-- Họ và tên -->
           <div>
             <label class="block text-sm text-gray-700 mb-1">Họ và tên</label>
@@ -23,7 +24,7 @@
               type="text"
               v-model="fullName"
               placeholder="Nhập họ và tên"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-300"
               :class="{ 'border-red-500': errors.fullName }"
             />
             <p v-if="errors.fullName" class="text-red-500 text-sm mt-1">{{ errors.fullName }}</p>
@@ -32,12 +33,12 @@
           <!-- Số điện thoại -->
           <div>
             <label class="block text-sm text-gray-700 mb-1">Số điện thoại</label>
-           <input
+            <input
               type="tel"
               v-model="phone"
               placeholder="Nhập số điện thoại"
               @blur="checkPhone"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-300"
               :class="{ 'border-red-500': errors.phone }"
             />
             <p v-if="errors.phone" class="text-red-500 text-sm mt-1">{{ errors.phone }}</p>
@@ -51,7 +52,7 @@
               v-model="email"
               placeholder="Email"
               @blur="checkEmail"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-300"
               :class="{ 'border-red-500': errors.email }"
             />
             <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
@@ -64,7 +65,7 @@
               type="password"
               v-model="password"
               placeholder="Nhập mật khẩu"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-300"
               :class="{ 'border-red-500': errors.password }"
             />
             <p v-if="errors.password" class="text-red-500 text-sm mt-1">{{ errors.password }}</p>
@@ -77,7 +78,7 @@
               type="password"
               v-model="confirmPassword"
               placeholder="Nhập lại mật khẩu"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-300 placeholder-gray-400"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-300"
               :class="{ 'border-red-500': errors.confirmPassword }"
             />
             <p v-if="errors.confirmPassword" class="text-red-500 text-sm mt-1">{{ errors.confirmPassword }}</p>
@@ -87,21 +88,19 @@
           <button
             type="submit"
             :disabled="loading"
-            class="relative overflow-hidden w-full py-3 bg-[#edb173] text-black font-medium rounded-[10px] shadow flex justify-center items-center space-x-2 group disabled:opacity-70 disabled:cursor-not-allowed"
+            class="relative overflow-hidden w-full py-3 bg-[#edb173] text-black font-medium rounded-[10px] shadow"
           >
             <span v-if="loading" class="animate-spin rounded-full h-5 w-5 border-2 border-t-transparent border-black"></span>
-            <span v-else class="relative group-hover:text-white flex justify-center items-center space-x-2 text-[16px]">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
-                   viewBox="0 0 24 24" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 20h9M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" />
+            <span v-else class="flex justify-center items-center space-x-2 text-[16px]">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" />
               </svg>
               <span>Đăng ký</span>
             </span>
           </button>
         </form>
 
-        <!-- Login / OR -->
+        <!-- Login -->
         <div class="text-center text-sm text-gray-600">
           <p>
             Bạn đã có tài khoản?
@@ -119,105 +118,113 @@
 
         <!-- Social buttons -->
         <div class="flex space-x-3">
-          <button class="w-full py-2 border border-blue-600 text-blue-600 rounded-md flex justify-center items-center space-x-2 hover:bg-blue-50 transition">Facebook</button>
-          <button 
-           @click="auth.loginGoogle()"
-          class="w-full py-2 border border-red-500 text-red-500 rounded-md flex justify-center items-center space-x-2 hover:bg-red-50 transition">Google</button>
+          <button class="w-full py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition">
+            Facebook
+          </button>
+
+          <!-- KEEP Tien-Quan version (Google + function call) -->
+          <button
+            @click="auth.loginGoogle()"
+            class="w-full py-2 border border-red-500 text-red-500 rounded-md hover:bg-red-50 transition"
+          >
+            Google
+          </button>
         </div>
+
       </div>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive } from "vue";
 
-  const auth = useAuthStore();
-
-// IMPORT ĐỦ 3 HÀM TỪ useAuth
-const { 
-  register: registerApi, 
-  checkEmailAvailable,
-  checkPhoneAvailable
-} = useAuth()
-
-const fullName = ref('')
-const phone = ref('')
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
-const loading = ref(false)
+const auth = useAuthStore();
 const toast = useToast();
 
+const { register: registerApi, checkEmailAvailable, checkPhoneAvailable } = useAuth();
+
+const fullName = ref("");
+const phone = ref("");
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const loading = ref(false);
+
 const errors = reactive({
-  fullName: '',
-  phone: '',
-  email: '',
-  password: '',
-  confirmPassword: ''
-})
+  fullName: "",
+  phone: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+});
 
 // ================= CHECK PHONE =================
 const checkPhone = async () => {
-  errors.phone = ''
+  errors.phone = "";
 
-  if (!phone.value) return
+  if (!phone.value) return;
   if (!/^0\d{9}$/.test(phone.value)) {
-    errors.phone = 'Số điện thoại không hợp lệ (bắt đầu 0, 10 số)'
-    return
+    errors.phone = "Số điện thoại không hợp lệ (bắt đầu 0, 10 số)";
+    return;
   }
 
   try {
-    const res = await checkPhoneAvailable(phone.value)
-    if (!res.available) errors.phone = 'Số điện thoại đã tồn tại'
+    const res = await checkPhoneAvailable(phone.value);
+    if (!res.available) errors.phone = "Số điện thoại đã tồn tại";
   } catch (err) {
-    console.error(err)
-    errors.phone = 'Không thể kiểm tra số điện thoại'
+    errors.phone = "Không thể kiểm tra số điện thoại";
   }
-}
+};
 
 // ================= CHECK EMAIL =================
 const checkEmail = async () => {
-  errors.email = ''
+  errors.email = "";
 
-  if (!email.value) return
+  if (!email.value) return;
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.value)) {
-    errors.email = 'Email không đúng định dạng'
-    return
+    errors.email = "Email không đúng định dạng";
+    return;
   }
 
   try {
-    const res = await checkEmailAvailable(email.value)
-    if (!res.available) errors.email = 'Email đã được sử dụng'
+    const res = await checkEmailAvailable(email.value);
+    if (!res.available) errors.email = "Email đã được sử dụng";
   } catch (e) {
-    errors.email = 'Không thể kiểm tra email'
+    errors.email = "Không thể kiểm tra email";
   }
-}
+};
 
 // ================= REGISTER =================
 const register = async () => {
   // Reset lỗi
-  Object.keys(errors).forEach(key => (errors[key] = ''));
+  Object.keys(errors).forEach((key) => (errors[key] = ""));
 
   // Validate frontend
-  if (!fullName.value) errors.fullName = 'Tên không được để trống';
-  else if (/\d/.test(fullName.value)) errors.fullName = 'Tên không được chứa số';
+  if (!fullName.value) errors.fullName = "Tên không được để trống";
+  else if (/\d/.test(fullName.value)) errors.fullName = "Tên không được chứa số";
 
-  if (!phone.value) errors.phone = 'Số điện thoại không được để trống';
-  else if (!/^0\d{9}$/.test(phone.value)) errors.phone = 'Số điện thoại không hợp lệ (bắt đầu 0, 10 số)';
-  else if (phone.value.length > 20) errors.phone = 'Số điện thoại quá dài';
+  if (!phone.value) errors.phone = "Số điện thoại không được để trống";
+  else if (!/^0\d{9}$/.test(phone.value))
+    errors.phone = "Số điện thoại không hợp lệ (bắt đầu 0, 10 số)";
+  else if (phone.value.length > 20) errors.phone = "Số điện thoại quá dài";
 
-  if (!email.value) errors.email = 'Email không được để trống';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errors.email = 'Email không đúng định dạng';
+  if (!email.value) errors.email = "Email không được để trống";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))
+    errors.email = "Email không đúng định dạng";
 
-  if (!password.value) errors.password = 'Mật khẩu không được để trống';
-  else if (password.value.length < 8) errors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+  if (!password.value) errors.password = "Mật khẩu không được để trống";
+  else if (password.value.length < 8)
+    errors.password = "Mật khẩu phải có ít nhất 8 ký tự";
 
-  if (!confirmPassword.value) errors.confirmPassword = 'Vui lòng nhập lại mật khẩu';
-  else if (password.value !== confirmPassword.value) errors.confirmPassword = 'Xác nhận mật khẩu không khớp';
+  if (!confirmPassword.value)
+    errors.confirmPassword = "Vui lòng nhập lại mật khẩu";
+  else if (password.value !== confirmPassword.value)
+    errors.confirmPassword = "Xác nhận mật khẩu không khớp";
 
-  if (Object.values(errors).some(e => e)) return;
+  if (Object.values(errors).some((e) => e)) return;
 
   loading.value = true;
 
@@ -227,13 +234,14 @@ const register = async () => {
       phone: phone.value,
       email: email.value,
       password_hash: password.value,
-      password_hash_confirmation: confirmPassword.value
+      password_hash_confirmation: confirmPassword.value,
     });
 
     if (res.errors) {
       if (res.errors.full_name) errors.fullName = res.errors.full_name[0];
       if (res.errors.email) errors.email = res.errors.email[0];
-      if (res.errors.password_hash) errors.password = res.errors.password_hash[0];
+      if (res.errors.password_hash)
+        errors.password = res.errors.password_hash[0];
       if (res.errors.phone) errors.phone = res.errors.phone[0];
       return;
     }
@@ -246,15 +254,13 @@ const register = async () => {
         position: "bottom-right",
         color: "success",
         iconColor: "#ffffff",
-        style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+        style:
+          "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
       });
 
-      navigateTo('/login');
+      navigateTo("/login");
     }
-
   } catch (err) {
-    console.error('❌ Lỗi đăng ký:', err);
-
     toast.add({
       title: "Có lỗi xảy ra, vui lòng thử lại!",
       icon: "heroicons:exclamation-circle",
@@ -262,12 +268,11 @@ const register = async () => {
       position: "bottom-right",
       color: "error",
       iconColor: "#ffffff",
-      style: "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
+      style:
+        "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
     });
-
   } finally {
     loading.value = false;
   }
 };
-
 </script>
