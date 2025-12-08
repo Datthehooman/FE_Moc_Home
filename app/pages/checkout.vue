@@ -4,7 +4,6 @@
       class="max-w-[90%] mx-auto flex flex-col lg:flex-row gap-8 justify-between"
     >
       <!-- FORM THANH TOÁN -->
-      <!-- FORM THANH TOÁN -->
       <div
         class="flex-[2.3] bg-white rounded-2xl border border-gray-200 p-6 shadow-sm w-full"
       >
@@ -14,6 +13,8 @@
 
         <form class="space-y-6 text-[14px]" @submit.prevent="submitPayment">
           <!-- Họ và tên, email, phone (chỉ hiển thị khi guest) -->
+          <!-- Họ và tên -->
+          <!-- Nếu đã đăng nhập -->
           <div v-if="isLoggedIn">
             <div>
               <label class="block font-medium mb-1 text-[#6E4E37]"
@@ -59,6 +60,7 @@
             </div>
           </div>
 
+          <!-- Nếu chưa đăng nhập -->
           <div v-else>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -118,74 +120,93 @@
           <!-- Địa chỉ -->
           <div>
             <label class="block font-medium mb-1 text-[#6E4E37]">Địa chỉ</label>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="relative">
-                <input
-                  type="text"
-                  v-model="provinceSearch"
-                  @focus="showProvinceList = true"
-                  placeholder="Tìm tỉnh / thành phố..."
-                  class="w-full border border-gray-300 rounded-xl px-3 py-2"
-                />
-
-                <!-- LIST TỈNH -->
-                <ul
-                  v-if="showProvinceList"
-                  class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
+                <select
+                  v-model="selectedProvince"
+                  @change="updateDistricts"
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
                 >
-                  <li
-                    v-for="p in filteredProvinces"
-                    :key="p.code"
-                    @click="selectProvince(p)"
-                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  >
+                  <option disabled value="">Tỉnh / Thành phố</option>
+                  <option v-for="p in provinces" :key="p.name" :value="p.name">
                     {{ p.name }}
-                  </li>
-                </ul>
-
+                  </option>
+                </select>
+                <svg
+                  class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
                 <p v-if="errors.province" class="text-red-500 text-xs mt-1">
                   {{ errors.province }}
                 </p>
               </div>
               <div class="relative">
-                <input
-                  type="text"
-                  v-model="wardSearch"
-                  @focus="showWardList = true"
-                  placeholder="Tìm xã / phường..."
-                  class="w-full border border-gray-300 rounded-xl px-3 py-2"
-                />
-
-                <ul
-                  v-if="showWardList"
-                  class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
+                <select
+                  v-model="selectedDistrict"
+                  @change="updateWards"
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
                 >
-                  <li
-                    v-for="w in filteredWards"
-                    :key="w.code"
-                    @click="selectWard(w)"
-                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  >
-                    {{ w.name }}
-                  </li>
-                </ul>
-
+                  <option disabled value="">Quận / Huyện</option>
+                  <option v-for="d in districts" :key="d.name" :value="d.name">
+                    {{ d.name }}
+                  </option>
+                </select>
+                <svg
+                  class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+                <p v-if="errors.district" class="text-red-500 text-xs mt-1">
+                  {{ errors.district }}
+                </p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+              <div class="relative">
+                <select
+                  v-model="selectedWard"
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white appearance-none focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
+                >
+                  <option disabled value="">Xã / Phường</option>
+                  <option v-for="w in wards" :key="w" :value="w">
+                    {{ w }}
+                  </option>
+                </select>
                 <p v-if="errors.ward" class="text-red-500 text-xs mt-1">
                   {{ errors.ward }}
                 </p>
               </div>
-            </div>
-
-            <div class="mt-3">
-              <input
-                type="text"
-                v-model="form.addressDetail"
-                placeholder="Địa chỉ cụ thể"
-                class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
-              />
-              <p v-if="errors.addressDetail" class="text-red-500 text-xs mt-1">
-                {{ errors.addressDetail }}
-              </p>
+              <div>
+                <input
+                  type="text"
+                  v-model="form.addressDetail"
+                  placeholder="Địa chỉ cụ thể"
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:border-[#A77A5D] focus:ring-1 focus:ring-[#A77A5D] transition"
+                />
+                <p
+                  v-if="errors.addressDetail"
+                  class="text-red-500 text-xs mt-1"
+                >
+                  {{ errors.addressDetail }}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -363,194 +384,339 @@
     </div>
   </section>
 </template>
+
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useCheckoutStore } from "@/stores/checkout";
-import { useCheckout } from "@/composables/useCheckout";
-import { useAddress } from "@/composables/useAddress";
-import { useCookie } from "#app";
+  import { reactive, ref, computed, onMounted } from "vue";
+  import { useRouter } from "vue-router";
+  import { useCheckoutStore } from "@/stores/checkout";
+  import { useCheckout } from "@/composables/useCheckout";
+  import { useCookie } from "#app";
 
-const router = useRouter();
-const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
-const checkoutStore = useCheckoutStore();
-const authStore = useAuthStore();
-const toast = useToast();
+  const router = useRouter();
+  const toast = useToast();
+  const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
+  const checkoutStore = useCheckoutStore();
+  const buyNowItem = checkoutStore.buyNowItem;
+  const authStore = useAuthStore();
+  let tokenCookie = useCookie("tokenLocal");
 
-/* ------------------ LOGIN CHECK ------------------ */
-let tokenCookie = useCookie("tokenLocal");
-if (!tokenCookie.value) {
-  tokenCookie = useCookie("token", { path: "/", domain: ".mocfurni.shop" });
-}
-const isLoggedIn = computed(() => !!tokenCookie.value);
-
-/* ------------------ CART DATA ------------------ */
-const checkoutItems = computed(() => checkoutStore.cartItems || []);
-const buyNowItem = checkoutStore.buyNowItem;
-
-/* ------------------ FORM DATA ------------------ */
-const form = reactive({
-  firstName: "",
-  lastName: "",
-  full_name: "",
-  email: "",
-  phone: "",
-  addressDetail: "",
-  note: "",
-  voucher_code: "",
-});
-
-/* ------------------ SHIPPING ------------------ */
-const paymentMethod = ref("offline");
-const selectedShipping = ref("Tiêu chuẩn");
-const shippingMethods = [{ name: "Tiêu chuẩn", desc: "6–7 ngày", price: "Miễn phí" }];
-
-/* ------------------ ADDRESS ------------------ */
-const { provinces, wards, fetchProvinces, fetchWards } = useAddress();
-const selectedProvince = ref("");
-const selectedWard = ref("");
-const provinceSearch = ref("");
-const wardSearch = ref("");
-const showProvinceList = ref(false);
-const showWardList = ref(false);
-
-/* Filter for autocomplete */
-const filteredProvinces = computed(() =>
-  provinces.value.filter((p) =>
-    p.name.toLowerCase().includes(provinceSearch.value.toLowerCase())
-  )
-);
-
-const filteredWards = computed(() =>
-  wards.value.filter((w) =>
-    w.name.toLowerCase().includes(wardSearch.value.toLowerCase())
-  )
-);
-
-const selectProvince = (p: any) => {
-  provinceSearch.value = p.name;
-  selectedProvince.value = p.code;
-  showProvinceList.value = false;
-  fetchWards(p.code);
-};
-
-const selectWard = (w: any) => {
-  wardSearch.value = w.name;
-  selectedWard.value = w.code;
-  showWardList.value = false;
-};
-
-/* ------------------ ERRORS ------------------ */
-const errors = reactive<any>({});
-
-/* ------------------ VALIDATION ------------------ */
-const validate = () => {
-  Object.keys(errors).forEach((k) => (errors[k] = ""));
-  let valid = true;
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
-
-  if (isLoggedIn.value) {
-    if (!form.full_name) { errors.full_name = "Họ và tên không được để trống"; valid = false; }
-  } else {
-    if (!form.firstName) { errors.firstName = "Họ không được để trống"; valid = false; }
-    if (!form.lastName) { errors.lastName = "Tên không được để trống"; valid = false; }
-  }
-
-  if (!form.email) { errors.email = "Email không được để trống"; valid = false; }
-  else if (!emailRegex.test(form.email)) { errors.email = "Email không đúng định dạng"; valid = false; }
-
-  if (!form.phone) { errors.phone = "SĐT không được để trống"; valid = false; }
-  else if (!phoneRegex.test(form.phone)) { errors.phone = "SĐT không đúng định dạng"; valid = false; }
-
-  if (!selectedProvince.value) { errors.province = "Chọn tỉnh/thành phố"; valid = false; }
-  if (!selectedWard.value) { errors.ward = "Chọn xã/phường"; valid = false; }
-  if (!form.addressDetail) { errors.addressDetail = "Nhập địa chỉ cụ thể"; valid = false; }
-
-  if (!paymentMethod.value) { errors.paymentMethod = "Chọn phương thức thanh toán"; valid = false; }
-
-  return valid;
-};
-
-/* ------------------ TOTAL AMOUNT ------------------ */
-const totalAmount = computed(() => {
-  const items = checkoutItems.value.length
-    ? checkoutItems.value
-    : buyNowItem ? [buyNowItem] : [];
-
-  const base = items.reduce(
-    (acc, i) => acc + (i.product_sale || i.product_price || i.price) * i.quantity,
-    0
-  );
-
-  return base + (selectedShipping.value === "Nhanh" ? 30000 : 0);
-});
-
-/* ------------------ SUBMIT PAYMENT ------------------ */
-const submitPayment = async () => {
-  const itemsToPay = checkoutItems.value.length
-    ? checkoutItems.value
-    : buyNowItem ? [buyNowItem] : [];
-
-  if (!itemsToPay.length) {
-    toast.add({
-      title: "Không có sản phẩm để thanh toán",
-      color: "error",
+  if (!tokenCookie.value) {
+    tokenCookie = useCookie("token", {
+      path: "/",
+      domain: ".mocfurni.shop",
     });
-    router.replace("/error");
-    return;
+  }
+  const isLoggedIn = computed(() => !!tokenCookie.value);
+
+  // Cart items
+  const checkoutItems = computed(() => checkoutStore.cartItems || []);
+
+  // Nếu không có sản phẩm => redirect /error
+  onMounted(() => {
+    // Nếu đã login thì điền sẵn thông tin
+    if (isLoggedIn.value && authStore.user) {
+      form.firstName = authStore.user.firstName || "";
+      form.lastName = authStore.user.lastName || "";
+      form.full_name = authStore.user.full_name || "";
+      form.email = authStore.user.email || "";
+      form.phone = authStore.user.phone || "";
+    }
+
+    // Nếu không có sản phẩm => redirect /error
+    if (!checkoutItems.value.length && !buyNowItem) {
+      router.replace("/error");
+    }
+  });
+
+  // Form
+  const form = reactive({
+    firstName: "",
+    lastName: "",
+    full_name: "",
+    email: "",
+    phone: "",
+    addressDetail: "",
+    note: "",
+    voucher_code: "", // <<< THÊM DÒNG NÀY
+  });
+
+  // Payment & shipping
+  const paymentMethod = ref("offline");
+  const selectedShipping = ref("Tiêu chuẩn");
+
+  // Location
+  const selectedProvince = ref("");
+  const selectedDistrict = ref("");
+  const selectedWard = ref("");
+  const districts = ref([]);
+  const wards = ref([]);
+
+  const provinces = ref([
+    {
+      name: "TP Hồ Chí Minh",
+      districts: [
+        { name: "Quận 1", wards: ["Bến Nghé", "Bến Thành"] },
+        { name: "Quận 3", wards: ["Phường 1", "Phường 2"] },
+      ],
+    },
+    {
+      name: "Cần Thơ",
+      districts: [{ name: "Ninh Kiều", wards: ["An Bình", "An Khánh"] }],
+    },
+  ]);
+
+  function updateDistricts() {
+    const province = provinces.value.find(
+      (p) => p.name === selectedProvince.value
+    );
+    districts.value = province ? province.districts : [];
+    selectedDistrict.value = "";
+    wards.value = [];
   }
 
-  if (!validate()) {
-    toast.add({
-      title: "Vui lòng điền đầy đủ thông tin",
-      color: "error",
-    });
-    return;
+  function updateWards() {
+    const district = districts.value.find(
+      (d) => d.name === selectedDistrict.value
+    );
+    wards.value = district ? district.wards : [];
+    selectedWard.value = "";
   }
 
-  const shipping_address = `${form.addressDetail}, ${wardSearch.value}, ${provinceSearch.value}`;
+  const shippingMethods = [
+    { name: "Tiêu chuẩn", desc: "6–7 ngày", price: "Miễn phí" },
+    // { name: "Nhanh", desc: "3–4 ngày", price: "30.000 đ" },
+  ];
 
-  const payload = isLoggedIn.value
-    ? {
-        user_id: authStore.user.user_id,
-        shipping_address,
-        province_code: selectedProvince.value,
-        ward_code: selectedWard.value,
-        province_name: provinceSearch.value,
-        ward_name: wardSearch.value,
-        note: form.note || "",
-        payment_method_id: paymentMethod.value === "online" ? 2 : 1,
-        items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
-        voucher_code: form.voucher_code || null,
+  const errors = reactive({});
+
+  function validate() {
+    // Reset errors
+    Object.keys(errors).forEach((key) => (errors[key] = ""));
+    let valid = true;
+
+    // Regex
+    const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
+    const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
+
+    if (isLoggedIn.value) {
+      // User đã đăng nhập
+      if (!form.full_name) {
+        errors.full_name = "Họ và tên không được để trống";
+        valid = false;
       }
-    : {
-        customer_name: `${form.firstName} ${form.lastName}`,
-        customer_phone: form.phone,
-        customer_email: form.email,
-        shipping_address,
-        province_code: selectedProvince.value,
-        ward_code: selectedWard.value,
-        province_name: provinceSearch.value,
-        ward_name: wardSearch.value,
-        note: form.note || "",
-        payment_method_id: paymentMethod.value === "online" ? 2 : 1,
-        items: itemsToPay.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
-        voucher_code: form.voucher_code || null,
-      };
 
-  const orderData = isLoggedIn.value
-    ? await buyNow(payload)
-    : await buyNowGuest(payload);
+      if (!form.email) {
+        errors.email = "Email không được để trống";
+        valid = false;
+      } else if (!emailRegex.test(form.email)) {
+        errors.email = "Email không đúng định dạng";
+        valid = false;
+      }
 
-  const order_id = Number(orderData.order_id);
+      if (!form.phone) {
+        errors.phone = "SĐT không được để trống";
+        valid = false;
+      } else if (!phoneRegex.test(form.phone)) {
+        errors.phone = "Số điện thoại không đúng định dạng";
+        valid = false;
+      }
+    } else {
+      // Guest
+      if (!form.firstName) {
+        errors.firstName = "Họ không được để trống";
+        valid = false;
+      }
+      if (!form.lastName) {
+        errors.lastName = "Tên không được để trống";
+        valid = false;
+      }
+      if (!form.email) {
+        errors.email = "Email không được để trống";
+        valid = false;
+      } else if (!emailRegex.test(form.email)) {
+        errors.email = "Email không đúng định dạng";
+        valid = false;
+      }
+      if (!form.phone) {
+        errors.phone = "SĐT không được để trống";
+        valid = false;
+      } else if (!phoneRegex.test(form.phone)) {
+        errors.phone = "Số điện thoại không đúng định dạng";
+        valid = false;
+      }
+    }
 
-  if (paymentMethod.value === "online") {
-    await payWithVNPAY({ order_id });
-    return;
+    // Địa chỉ
+    if (!selectedProvince.value) {
+      errors.province = "Chọn tỉnh/thành phố";
+      valid = false;
+    }
+    if (!selectedDistrict.value) {
+      errors.district = "Chọn quận/huyện";
+      valid = false;
+    }
+    if (!selectedWard.value) {
+      errors.ward = "Chọn xã/phường";
+      valid = false;
+    }
+    if (!form.addressDetail) {
+      errors.addressDetail = "Nhập địa chỉ cụ thể";
+      valid = false;
+    }
+
+    // Vận chuyển & thanh toán
+    if (!selectedShipping.value) {
+      errors.shipping = "Chọn hình thức vận chuyển";
+      valid = false;
+    }
+    if (!paymentMethod.value) {
+      errors.paymentMethod = "Chọn phương thức thanh toán";
+      valid = false;
+    }
+
+    return valid;
   }
 
-  router.replace(`/payment-success?order_id=${order_id}`);
-};
+  const totalAmount = computed(() => {
+    const items = checkoutItems.value.length
+      ? checkoutItems.value
+      : buyNowItem
+      ? [buyNowItem]
+      : [];
+    const total = items.reduce(
+      (acc, i) =>
+        acc + (i.product_sale || i.product_price || i.price) * i.quantity,
+      0
+    );
+    return total + (selectedShipping.value === "Nhanh" ? 30000 : 0);
+  });
+
+  async function submitPayment() {
+    const itemsToPay = checkoutItems.value.length
+      ? checkoutItems.value
+      : buyNowItem
+      ? [buyNowItem]
+      : [];
+
+    if (!itemsToPay.length) {
+      toast.add({
+        title: "Không có sản phẩm để thanh toán",
+        color: "error",
+      });
+      router.replace("/error");
+      return;
+    }
+
+    if (!validate()) {
+      toast.add({
+        title: "Vui lòng điền đầy đủ thông tin",
+        color: "error",
+      });
+      return;
+    }
+
+    const shipping_address = `${form.addressDetail}, ${selectedWard.value}, ${selectedDistrict.value}, ${selectedProvince.value}`;
+    let order_id: number = 0;
+
+    try {
+      // Nếu chọn thanh toán online VNPAY
+      if (paymentMethod.value === "online") {
+        let orderData: any;
+
+        if (isLoggedIn.value) {
+          const payloadUser = {
+            user_id: authStore.user.user_id,
+            shipping_address,
+            note: form.note || "",
+            payment_method_id: 2, // 2 = VNPAY
+            items: itemsToPay.map((i) => ({
+              product_id: i.product_id,
+              quantity: i.quantity,
+            })),
+            voucher_code: form.voucher_code || null,
+          };
+          orderData = await buyNow(payloadUser);
+        } else {
+          const payloadGuest = {
+            customer_name: `${form.firstName} ${form.lastName}`,
+            customer_phone: form.phone,
+            customer_email: form.email,
+            shipping_address,
+            note: form.note || "",
+            payment_method_id: 2,
+            items: itemsToPay.map((i) => ({
+              product_id: i.product_id,
+              quantity: i.quantity,
+            })),
+            voucher_code: form.voucher_code || null,
+          };
+          orderData = await buyNowGuest(payloadGuest);
+        }
+
+        order_id = Number(orderData.order_id); // Ép sang number
+
+        // Chỉ gửi order_id cho VNPAY
+        await payWithVNPAY({ order_id });
+
+        return; // redirect sang VNPAY xong
+      }
+
+      // Nếu thanh toán offline (COD)
+      if (paymentMethod.value === "offline") {
+        let orderData: any;
+        if (isLoggedIn.value) {
+          const payloadUser = {
+            user_id: authStore.user.user_id,
+            shipping_address,
+            note: form.note || "",
+            payment_method_id: 1, // offline
+            items: itemsToPay.map((i) => ({
+              product_id: i.product_id,
+              quantity: i.quantity,
+            })),
+            voucher_code: form.voucher_code || null,
+          };
+          orderData = await buyNow(payloadUser);
+        } else {
+          const payloadGuest = {
+            customer_name: `${form.firstName} ${form.lastName}`,
+            customer_phone: form.phone,
+            customer_email: form.email,
+            shipping_address,
+            note: form.note || "",
+            payment_method_id: 1,
+            items: itemsToPay.map((i) => ({
+              product_id: i.product_id,
+              quantity: i.quantity,
+            })),
+            voucher_code: form.voucher_code || null,
+          };
+          orderData = await buyNowGuest(payloadGuest);
+        }
+
+        toast.add({
+          title: "Thanh toán thành công! 🎉",
+          color: "success",
+        });
+        checkoutStore.clearCheckout();
+        router.push({
+          path: "/thanks",
+          query: {
+            order_code: orderData.order_code,
+          },
+        });
+      }
+    } catch (err: any) {
+      console.error("❌ Lỗi khi tạo order:", err);
+      toast.add({
+        title: err?.message || "Thanh toán thất bại, vui lòng thử lại sau",
+        color: "error",
+      });
+    }
+  }
+
+  function formatPrice(value: number | undefined | null) {
+    const v = Number(value) || 0;
+    return v.toLocaleString("vi-VN") + " đ";
+  }
 </script>
