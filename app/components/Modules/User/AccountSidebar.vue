@@ -12,7 +12,7 @@
       />
       </div>
      <h2 class="mt-2 font-semibold text-gray-800">
-  {{ authStore.user.full_name || "Người dùng" }}
+  {{ authStore.user.full_name || "Tên người dùng" }}
 </h2>
 <p class="text-sm text-gray-400">
   {{ authStore.user.email || "Chưa có email" }}
