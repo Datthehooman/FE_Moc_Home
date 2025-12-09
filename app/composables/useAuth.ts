@@ -224,6 +224,26 @@ export const useAuth = () => {
     }
   };
 
+  // ===================== RESET PASSWORD V1 =====================
+const resetPasswordV1 = async (data: {
+  email: string;
+  password: string;
+  password_confirmation: string;
+}) => {
+  try {
+    return await $fetch("https://api.mocfurni.shop/api/client/reset-password-v1", {
+      method: "POST",
+      body: data,
+    })
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.data?.message || "Không thể đổi mật khẩu",
+    }
+  }
+};
+
+
   // ===================== LOGOUT =====================
   const logout = () => {
     tokenCookie.value = null;
@@ -240,6 +260,7 @@ export const useAuth = () => {
     checkPhoneAvailable,
     updateUserProfile,
     verifyOtp,
+    resetPasswordV1,
     tokenCookie,
     isLogged,
     user,
