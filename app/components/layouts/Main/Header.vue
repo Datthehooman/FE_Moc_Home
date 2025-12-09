@@ -53,7 +53,7 @@
           </li>
 
           <li><NuxtLink to="/ProductList" class="text-black hover:text-[#654538]" active-class="text-[#654538]">Cửa hàng</NuxtLink></li>
-          <li><NuxtLink to="/blog" class="text-black hover:text-[#654538]" active-class="text-[#654538]">Blog</NuxtLink></li>
+          <li><NuxtLink to="/articles" class="text-black hover:text-[#654538]" active-class="text-[#654538]">Articles</NuxtLink></li>
           <li><NuxtLink to="/contact" class="text-black hover:text-[#654538]" active-class="text-[#654538]">Liên hệ</NuxtLink></li>
         </ul>
       </nav>
