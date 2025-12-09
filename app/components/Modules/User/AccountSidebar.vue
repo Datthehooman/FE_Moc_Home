@@ -44,26 +44,13 @@
 
 const router = useRouter();
 const route = useRoute();
-const authStore = useAuthStore();
-const toast = useToast();
+const auth = useAuth();
 
-// Nếu user chưa có info, fetch profile luôn
-onMounted(async () => {
-  if (!authStore.user.full_name) {
-    try {
-      const profile = await authStore.fetchUserProfile();
-      if (profile) authStore.user = profile;
-    } catch (err) {
-      console.log("Fetch user failed:", err);
-    }
-  }
-});
+// Computed reactive user info
+const fullName = computed(() => auth.user.value.full_name || "Người dùng");
+const email = computed(() => auth.user.value.email || "Chưa có email");
 
-// Computed reactive, tự update khi store thay đổi
-const fullName = computed(() => authStore.user.full_name || "Người dùng");
-const email = computed(() => authStore.user.email || "Chưa có email");
-
-// Menu sidebar
+// ================= MENU =================
 const menuItems = [
   { name: "Hồ sơ của tôi", path: "/user/profile", icon: "heroicons:user" },
   { name: "Danh sách đơn hàng", path: "/user/orders/list", icon: "heroicons:list-bullet" },
@@ -74,17 +61,32 @@ const menuItems = [
   { name: "Đăng xuất", path: "/logout", icon: "heroicons:arrow-right-on-rectangle" },
 ];
 
-// Điều hướng menu
+// ================= NAVIGATE =================
 const navigate = async (path: string) => {
   if (path === "/logout") {
-    await authStore.logout();
+    auth.logout();
     router.push("/");
-    toast.add({
-      title: "Đăng xuất thành công 🎉",
-      color: "success",
-    });
+    alert("Đăng xuất thành công 🎉");
   } else {
     router.push(path);
   }
 };
+
+// ================= FETCH PROFILE =================
+// Khi sidebar mount, nếu user rỗng và có token → fetch
+onMounted(() => {
+  if (!auth.user.value.full_name && auth.tokenCookie.value) {
+    auth.fetchUserProfile();
+  }
+});
+
+// Watch token để fetch profile tự động khi login mới
+watch(
+  () => auth.tokenCookie.value,
+  async (newToken) => {
+    if (newToken && !auth.user.value.full_name) {
+      await auth.fetchUserProfile();
+    }
+  }
+);
 </script>
