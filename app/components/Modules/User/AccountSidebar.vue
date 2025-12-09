@@ -11,7 +11,7 @@
       </div>
 
       <h2 class="mt-2 font-semibold text-gray-800">
-        {{ authStore.user.full_name || "Tên người dùng" }}
+        {{ authStore.user.full_name || "Người dùng" }}
       </h2>
       <p class="text-sm text-gray-400">
         {{ authStore.user.email || "Chưa có email" }}
@@ -45,10 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { useAuthStore } from "@/stores/authStore";
-import { useToast } from "@/composables/useToast";
 
 const router = useRouter();
 const route = useRoute();
