@@ -140,14 +140,8 @@ const toast = useToast();
 // Reactive isLogged
 const isLogged = computed(() => authStore.isLogged);
 
-// Watch login/logout để render lại menu hoặc fetch data
-watch(() => authStore.isLogged, async (logged) => {
-  if (logged) {
-    await fetchCategoriesAndProducts();
-  } else {
-    categories.value = [];
-  }
-});
+// Lấy token động từ store hoặc cookie
+const getToken = () => authStore.token || useCookie("token").value;
 
 // Scroll header
 const isScrolled = ref(false);
@@ -202,9 +196,10 @@ const categories = ref<Category[]>([]);
 
 const fetchCategoriesAndProducts = async () => {
   try {
+    const token = getToken();
     const [catRes, prodRes] = await Promise.all([
-      fetch("https://api.mocfurni.shop/api/client/category"),
-      fetch("https://api.mocfurni.shop/api/client/products"),
+      fetch("https://api.mocfurni.shop/api/client/category", { headers: token ? { Authorization: `Bearer ${token}` } : {} }),
+      fetch("https://api.mocfurni.shop/api/client/products", { headers: token ? { Authorization: `Bearer ${token}` } : {} }),
     ]);
     const catJson = await catRes.json();
     const prodJson = await prodRes.json();
@@ -233,5 +228,11 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
   window.removeEventListener("click", handleClickOutside);
+});
+
+// Watch login/logout để render lại menu hoặc fetch data
+watch(() => authStore.isLogged, async (logged) => {
+  if (logged) await fetchCategoriesAndProducts();
+  else categories.value = [];
 });
 </script>
