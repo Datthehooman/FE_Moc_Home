@@ -11,12 +11,13 @@
         class="w-20 h-20 rounded-full border-2 border-gray-200 object-cover"
       />
       </div>
-      <h2 class="mt-2 font-semibold text-gray-800">
-        {{ authStore.user.full_name || "Người dùng" }}
-      </h2>
-      <p class="text-sm text-gray-400">
-        {{ authStore.user.email || "Chưa có email" }}
-      </p>
+     <h2 class="mt-2 font-semibold text-gray-800">
+  {{ authStore.user.full_name || "Người dùng" }}
+</h2>
+<p class="text-sm text-gray-400">
+  {{ authStore.user.email || "Chưa có email" }}
+</p>
+
     </div>
 
     <hr class="border-t border-gray-200 mb-4" />
@@ -54,6 +55,20 @@
   const route = useRoute();
   const authStore = useAuthStore(); // <-- use store instance
   const toast = useToast();
+
+  onMounted(async () => {
+  if (!authStore.user.full_name) {
+    try {
+      const profile = await authStore.fetchUserProfile();
+      if (profile) {
+        authStore.user = profile; // set luôn vào store
+      }
+    } catch (err) {
+      console.log("Fetch user failed:", err);
+    }
+  }
+});
+
 
   const navigate = async (path: string) => {
     if (path === "/logout") {
