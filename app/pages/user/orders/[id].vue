@@ -20,18 +20,21 @@
                 <h3 class="text-[20px] font-semibold text-gray-700">
                   Đơn hàng (#{{ order.code }})
                 </h3>
-                <p class="text-sm text-gray-500 mt-1">
-                  Trạng thái:
-                  <span
-                    :class="{
-                      'text-green-600': order.status === 'paid',
-                      'text-yellow-500': order.status === 'pending',
-                      'text-red-500': order.status === 'cancelled',
-                    }"
-                  >
-                    {{ order.statusText }}
-                  </span>
-                </p>
+               <p class="text-sm text-gray-500 mt-1">
+  Trạng thái:
+  <span
+    :class="{
+      'text-yellow-500': order.status === 'pending',
+      'text-blue-500': order.status === 'confirmed',
+      'text-indigo-500': order.status === 'processing',
+      'text-green-600': order.status === 'completed',
+      'text-red-500': order.status === 'cancelled',
+    }"
+  >
+    {{ statusText }}
+  </span>
+</p>
+
               </div>
 
               <div class="flex gap-3 items-center">
@@ -249,9 +252,6 @@
     middleware: "auth",
   });
 
-  import { useRoute, useRouter } from "vue-router"; // Cần import useRouter
-  import { onMounted, ref } from "vue";
-  import { useOrderDetail } from "@/composables/useOrderDetail"; // Cần đảm bảo path đúng
 
   const route = useRoute();
   const router = useRouter(); // Khởi tạo router
@@ -268,6 +268,17 @@
     "Giá quá cao so với dự kiến",
     "Lý do khác",
   ];
+const statusTextMap: Record<string, string> = {
+  pending: "Chờ xác nhận",
+  confirmed: "Đã xác nhận",
+  processing: "Đang xử lý / Chuẩn bị hàng",
+  completed: "Đã hoàn thành",
+  cancelled: "Đã hủy",
+};
+
+const statusText = computed(() => {
+  return statusTextMap[order.value?.status] || "Không xác định";
+});
 
   // Khi click chọn 1 lý do hủy
   const applyFilter = (val: string) => {

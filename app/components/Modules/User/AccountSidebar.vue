@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="w-64 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6"
+    class="w-64 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6 "
   >
     <!-- Avatar -->
     <div class="flex flex-col items-center mb-4 relative">
@@ -98,11 +98,11 @@
       icon: "heroicons:map-pin",
     },
     // { name: "Hỗ trợ", path: "/user/support", icon: "heroicons:lifebuoy" },
-    {
-      name: "Theo dõi đơn hàng",
-      path: "/user/track-order",
-      icon: "heroicons:truck",
-    },
+    // {
+    //   name: "Theo dõi đơn hàng",
+    //   path: "/user/track-order",
+    //   icon: "heroicons:truck",
+    // },
     // {
     //   name: "Phương thức thanh toán",
     //   path: "/user/payment",
