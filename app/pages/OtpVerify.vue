@@ -19,40 +19,47 @@
   };
 
   // 🟢 XÁC MINH OTP
-  const handleVerifyOtp = async () => {
-    error.value = "";
-    success.value = false;
+// 🟢 XÁC MINH OTP
+const handleVerifyOtp = async () => {
+  error.value = "";
+  success.value = false;
 
-    const enteredOtp = otp.value.join("");
+  const enteredOtp = otp.value.join("");
 
-    if (enteredOtp.length < 6) {
-      error.value = "Vui lòng nhập đủ 6 ký tự OTP";
-      return;
+  if (enteredOtp.length < 6) {
+    error.value = "Vui lòng nhập đủ 6 ký tự OTP";
+    return;
+  }
+
+  try {
+    loading.value = true;
+    const res = await verifyOtp(enteredOtp);
+
+    if (res.success) {
+      success.value = true;
+
+      toast.add({
+        title: res.message || "Xác thực OTP thành công 🎉",
+        color: "success",
+      });
+
+      // 🟢 LƯU TRẠNG THÁI ĐÃ XÁC THỰC OTP
+      localStorage.setItem("otpVerified", "1");
+
+      // 🟢 CHUYỂN QUA TRANG ĐẶT LẠI MẬT KHẨU
+      navigateTo("/ResetPassword");
+
+    } else {
+      error.value = res.message || "OTP không hợp lệ";
     }
+  } catch (e) {
+    console.error(e);
+    error.value = "Xác thực OTP thất bại, thử lại sau";
+  } finally {
+    loading.value = false;
+  }
+};
 
-    try {
-      loading.value = true;
-      const res = await verifyOtp(enteredOtp);
-
-      if (res.success) {
-        success.value = true;
-        toast.add({
-          title: res.message || "Xác thực OTP thành công 🎉",
-          color: "success",
-        });
-
-        // TODO: chuyển qua trang đổi mật khẩu
-        // navigateTo('/reset-password')
-      } else {
-        error.value = res.message || "OTP không hợp lệ";
-      }
-    } catch (e) {
-      console.error(e);
-      error.value = "Xác thực OTP thất bại, thử lại sau";
-    } finally {
-      loading.value = false;
-    }
-  };
 
   // 🟣 GỬI LẠI OTP
   const resendOtp = async () => {
@@ -85,6 +92,7 @@
       loading.value = false;
     }
   };
+  
 </script>
 
 <template>
