@@ -132,11 +132,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/authStore";
-import { useCookie } from "#app";
-import { useToast } from "vue-toastification";
 
 const authStore = useAuthStore();
 const router = useRouter();
