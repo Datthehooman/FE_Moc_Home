@@ -197,28 +197,33 @@ export const useAuthStore = defineStore("auth", {
     // ============================
     // GOOGLE TOKEN SAVE (CÁCH 2)
     // ============================
-    async saveGoogleToken(token: string) {
-      this.token = token;
-      this.tokenLocal = token;
+async saveGoogleToken(token: string) {
+  // 1️⃣ Cập nhật store
+  this.token = token;
+  this.tokenLocal = token;
 
-      // Cookie domain .mocfurni.shop
-      useCookie("token", {
-        path: "/",
-        maxAge: 86400,
-        domain: ".mocfurni.shop",
-        sameSite: "lax",
-        secure: true,
-      }).value = token;
+  // 2️⃣ Lưu cookie
+  useCookie("token", {
+    path: "/",
+    maxAge: 86400,
+    domain: ".mocfurni.shop",
+    sameSite: "lax",
+    secure: true,
+  }).value = token;
 
-      // Cookie localhost
-      useCookie("tokenLocal", {
-        path: "/",
-        maxAge: 86400,
-      }).value = token;
+  useCookie("tokenLocal", {
+    path: "/",
+    maxAge: 86400,
+  }).value = token;
 
-      // **Chờ fetchUser xong mới set isLogged**
-      await this.fetchUser();
-    },
+  // 3️⃣ Fetch user và set isLogged đúng
+  try {
+    await this.fetchUser();
+  } catch (err) {
+    console.error("Lỗi fetch user sau khi login Google:", err);
+    this.isLogged = false;
+  }
+},
 
     // ============================
     // GET USER PROFILE
