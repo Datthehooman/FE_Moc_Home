@@ -331,11 +331,25 @@
     </div>
   </header>
 </template>
-
 <script setup lang="ts">
+
 const authStore = useAuthStore();
 const router = useRouter();
 const toast = useToast();
+
+// 🔥 Load user khi FE mount (Google login + normal)
+onMounted(async () => {
+  await authStore.fetchUser(); // check cookie/token và set user/isLogged
+
+  fetchCategoriesAndProducts();
+  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("click", handleClickOutside);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener("click", handleClickOutside);
+});
 
 // Scroll header
 const isScrolled = ref(false);
@@ -346,6 +360,7 @@ const handleScroll = () => {
 // Search toggle (mobile only)
 const isSearchOpen = ref(false);
 const searchInputRef = ref<HTMLInputElement | null>(null);
+const searchQuery = ref("");
 const toggleSearch = () => {
   isSearchOpen.value = !isSearchOpen.value;
   if (isSearchOpen.value) {
@@ -354,6 +369,15 @@ const toggleSearch = () => {
     });
   } else {
     searchQuery.value = "";
+  }
+};
+const goSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({
+      path: "/ProductList",
+      query: { search: searchQuery.value.trim() },
+    });
+    isSearchOpen.value = false;
   }
 };
 
@@ -371,7 +395,7 @@ const closeUserDropdown = () => {
   isUserDropdownOpen.value = false;
 };
 
-// 🔥 Final merged logout
+// 🔥 Logout
 const logout = async () => {
   await authStore.logout();
   closeUserDropdown();
@@ -388,7 +412,7 @@ const logout = async () => {
   router.push("/");
 };
 
-// 🔥 Final merged wishlist handler
+// 🔥 Wishlist
 const goWishlist = () => {
   if (!authStore.isLogged) {
     toast.add({
@@ -400,7 +424,6 @@ const goWishlist = () => {
       iconColor: "#ffffff",
       color: "error",
     });
-
     router.push("/login");
   } else {
     router.push("/user/wishlist");
@@ -457,28 +480,4 @@ const fetchCategoriesAndProducts = async () => {
     console.error("❌ Error fetching categories/products:", error);
   }
 };
-
-// Search
-const searchQuery = ref("");
-const goSearch = () => {
-  if (searchQuery.value.trim()) {
-    router.push({
-      path: "/ProductList",
-      query: { search: searchQuery.value.trim() },
-    });
-    isSearchOpen.value = false;
-  }
-};
-
-// Mounted / unmounted
-onMounted(() => {
-  fetchCategoriesAndProducts();
-  window.addEventListener("scroll", handleScroll);
-  window.addEventListener("click", handleClickOutside);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-  window.removeEventListener("click", handleClickOutside);
-});
 </script>

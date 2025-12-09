@@ -5,11 +5,11 @@
     <!-- Avatar -->
     <div class="flex flex-col items-center mb-4 relative">
       <div class="relative">
-        <img
-          src="https://live.themewild.com/fameo/assets/img/account/02.jpg"
-          alt="Avatar"
-          class="w-20 h-20 rounded-full border-2 border-gray-200"
-        />
+      <img
+        src="https://nagawa.vn/wp-content/uploads/2025/11/avt-avatar-fb-mac-dinh.jpg"
+        alt="Avatar"
+        class="w-20 h-20 rounded-full border-2 border-gray-200 object-cover"
+      />
       </div>
       <h2 class="mt-2 font-semibold text-gray-800">
         {{ authStore.user.full_name || "Người dùng" }}

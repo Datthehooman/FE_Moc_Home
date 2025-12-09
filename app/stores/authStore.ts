@@ -179,56 +179,56 @@ export const useAuthStore = defineStore("auth", {
     // ============================
     // GOOGLE LOGIN (REDIRECT)
     // ============================
-   async loginGoogle() {
-  try {
-    const res = await $fetch(
-      "https://api.mocfurni.shop/api/client/login/google",
-      { method: "GET" }
-    );
+    async loginGoogle() {
+      try {
+        const res = await $fetch(
+          "https://api.mocfurni.shop/api/client/login/google",
+          { method: "GET" }
+        );
 
-    if (res?.redirect_url) {
-      window.location.href = res.redirect_url;
-    }
-  } catch (err) {
-    console.error("Google login error:", err);
-  }
-},
-
+        if (res?.redirect_url) {
+          window.location.href = res.redirect_url;
+        }
+      } catch (err) {
+        console.error("Google login error:", err);
+      }
+    },
 
     // ============================
     // GOOGLE TOKEN SAVE (CÁCH 2)
     // ============================
-saveGoogleToken(token: string) {
-  this.token = token;
-  this.tokenLocal = token;
-  this.isLogged = true;
+    async saveGoogleToken(token: string) {
+      this.token = token;
+      this.tokenLocal = token;
 
-  // Cookie domain .mocfurni.shop
-  useCookie("token", {
-    path: "/",
-    maxAge: 86400,
-    domain: ".mocfurni.shop",
-    sameSite: "lax",
-    secure: true,
-  }).value = token;
+      // Cookie domain .mocfurni.shop
+      useCookie("token", {
+        path: "/",
+        maxAge: 86400,
+        domain: ".mocfurni.shop",
+        sameSite: "lax",
+        secure: true,
+      }).value = token;
 
-  // Cookie localhost
-  useCookie("tokenLocal", {
-    path: "/",
-    maxAge: 86400,
-  }).value = token;
+      // Cookie localhost
+      useCookie("tokenLocal", {
+        path: "/",
+        maxAge: 86400,
+      }).value = token;
 
-  // Fetch user sau khi có token
-  this.fetchUser();
-},
-
+      // **Chờ fetchUser xong mới set isLogged**
+      await this.fetchUser();
+    },
 
     // ============================
     // GET USER PROFILE
     // ============================
     async fetchUser() {
       const token = this.activeToken;
-      if (!token) return;
+      if (!token) {
+        this.isLogged = false;
+        return;
+      }
 
       try {
         const res = await $fetch(
