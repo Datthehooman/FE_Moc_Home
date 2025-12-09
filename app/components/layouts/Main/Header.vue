@@ -137,11 +137,10 @@ const authStore = useAuthStore();
 const router = useRouter();
 const toast = useToast();
 
-// Reactive isLogged
-const isLogged = computed(() => authStore.isLogged);
+const isLogged = computed(() => !!useCookie("token").value);
 
-// Lấy token động từ store hoặc cookie
-const getToken = () => authStore.token || useCookie("token").value;
+const getToken = () => useCookie("token").value;
+
 
 // Scroll header
 const isScrolled = ref(false);
