@@ -10,12 +10,8 @@
         />
       </div>
 
-      <h2 class="mt-2 font-semibold text-gray-800">
-        {{ authStore.user.full_name || "Người dùng" }}
-      </h2>
-      <p class="text-sm text-gray-400">
-        {{ authStore.user.email || "Chưa có email" }}
-      </p>
+      <h2 class="mt-2 font-semibold text-gray-800">{{ fullName }}</h2>
+      <p class="text-sm text-gray-400">{{ email }}</p>
     </div>
 
     <hr class="border-t border-gray-200 mb-4" />
@@ -45,25 +41,42 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import { useToast } from "@/composables/useToast";
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const toast = useToast();
 
-// Khi component mounted, fetch user profile nếu chưa có
+// Nếu user chưa có info, fetch profile luôn
 onMounted(async () => {
   if (!authStore.user.full_name) {
     try {
       const profile = await authStore.fetchUserProfile();
-      if (profile) {
-        authStore.user = profile; // set luôn vào store để hiển thị
-      }
+      if (profile) authStore.user = profile;
     } catch (err) {
       console.log("Fetch user failed:", err);
     }
   }
 });
+
+// Computed reactive, tự update khi store thay đổi
+const fullName = computed(() => authStore.user.full_name || "Người dùng");
+const email = computed(() => authStore.user.email || "Chưa có email");
+
+// Menu sidebar
+const menuItems = [
+  { name: "Hồ sơ của tôi", path: "/user/profile", icon: "heroicons:user" },
+  { name: "Danh sách đơn hàng", path: "/user/orders/list", icon: "heroicons:list-bullet" },
+  { name: "Danh sách yêu thích", path: "/user/wishlist", icon: "heroicons:heart" },
+  { name: "Danh sách địa chỉ", path: "/user/address", icon: "heroicons:map-pin" },
+  { name: "Thông báo", path: "/user/notifications", icon: "heroicons:bell" },
+  { name: "Tin nhắn", path: "/user/messages", icon: "heroicons:chat-bubble-left-right" },
+  { name: "Đăng xuất", path: "/logout", icon: "heroicons:arrow-right-on-rectangle" },
+];
 
 // Điều hướng menu
 const navigate = async (path: string) => {
@@ -78,15 +91,4 @@ const navigate = async (path: string) => {
     router.push(path);
   }
 };
-
-// Menu sidebar
-const menuItems = [
-  { name: "Hồ sơ của tôi", path: "/user/profile", icon: "heroicons:user" },
-  { name: "Danh sách đơn hàng", path: "/user/orders/list", icon: "heroicons:list-bullet" },
-  { name: "Danh sách yêu thích", path: "/user/wishlist", icon: "heroicons:heart" },
-  { name: "Danh sách địa chỉ", path: "/user/address", icon: "heroicons:map-pin" },
-  { name: "Thông báo", path: "/user/notifications", icon: "heroicons:bell" },
-  { name: "Tin nhắn", path: "/user/messages", icon: "heroicons:chat-bubble-left-right" },
-  { name: "Đăng xuất", path: "/logout", icon: "heroicons:arrow-right-on-rectangle" },
-];
 </script>
