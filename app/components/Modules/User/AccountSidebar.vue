@@ -1,23 +1,21 @@
 <template>
-  <aside
-    class="w-64 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6 "
-  >
+  <aside class="w-64 bg-white shadow-md rounded-r-xl p-4 flex flex-col mt-6 mb-6">
     <!-- Avatar -->
     <div class="flex flex-col items-center mb-4 relative">
       <div class="relative">
-      <img
-        src="https://nagawa.vn/wp-content/uploads/2025/11/avt-avatar-fb-mac-dinh.jpg"
-        alt="Avatar"
-        class="w-20 h-20 rounded-full border-2 border-gray-200 object-cover"
-      />
+        <img
+          src="https://nagawa.vn/wp-content/uploads/2025/11/avt-avatar-fb-mac-dinh.jpg"
+          alt="Avatar"
+          class="w-20 h-20 rounded-full border-2 border-gray-200 object-cover"
+        />
       </div>
-     <h2 class="mt-2 font-semibold text-gray-800">
-  {{ authStore.user.full_name || "Tên người dùng" }}
-</h2>
-<p class="text-sm text-gray-400">
-  {{ authStore.user.email || "Chưa có email" }}
-</p>
 
+      <h2 class="mt-2 font-semibold text-gray-800">
+        {{ authStore.user.full_name || "Người dùng" }}
+      </h2>
+      <p class="text-sm text-gray-400">
+        {{ authStore.user.email || "Chưa có email" }}
+      </p>
     </div>
 
     <hr class="border-t border-gray-200 mb-4" />
@@ -33,16 +31,11 @@
         >
           <div
             class="flex items-center gap-3 px-3 py-2 rounded-[10px] transition-colors duration-200"
-            :class="
-              route.path === item.path
-                ? 'bg-[#6E4E37] text-white'
-                : 'bg-white text-gray-700 hover:bg-[#6E4E37] hover:text-white'
-            "
+            :class="route.path === item.path
+              ? 'bg-[#6E4E37] text-white'
+              : 'bg-white text-gray-700 hover:bg-[#6E4E37] hover:text-white'"
           >
-            <!-- ICON -->
             <UIcon :name="item.icon" class="w-5 h-5" />
-
-            <!-- NAME -->
             <span>{{ item.name }}</span>
           </div>
         </li>
@@ -50,18 +43,21 @@
     </nav>
   </aside>
 </template>
-<script setup lang="ts">
-  const router = useRouter();
-  const route = useRoute();
-  const authStore = useAuthStore(); // <-- use store instance
-  const toast = useToast();
 
-  onMounted(async () => {
+<script setup lang="ts">
+
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
+const toast = useToast();
+
+// Khi component mounted, fetch user profile nếu chưa có
+onMounted(async () => {
   if (!authStore.user.full_name) {
     try {
       const profile = await authStore.fetchUserProfile();
       if (profile) {
-        authStore.user = profile; // set luôn vào store
+        authStore.user = profile; // set luôn vào store để hiển thị
       }
     } catch (err) {
       console.log("Fetch user failed:", err);
@@ -69,71 +65,28 @@
   }
 });
 
+// Điều hướng menu
+const navigate = async (path: string) => {
+  if (path === "/logout") {
+    await authStore.logout();
+    router.push("/");
+    toast.add({
+      title: "Đăng xuất thành công 🎉",
+      color: "success",
+    });
+  } else {
+    router.push(path);
+  }
+};
 
-  const navigate = async (path: string) => {
-    if (path === "/logout") {
-      await authStore.logout();
-      router.push("/");
-
-      toast.add({
-        title: "Đăng xuất thành công 🎉",
-        color: "success",
-      });
-    } else {
-      router.push(path);
-    }
-  };
-
-  // const navigate = async (path: string) => {
-  //   if (path === '/logout') {
-  //     auth.logout()              // xóa token
-  //     router.push('/')           // chuyển về trang chủ hoặc login
-  //     alert('Đăng xuất thành công 🎉')
-  //   } else {
-  //     router.push(path)
-  //   }
-  // }
-
-  const menuItems = [
-    // { name: "Thống kê", path: "/user/dashboard", icon: "heroicons:chart-bar" },
-    { name: "Hồ sơ của tôi", path: "/user/profile", icon: "heroicons:user" },
-    {
-      name: "Danh sách đơn hàng",
-      path: "/user/orders/list",
-      icon: "heroicons:list-bullet",
-    },
-    {
-      name: "Danh sách yêu thích",
-      path: "/user/wishlist",
-      icon: "heroicons:heart",
-    },
-    {
-      name: "Danh sách địa chỉ",
-      path: "/user/address",
-      icon: "heroicons:map-pin",
-    },
-    // { name: "Hỗ trợ", path: "/user/support", icon: "heroicons:lifebuoy" },
-    // {
-    //   name: "Theo dõi đơn hàng",
-    //   path: "/user/track-order",
-    //   icon: "heroicons:truck",
-    // },
-    // {
-    //   name: "Phương thức thanh toán",
-    //   path: "/user/payment",
-    //   icon: "heroicons:credit-card",
-    // },
-    { name: "Thông báo", path: "/user/notifications", icon: "heroicons:bell" },
-    {
-      name: "Tin nhắn",
-      path: "/user/messages",
-      icon: "heroicons:chat-bubble-left-right",
-    },
-    // { name: "Cài đặt", path: "/user/settings", icon: "heroicons:cog-6-tooth" },
-    {
-      name: "Đăng xuất",
-      path: "/logout",
-      icon: "heroicons:arrow-right-on-rectangle",
-    },
-  ];
+// Menu sidebar
+const menuItems = [
+  { name: "Hồ sơ của tôi", path: "/user/profile", icon: "heroicons:user" },
+  { name: "Danh sách đơn hàng", path: "/user/orders/list", icon: "heroicons:list-bullet" },
+  { name: "Danh sách yêu thích", path: "/user/wishlist", icon: "heroicons:heart" },
+  { name: "Danh sách địa chỉ", path: "/user/address", icon: "heroicons:map-pin" },
+  { name: "Thông báo", path: "/user/notifications", icon: "heroicons:bell" },
+  { name: "Tin nhắn", path: "/user/messages", icon: "heroicons:chat-bubble-left-right" },
+  { name: "Đăng xuất", path: "/logout", icon: "heroicons:arrow-right-on-rectangle" },
+];
 </script>
