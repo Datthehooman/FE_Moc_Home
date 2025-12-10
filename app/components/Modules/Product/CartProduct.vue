@@ -170,24 +170,24 @@ const handleAddToCart = async () => {
 
 const handleAddToWishlist = async () => {
   if (!props.item.product_id) {
-    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
+    // toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
     return;
   }
 
   try {
     if (isInWishlist(props.item.product_id)) {
-      toast.add({ title: "ℹ️ Sản phẩm đã có trong yêu thích!", color: "info" });
+      // toast.add({ title: "ℹ️ Sản phẩm đã có trong yêu thích!", color: "info" });
       return;
     }
     const success = await addToWishlist(props.item.product_id);
     toast.add({
-      title: success ? "✅ Đã thêm sản phẩm vào yêu thích!" : "❌ Không thể thêm vào yêu thích!",
-      color: success ? "success" : "error",
+      // title: success ? "✅ Đã thêm sản phẩm vào yêu thích!" : "❌ Không thể thêm vào yêu thích!",
+      // color: success ? "success" : "error",
     });
   } catch (error: any) {
     toast.add({
-      title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || "Không rõ nguyên nhân"),
-      color: "error",
+      // title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || "Không rõ nguyên nhân"),
+      // color: "error",
     });
   }
 };

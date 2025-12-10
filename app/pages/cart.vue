@@ -33,7 +33,7 @@
                 </td>
 
                 <td class="font-semibold">
-                  {{ formatPrice(item.product_sale || item.product_price) }}
+                  {{ formatPrice(item.product_sale || item.product_price) }} đ
                 </td>
 
                 <td>
@@ -62,7 +62,7 @@
                 </td>
 
                 <td class="font-semibold">
-                  {{ formatPrice(item.quantity * (item.product_sale || item.product_price)) }}
+                  {{ formatPrice(item.quantity * (item.product_sale || item.product_price)) }} đ
                 </td>
 
                 <td class="text-center">
@@ -107,14 +107,14 @@
             <span>Tạm tính:</span><span>{{ formatPrice(apiTotal) }}</span>
           </div>
 
-          <div class="flex justify-between">
+          <!-- <div class="flex justify-between">
             <span>Giảm giá:</span>
             <span class="text-red-500">-{{ formatPrice(discount) }}</span>
           </div>
 
           <div class="flex justify-between">
             <span>Vận chuyển:</span><span>Miễn phí</span>
-          </div>
+          </div> -->
 
           <div class="border-t pt-3 flex justify-between font-semibold">
             <span>Tổng thanh toán:</span>
@@ -142,9 +142,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useCart } from "~/composables/useCart";
-import { useCheckout } from "~/composables/useCheckout";
-import { useProduct } from "~/composables/useProduct";
 
 const router = useRouter();
 const toast = useToast();

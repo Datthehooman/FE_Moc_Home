@@ -152,10 +152,6 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from "vue";
-  import { useRouter } from "vue-router";
-  import { useWishlist } from "~/composables/useWishlist";
-  import { useCart } from "~/composables/useCart";
 
   const props = defineProps<{ item: any; itemWidth: number }>();
   const emit = defineEmits<{
@@ -239,16 +235,16 @@
           console.log("🟢 Product removed from wishlist");
 
           // 🟢 HIỂN THỊ THÔNG BÁO THÀNH CÔNG
-          toast.add({ title: "✅ Đã xóa khỏi yêu thích!", color: "success" });
+          // toast.add({ title: "✅ Đã xóa khỏi yêu thích!", color: "success" });
 
           // 🟢 EMIT EVENT ĐỂ PARENT BIẾT CÓ THAY ĐỔI
           emit("wishlist-updated");
         } else {
-          toast.add({ title: "❌ Xóa thất bại!", color: "error" });
+          // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
         }
       } catch (error) {
         console.error("❌ Error removing from wishlist:", error);
-        toast.add({ title: "❌ Xóa thất bại!", color: "error" });
+        // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
       } finally {
         isDeleting.value = false;
       }
