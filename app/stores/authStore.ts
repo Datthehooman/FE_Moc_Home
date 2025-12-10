@@ -56,21 +56,30 @@ export const useAuthStore = defineStore("auth", {
 
   persist: true,
 
-  getters: {
-    activeToken(state) {
-      const isLocal =
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1";
+getters: {
+  activeToken(state) {
+    // Nếu đang chạy ở client thì check hostname
+    if (process.client) {
+      const hostname = window.location.hostname;
+      const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
       return isLocal ? state.tokenLocal : state.token;
-    },
+    }
 
-    activeRole(state) {
-      const isLocal =
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1";
-      return isLocal ? state.roleLocal : state.role;
-    },
+    // SSR mặc định trả token chính
+    return state.token;
   },
+
+  activeRole(state) {
+    if (process.client) {
+      const hostname = window.location.hostname;
+      const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
+      return isLocal ? state.roleLocal : state.role;
+    }
+
+    return state.role;
+  },
+},
+
 
   actions: {
     // ============================
@@ -228,32 +237,33 @@ async saveGoogleToken(token: string) {
     // ============================
     // GET USER PROFILE
     // ============================
-    async fetchUser() {
-      const token = this.activeToken;
-      if (!token) {
-        this.isLogged = false;
-        return;
-      }
+   async fetchUser() {
+  const token = this.activeToken;
+  if (!token) {
+    this.isLogged = false;
+    return;
+  }
 
-      try {
-        const res = await $fetch(
-          "https://api.mocfurni.shop/api/client/profile",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        this.user = res.user || {};
-        this.role = res.user?.role || null;
-        this.roleLocal = res.user?.role || null;
-        this.isLogged = true;
-      } catch {
-        this.user = {};
-        this.role = null;
-        this.roleLocal = null;
-        this.isLogged = false;
+  try {
+    const res = await $fetch(
+      "https://api.mocfurni.shop/api/client/user-profile",
+      {
+        headers: { Authorization: `Bearer ${token}` },
       }
-    },
+    );
+
+    this.user = res.result?.data || {};
+    this.role = this.user.role || null;
+    this.roleLocal = this.user.role || null;
+    this.isLogged = true;
+  } catch {
+    this.user = {};
+    this.role = null;
+    this.roleLocal = null;
+    this.isLogged = false;
+  }
+},
+
 
     // ============================
     // ADDRESS METHODS
