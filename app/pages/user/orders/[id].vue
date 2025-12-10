@@ -255,7 +255,12 @@
 
   const route = useRoute();
   const router = useRouter(); // Khởi tạo router
-  const id = Number(route.params.id);
+  const routeId = route.params.id;
+  const id = Array.isArray(routeId) ? routeId[0] : routeId;
+
+  if (!id) {
+    router.push('/user/orders'); 
+  }
   const toast = useToast();
 
   const showFilter = ref(false); // trạng thái mở/đóng dropdown
