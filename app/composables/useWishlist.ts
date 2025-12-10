@@ -30,7 +30,7 @@ export const useWishlist = () => {
       timeout: 3000,
       position: "bottom-right",
       style:
-        "color:white; font-weight:600; background-color:#dc3545; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+        "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
       iconColor: "#ffffff",
     });
   };
@@ -42,7 +42,7 @@ export const useWishlist = () => {
       timeout: 3000,
       position: "bottom-right",
       style:
-        "color:white; font-weight:600; background-color:#28a745; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+        "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
       iconColor: "#ffffff",
     });
   };

@@ -358,12 +358,7 @@
   </section>
 </template>
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useCheckoutStore } from "@/stores/checkout";
-import { useCheckout } from "@/composables/useCheckout";
-import { useAddress } from "@/composables/useAddress";
-import { useCookie } from "#app";
+
 
 const router = useRouter();
 const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
