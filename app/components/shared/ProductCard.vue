@@ -330,7 +330,7 @@
           title: "✅ Sản phẩm đã có trong yêu thích!",
           color: "info",
         });
-        return;
+        return;c
       }
 
       const success = await addToWishlist(productId);
