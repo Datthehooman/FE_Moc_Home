@@ -137,9 +137,11 @@ const authStore = useAuthStore();
 const router = useRouter();
 const toast = useToast();
 
-const isLogged = computed(() => !!useCookie("token").value);
+const isLogged = computed(() => authStore.isLogged);
 
-const getToken = () => useCookie("token").value;
+
+const getToken = () => authStore.activeToken;
+
 
 
 // Scroll header
@@ -178,7 +180,7 @@ const logout = async () => {
 
 // Wishlist
 const goWishlist = () => {
-  if (!isLogged.value) {
+  if (!authStore.isLogged) {
     toast.add({ title: "Vui lòng đăng nhập để xem danh sách yêu thích", icon: "heroicons:exclamation-circle", timeout: 3000, position: "top-right", style: "color:white; font-weight:600;", iconColor: "#ffffff", color: "error" });
     router.push("/login");
   } else router.push("/user/wishlist");
