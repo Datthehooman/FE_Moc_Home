@@ -102,29 +102,14 @@
               <!-- ACTIONS -->
               <div class="flex items-center gap-2">
 
-                <div
-                  class="w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black"
+                <NuxtLink
+                  :to="`/user/orders/${order.order_id}`"
+                  class="group w-[34px] h-[34px] flex items-center justify-center border border-black/20 rounded-[5px] cursor-pointer transition hover:bg-black hover:border-black"
                   title="Xem chi tiết đơn hàng"
                 >
-                  <NuxtLink
-                    :to="`/user/orders/${order.order_id}`"
-                    class="w-[34px] h-[34px] flex items-center justify-center rounded-[5px]"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor"
-                         class="w-5 h-5 text-gray-500 hover:text-white transition">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 8.354 7.36 5.25 12 
-                            5.25c4.638 0 8.574 3.103 9.963 6.433.07.162.07.353 0 .515C20.574 
-                            15.646 16.637 18.75 12 18.75c-4.64 0-8.577-3.103-9.964-6.428z" />
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </NuxtLink>
-                </div>
+                  <UIcon name="heroicons:eye" class="w-5 h-5 text-gray-500 group-hover:text-white transition" />
+                </NuxtLink>
 
-                <!-- REVIEW BUTTON -->
                 <NuxtLink
                   v-if="order.order_status === 'Hoàn tất'"
                   :to="`/user/orders/${order.order_id}`"
@@ -135,18 +120,17 @@
                   }"
                   :title="order.is_fully_reviewed ? 'Đơn hàng đã được đánh giá' : 'Đánh giá sản phẩm ngay'"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                       viewBox="0 0 24 24" stroke-width="1.5"
-                       stroke="currentColor" class="w-5 h-5 text-white">
-                    <path v-if="!order.is_fully_reviewed"
-                          stroke-linecap="round" stroke-linejoin="round"
-                          d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.102 5.618.498a.562.562 0 0 1 .31 1.018l-4.238 3.626 1.258 5.669a.562.562 0 0 1-.86.671l-4.814-2.885-4.814 2.885a.562.562 0 0 1-.86-.671l1.257-5.67-4.238-3.625a.562.562 0 0 1 .31-1.018l5.618-.498L11.48 3.5z" />
-                    <path v-else
-                          stroke-linecap="round" stroke-linejoin="round"
-                          d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                  </svg>
+                  <UIcon 
+                    v-if="!order.is_fully_reviewed"
+                    name="heroicons:star-20-solid" 
+                    class="w-5 h-5 text-white"
+                  />
+                  <UIicon 
+                    v-else
+                    name="heroicons:check-circle-20-solid" 
+                    class="w-5 h-5 text-white"
+                  />
                 </NuxtLink>
-
               </div>
             </div>
           </div>
