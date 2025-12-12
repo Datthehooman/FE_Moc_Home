@@ -41,13 +41,12 @@
     </div>
 
     <div v-else class="grid grid-cols-3 gap-6 mb-15">
-      <SharedBlogCard 
-        v-for="article in articles" 
-        :key="article.id" 
-        :article="article" 
+      <SharedBlogCard
+        v-for="article in articles"
+        :key="article.id"
+        :article="article"
       />
-      
-      </div>
+    </div>
 
     <div class="flex justify-center mb-17">
       <UPagination
@@ -110,21 +109,25 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted } from 'vue';
-  
+  import { ref, onMounted } from "vue";
+
   // 🔥 LƯU Ý: VUI LÒNG CHỈNH SỬA ĐƯỜNG DẪN IMPORT NÀY NẾU CẦN
   import { useArticle } from "~/composables/useArticle";
   import { useArticleCategory } from "~/composables/useArticleCategory";
 
   // Lấy các biến reactive TỪ HOOKS để đảm bảo đồng bộ trạng thái
   // Mặc dù bạn không dùng fetchArticles, nhưng vẫn cần articles, loading, error từ hook.
-  const { articles, loading, error } = useArticle(); 
+  const { articles, loading, error } = useArticle();
   const { categories, fetchCategories } = useArticleCategory();
 
   // Biến local cho Phân trang
   const page = ref(1);
-  const perPage = 10; 
+  const perPage = 10;
   const totalArticles = ref(0); // GIÁ TRỊ NÀY SẼ ĐƯỢC CẬP NHẬT TỪ API
+  const mapThumbnail = (thumbnail: string | null) => {
+    if (!thumbnail) return null;
+    return `https://api.mocfurni.shop/storage/system/articles/images/${thumbnail}`;
+  };
 
   // Biến cho Lọc theo Danh mục
   const selectedCategorySlug = ref<string | null>(null);
@@ -149,37 +152,37 @@
           `https://api.mocfurni.shop/api/client/articles/category/${selectedCategorySlug.value}`,
           { params }
         );
-        
-        // 🛠️ SỬA LỖI TRUY CẬP DATA & PAGINATION 
+
+        // 🛠️ SỬA LỖI TRUY CẬP DATA & PAGINATION
         articles.value = (res?.result?.data ?? []).map((a: any) => ({
           ...a,
+          thumbnail: mapThumbnail(a.thumbnail),
           created_at: a.created_at
             ? new Date(a.created_at).toLocaleDateString("vi-VN")
             : "",
         }));
         totalArticles.value = res?.result?.pagination?.total ?? 0;
-        
       } else {
         // Fetch tất cả bài viết
         const res: any = await $fetch(
           "https://api.mocfurni.shop/api/client/articles",
           { params }
         );
-        
+
         // 🛠️ SỬA LỖI TRUY CẬP DATA & PAGINATION
         articles.value = (res?.result?.data ?? []).map((a: any) => ({
           ...a,
+          thumbnail: mapThumbnail(a.thumbnail),
           created_at: a.created_at
             ? new Date(a.created_at).toLocaleDateString("vi-VN")
             : "",
         }));
         totalArticles.value = res?.result?.pagination?.total ?? 0;
       }
-      
+
       // LOG ĐỂ DEBUG (nếu bạn cần kiểm tra lại trên Console)
       console.log(`[DEBUG] Số lượng bài viết đã gán: ${articles.value.length}`);
       console.log(`[DEBUG] Tổng số bài viết: ${totalArticles.value}`);
-      
     } catch (err: any) {
       error.value = err?.data?.message || "Không thể tải bài viết";
       articles.value = [];
@@ -190,12 +193,11 @@
     }
   };
 
-
   /**
    * Xử lý khi chọn danh mục
    */
   const selectCategory = (slug: string | null) => {
-    if (selectedCategorySlug.value === slug) return; 
+    if (selectedCategorySlug.value === slug) return;
 
     selectedCategorySlug.value = slug;
     page.value = 1; // Reset trang về 1 khi đổi danh mục
@@ -206,8 +208,8 @@
   onMounted(async () => {
     // Lấy danh sách danh mục (dùng hook)
     await fetchCategories();
-    
+
     // Lấy bài viết (dùng logic custom đã sửa để lấy pagination)
-    await fetchData(); 
+    await fetchData();
   });
 </script>

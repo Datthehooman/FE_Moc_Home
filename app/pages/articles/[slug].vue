@@ -11,11 +11,14 @@
         Không tìm thấy bài viết.
       </div>
       <div v-else>
-        <NuxtImg
-          :src="article.image || '/Blog 2.png'"
-          class="w-full h-auto rounded-md mb-[23px] object-cover"
-          alt="Hình ảnh bài viết"
-        />
+        <div
+          class="w-full h-auto rounded-md mb-[23px] flex justify-center items-center"
+        >
+          <NuxtImg
+            :src="article.thumbnail || '/Blog 2.png'"
+            alt="Hình ảnh bài viết"
+          />
+        </div>
 
         <div class="flex justify-between mb-[27px] text-sm">
           <div class="flex gap-7.5">
@@ -102,7 +105,7 @@
           >
             <div class="w-20 h-20 flex-shrink-0 overflow-hidden rounded-md">
               <NuxtImg
-                :src="relArticle.image || '/blog 1.png'"
+                :src="relArticle.thumbnail || '/blog 1.png'"
                 class="w-full h-full object-cover"
                 alt="Hình ảnh bài viết liên quan"
               />

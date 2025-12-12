@@ -6,7 +6,7 @@ interface Article {
   title: string;
   content: string;
   slug: string;
-  image: string | null;
+  thumbnail: string | null;
   created_at: string; // ISO 8601 string
   category: {
     id: number;
@@ -29,6 +29,10 @@ export function useArticle() {
   const error = ref<string | null>(null);
 
   const BASE_URL = "https://api.mocfurni.shop/api/client";
+  const mapThumbnail = (thumbnail: string | null) => {
+    if (!thumbnail) return null;
+    return `https://api.mocfurni.shop/storage/system/articles/images/${thumbnail}`;
+  };
 
   /**
    * Lấy danh sách tất cả bài viết hoặc bài viết theo trang/số lượng (mặc định)
@@ -56,8 +60,7 @@ export function useArticle() {
           : "",
       }));
     } catch (err: any) {
-      error.value =
-        err?.data?.message || "Không lấy được danh sách bài viết";
+      error.value = err?.data?.message || "Không lấy được danh sách bài viết";
       console.error("Error fetching articles:", err);
     } finally {
       loading.value = false;
@@ -126,21 +129,22 @@ export function useArticle() {
         articleDetail.value = {
           article: {
             ...articleData.article,
+            thumbnail: mapThumbnail(articleData.article.thumbnail),
             created_at: articleData.article.created_at
-              ? new Date(
-                  articleData.article.created_at
-                ).toLocaleDateString("vi-VN")
+              ? new Date(articleData.article.created_at).toLocaleDateString(
+                  "vi-VN"
+                )
               : "",
           },
           // Ánh xạ các bài viết liên quan nếu có
-          related_articles: (articleData.related_articles ?? []).map((ra: any) => ({
-             ...ra,
-             created_at: ra.created_at
-              ? new Date(
-                  ra.created_at
-                ).toLocaleDateString("vi-VN")
-              : "",
-          })),
+          related_articles: (articleData.related_articles ?? []).map(
+            (ra: any) => ({
+              ...ra,
+              created_at: ra.created_at
+                ? new Date(ra.created_at).toLocaleDateString("vi-VN")
+                : "",
+            })
+          ),
         };
       }
     } catch (err: any) {
