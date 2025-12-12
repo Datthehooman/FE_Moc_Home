@@ -218,7 +218,7 @@
               </div>
             </div>
 
-            <div
+            <!-- <div
               class="mt-10 bg-white p-8 rounded-xl shadow-sm border border-gray-200"
             >
               <h3 class="text-xl font-semibold text-gray-800 mb-4">
@@ -262,7 +262,7 @@
               >
                 {{ creatingReview ? "Đang gửi..." : "Gửi bình luận" }}
               </button>
-            </div>
+            </div> -->
           </div>
         </div>
       </transition>
