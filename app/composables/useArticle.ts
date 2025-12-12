@@ -54,6 +54,7 @@ export function useArticle() {
 
       articles.value = raw.map((a: any) => ({
         ...a,
+        thumbnail: mapThumbnail(a.thumbnail),
         // Format ngày tạo cho dễ đọc
         created_at: a.created_at
           ? new Date(a.created_at).toLocaleDateString("vi-VN")
@@ -94,6 +95,7 @@ export function useArticle() {
 
       articles.value = raw.map((a: any) => ({
         ...a,
+        thumbnail: mapThumbnail(a.thumbnail),
         // Format ngày tạo
         created_at: a.created_at
           ? new Date(a.created_at).toLocaleDateString("vi-VN")
@@ -156,6 +158,8 @@ export function useArticle() {
       loading.value = false;
     }
   };
+
+  fetchArticles();
 
   return {
     articles,

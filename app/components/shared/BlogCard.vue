@@ -2,8 +2,9 @@
   <div class="w-[411px] h-135">
     <div class="w-full h-70 rounded-xl overflow-hidden relative mb-[9px]">
       <NuxtImg
-        :key="article.thumbnail"
-        :src="article.thumbnail ? article.thumbnail + `?v=${article.id}` : ''"
+        :key="article.thumbnail + article.id"
+        :src="article.thumbnail || '/images/default-thumbnail.jpg'"
+        :modifiers="{ v: article.id }"
         class="w-full h-full object-cover z-0"
         alt="Blog Image"
       />
@@ -37,10 +38,10 @@
       :to="`/articles/${article.slug}`"
       class="block hover:text-primary transition-colors duration-300"
     >
-      <p class="text-xl font-medium mb-[11px] line-clamp-2">
+      <p class="text-xl font-medium mb-[11px] line-clamp-1">
         {{ article.title }}
       </p>
-      <p class="font-medium mb-3 text-muted line-clamp-3">
+      <p class="font-medium mb-3 text-muted line-clamp-2">
         {{ contentSnippet }}
       </p>
     </NuxtLink>
