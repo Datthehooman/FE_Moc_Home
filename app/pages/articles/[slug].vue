@@ -66,10 +66,7 @@
 
         <h1 class="text-[32px] font-bold mb-7">{{ article.title }}</h1>
 
-        <div
-          class="article-content prose max-w-none mb-5.5 text-lg font-medium"
-          v-html="article.content"
-        ></div>
+        <MdPreview :id="id" :modelValue="article?.content || ''" />
       </div>
     </div>
 
@@ -83,7 +80,6 @@
             <UButton
               :to="`/articles`"
               variant="link"
-              
               class="justify-between w-full hover:text-primary transition-colors !px-0"
             >
               <span class="font-medium text-lg">{{ category.name }}</span>
@@ -123,59 +119,64 @@
         </div>
       </div>
       <div v-else class="text-gray-500">Không có bài viết gần đây.</div>
-
-
-      </div>
+    </div>
   </UContainer>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
-import { useArticle } from "~/composables/useArticle";
-import { useArticleCategory } from "~/composables/useArticleCategory";
-import { computed } from "vue";
-import { useAsyncData } from "#app";
+  import { useRoute } from "vue-router";
+  import { useArticle } from "~/composables/useArticle";
+  import { useArticleCategory } from "~/composables/useArticleCategory";
+  import { computed } from "vue";
+  import { useAsyncData } from "#app";
+  import { MdPreview } from "md-editor-v3";
+  import "md-editor-v3/lib/preview.css";
 
-const route = useRoute();
-const articleSlug = route.params.slug as string;
+  const id = "preview-only";
+  const route = useRoute();
+  const articleSlug = route.params.slug as string;
 
-const { articleDetail, fetchArticleDetail, loading, error } = useArticle();
-const { categories, fetchCategories } = useArticleCategory();
+  const { articleDetail, fetchArticleDetail, loading, error } = useArticle();
+  const { categories, fetchCategories } = useArticleCategory();
 
+  const { pending } = useAsyncData(
+    `article-detail-${articleSlug}`,
+    async () => {
+      await fetchArticleDetail(articleSlug);
+      await fetchCategories();
+    },
+    {
+      server: false,
+      lazy: true,
+    }
+  );
 
-const { pending } = useAsyncData(
-  `article-detail-${articleSlug}`,
-  async () => {
-    await fetchArticleDetail(articleSlug);
-    await fetchCategories();
-  },
-  {
-    server: false,
-    lazy: true,
-  }
-);
+  const article = computed(() => articleDetail.value?.article);
+  const relatedArticles = computed(
+    () => articleDetail.value?.related_articles ?? []
+  );
 
-const article = computed(() => articleDetail.value?.article);
-const relatedArticles = computed(
-  () => articleDetail.value?.related_articles ?? []
-);
+  /**
+   * Hàm cắt ngắn nội dung (content) và loại bỏ thẻ HTML để hiển thị tóm tắt.
+   */
+  const truncateContent = (content: string, maxLength: number = 120) => {
+    const cleanContent = (content || "").replace(/<[^>]*>/g, "").trim();
 
-/**
- * Hàm cắt ngắn nội dung (content) và loại bỏ thẻ HTML để hiển thị tóm tắt.
- */
-const truncateContent = (content: string, maxLength: number = 120) => {
-  const cleanContent = (content || "").replace(/<[^>]*>/g, "").trim();
+    if (cleanContent.length <= maxLength) {
+      return cleanContent;
+    }
 
-  if (cleanContent.length <= maxLength) {
-    return cleanContent;
-  }
+    let truncated = cleanContent.substring(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(" ");
+    if (lastSpace !== -1) {
+      truncated = truncated.substring(0, lastSpace);
+    }
 
-  let truncated = cleanContent.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(" ");
-  if (lastSpace !== -1) {
-    truncated = truncated.substring(0, lastSpace);
-  }
-
-  return truncated.trim() + "...";
-};
+    return truncated.trim() + "...";
+  };
 </script>
+<style scoped>
+  #preview-only {
+    @apply bg-[#FFFBF8];
+  }
+</style>

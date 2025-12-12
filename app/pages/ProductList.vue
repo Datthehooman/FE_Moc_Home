@@ -1,15 +1,17 @@
 <template>
   <div class="bg-[#FFFBF8]">
     <div class="min-h-screen p-6 max-w-[85%] mx-auto">
-<div class="max-w-[1200px] mx-auto flex gap-6">
-  <!-- SIDEBAR -->
-<aside class="w-[250px] flex-shrink-0 sticky top-24 self-start h-[calc(100vh-96px)] overflow-y-auto scrollbar-none">
-  <ModulesProductSidebar
-    v-model:searchQuery="searchQuery"
-    v-model:selectedCategories="selectedCategories"
-    v-model:selectedBrands="selectedBrands"
-  />
-</aside>
+      <div class="max-w-[1200px] mx-auto flex gap-6">
+        <!-- SIDEBAR -->
+        <aside
+          class="w-[250px] flex-shrink-0 sticky top-24 self-start h-[calc(100vh-96px)] overflow-y-auto scrollbar-none"
+        >
+          <ModulesProductSidebar
+            v-model:searchQuery="searchQuery"
+            v-model:selectedCategories="selectedCategories"
+            v-model:selectedBrands="selectedBrands"
+          />
+        </aside>
         <!-- PRODUCT GRID -->
         <div class="flex-1">
           <!-- Sort -->
@@ -172,7 +174,7 @@
         try {
           let url = "https://api.mocfurni.shop/api/client/products";
           if (keyword) {
-            url = `http://api.mocfurni.shop/api/client/product-search?keyword=${encodeURIComponent(
+            url = `https://api.mocfurni.shop/api/client/product-search?keyword=${encodeURIComponent(
               keyword
             )}`;
           }
@@ -208,13 +210,12 @@
   });
 </script>
 <style scoped>
-/* Ẩn scrollbar nhưng vẫn scroll được */
-.scrollbar-none::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
-}
-.scrollbar-none {
-  -ms-overflow-style: none;  /* IE 10+ */
-  scrollbar-width: none;     /* Firefox */
-}
-
+  /* Ẩn scrollbar nhưng vẫn scroll được */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none; /* Firefox */
+  }
 </style>
