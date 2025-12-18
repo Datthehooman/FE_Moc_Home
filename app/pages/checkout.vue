@@ -271,89 +271,84 @@
       </div>
 
       <!-- HÓA ĐƠN -->
-      <div
-        class="flex-[1] w-full max-w-[360px] bg-[#A77A5D]/10 rounded-2xl p-6 shadow-sm h-fit md:sticky md:top-10"
-      >
-        <h2 class="text-lg font-semibold mb-4 text-[#6E4E37]">Hóa đơn</h2>
+<div
+  class="flex-[1] w-full max-w-[360px] bg-[#A77A5D]/10 rounded-2xl p-6 shadow-sm h-fit md:sticky md:top-10"
+>
+  <h2 class="text-lg font-semibold mb-4 text-[#6E4E37]">Hóa đơn</h2>
 
-        <div v-if="checkoutItems.length" class="space-y-2 text-sm">
-          <div
-            v-for="item in checkoutItems"
-            :key="item.product_id"
-            class="flex justify-between"
-          >
-            <span>{{ item.product_name }} x {{ item.quantity }}</span>
-            <span>{{
-              formatPrice(
-                item.quantity * (item.product_sale || item.product_price)
-              )
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Giảm giá:</span><span class="text-red-500">-0 đ</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Vận chuyển:</span
-            ><span>{{
-              selectedShipping === "Nhanh" ? "30.000 đ" : "Miễn phí"
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Thuế:</span><span>0 đ</span>
-          </div>
-          <div class="border-t pt-3 flex justify-between font-semibold">
-            <span>Tổng tiền:</span>
-            <span>{{ formatPrice(totalAmount) }}</span>
-          </div>
-        </div>
+  <!-- PREVIEW BILL -->
+  <div v-if="invoice" class="space-y-2 text-sm">
+    <div
+      v-for="item in invoice.items"
+      :key="item.product_id"
+      class="flex justify-between"
+    >
+      <span>{{ item.product_name }} x {{ item.quantity }}</span>
+      <span>{{ formatPrice(item.subtotal) }}</span>
+    </div>
 
-        <div v-else-if="buyNowItem" class="space-y-2 text-sm">
-          <div class="flex justify-between">
-            <span
-              >{{ buyNowItem.product_name }} x {{ buyNowItem.quantity }}</span
-            >
-            <span>{{
-              formatPrice(buyNowItem.price * buyNowItem.quantity)
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Giảm giá:</span><span class="text-red-500">-0 đ</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Vận chuyển:</span
-            ><span>{{
-              selectedShipping === "Nhanh" ? "30.000 đ" : "Miễn phí"
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Thuế:</span><span>0 đ</span>
-          </div>
-          <div class="border-t pt-3 flex justify-between font-semibold">
-            <span>Tổng tiền:</span>
-            <span>{{ formatPrice(totalAmount) }}</span>
-          </div>
-        </div>
+    <hr />
 
-        <div v-else class="text-center text-red-500">
-          Không có sản phẩm để thanh toán, quay lại sản phẩm để mua
-        </div>
-<div class="mt-4">
-  <label class="text-sm font-medium">Mã giảm giá</label>
-  <input
-    v-model="form.voucher_code"
-    type="text"
-    placeholder="Nhập mã giảm giá"
-    class="w-full mt-1 px-3 py-2 border rounded-lg"
-  />
+    <div class="flex justify-between">
+      <span>Tạm tính:</span>
+      <span>{{ formatPrice(invoice.subtotal) }}</span>
+    </div>
+
+    <div class="flex justify-between">
+      <span>Giảm giá:</span>
+      <span class="text-red-500">
+        -{{ formatPrice(invoice.discount_amount || 0) }}
+      </span>
+    </div>
+
+    <div class="flex justify-between">
+      <span>Vận chuyển:</span>
+      <span>
+        {{ hasAddress ? formatPrice(invoice.shipping_fee) : "—" }}
+      </span>
+    </div>
+
+    <!-- THÔNG BÁO CHƯA CÓ ĐỊA CHỈ -->
+    <p
+      v-if="!hasAddress"
+      class="text-xs text-orange-600 italic mt-1"
+    >
+      * Vui lòng thêm địa chỉ để tính phí vận chuyển
+    </p>
+
+    <div class="border-t pt-3 flex justify-between font-semibold">
+      <span>Tổng cộng:</span>
+      <span>
+        {{ formatPrice(hasAddress ? invoice.total_amount : invoice.subtotal - (invoice.discount_amount || 0)) }}
+      </span>
+    </div>
+  </div>
+
+  <!-- FALLBACK -->
+  <div v-else class="text-center text-gray-500 text-sm">
+    Đang tính hóa đơn...
+  </div>
+
+  <!-- Voucher -->
+  <div class="mt-4">
+    <label class="text-sm font-medium">Mã giảm giá</label>
+    <input
+      v-model="form.voucher_code"
+      type="text"
+      placeholder="Nhập mã giảm giá"
+      class="w-full mt-1 px-3 py-2 border rounded-lg"
+    />
+  </div>
+
+  <a
+    href="/cart"
+    class="flex items-center gap-2 text-sm mt-3 text-gray-600 hover:underline"
+  >
+    ← Quay lại giỏ hàng
+  </a>
 </div>
 
-        <a
-          href="/cart"
-          class="flex items-center gap-2 text-sm mt-3 text-gray-600 hover:underline"
-        >
-          ← Quay lại giỏ hàng
-        </a>
-      </div>
+
     </div>
   </section>
 </template>
@@ -361,9 +356,10 @@
 
 
 const router = useRouter();
-const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
+const { buyNow, buyNowGuest, payWithVNPAY, previewInvoice  } = useCheckout();
 const checkoutStore = useCheckoutStore();
 const authStore = useAuthStore();
+const invoice = computed(() => checkoutStore.invoicePreview);
 
 // Token
 let tokenCookie = useCookie("tokenLocal");
@@ -549,6 +545,15 @@ onMounted(async () => {
   }
 
   if (!checkoutItems.value.length && !buyNowItem) router.replace("/error");
+  // 🔥 Preview invoice lần đầu (chưa có địa chỉ)
+if (!checkoutStore.invoicePreview) {
+  await previewInvoice({
+    province_id: null,
+    district_id: null,
+    ward_id: null,
+  });
+}
+
 });
 
 
@@ -603,5 +608,46 @@ const selectWard = (ward: any) => {
   wardSearch.value = ward.name;
   showWardList.value = false;
 };
+let previewTimeout: any = null;
+
+watch(
+  () => [selectedProvince.value, selectedWard.value],
+  async ([p, w]) => {
+    clearTimeout(previewTimeout);
+
+    // ❌ Chưa đủ địa chỉ → reset phí ship
+    if (!p || !w) {
+      if (checkoutStore.invoicePreview) {
+        checkoutStore.setInvoicePreview({
+          ...checkoutStore.invoicePreview,
+          shipping_fee: 0,
+          total_amount:
+            checkoutStore.invoicePreview.subtotal -
+            (checkoutStore.invoicePreview.discount_amount || 0),
+        });
+      }
+      return;
+    }
+
+    // ✅ Có địa chỉ → debounce gọi API
+    previewTimeout = setTimeout(async () => {
+      try {
+        await previewInvoice({
+          province_id: Number(p),
+          district_id: 760, // ⚠️ tạm
+          ward_id: Number(w),
+        });
+      } catch (e) {
+        console.error("Preview invoice error", e);
+      }
+    }, 400);
+  }
+);
+
+
+const hasAddress = computed(() => {
+  return !!selectedProvince.value && !!selectedWard.value;
+});
+
 
 </script>
