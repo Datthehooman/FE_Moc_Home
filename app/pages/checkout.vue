@@ -275,12 +275,13 @@
             </p>
           </div>
 
-          <button
-            type="submit"
-            class="w-full bg-[#A77A5D] hover:bg-[#8B6145] text-white font-semibold py-2 mt-5 rounded-lg transition"
-          >
-            Tiến hành thanh toán
-          </button>
+      <button
+        type="submit"
+        :disabled="!checkPaymentEligibility()"
+        class="w-full bg-[#A77A5D] hover:bg-[#8B6145] text-white font-semibold py-2 mt-5 rounded-lg transition"
+      >
+        Tiến hành thanh toán
+      </button>
         </form>
       </div>
 
@@ -406,7 +407,6 @@ const checkDepositEligibility = () => {
 };
 
 const checkPaymentEligibility = () => {
-  // Thanh toán khi nhận hàng
   if (paymentMethod.value === "offline" && totalAmount.value >= 2000000) {
     showErrorToast(
       "Đơn hàng trên 2.000.000đ chỉ có thể thanh toán Online hoặc Đặt cọc"
@@ -415,7 +415,6 @@ const checkPaymentEligibility = () => {
     return false;
   }
 
-  // Đặt cọc
   if (paymentMethod.value === "deposit" && totalAmount.value < 2000000) {
     showErrorToast(
       "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc"
@@ -426,6 +425,7 @@ const checkPaymentEligibility = () => {
 
   return true;
 };
+
 
 
 
@@ -502,15 +502,16 @@ const validate = () => {
   const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
   // Thêm sau validate paymentMethod
   const total = totalAmount.value;
-  if (paymentMethod.value === "offline" && total >= 2000000) {
-    errors.paymentMethod = "Đơn hàng từ 2.000.000đ trở lên vui lòng thanh toán bằng Đặt cọc hoặc Thanh toán Online";
-    valid = false;
-  }
+if (paymentMethod.value === "offline" && totalAmount.value >= 2000000) {
+  errors.paymentMethod = "Đơn hàng trên 2.000.000đ chỉ có thể thanh toán Online hoặc Đặt cọc";
+  valid = false;
+}
 
-  if (paymentMethod.value === "deposit" && total < 2000000) {
-    errors.paymentMethod = "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc";
-    valid = false;
-  }
+if (paymentMethod.value === "deposit" && totalAmount.value < 2000000) {
+  errors.paymentMethod = "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc";
+  valid = false;
+}
+
 
   if (isLoggedIn.value) {
     if (!form.full_name) { errors.full_name = "Họ và tên không được để trống"; valid = false; }
@@ -572,7 +573,7 @@ const submitPayment = async () => {
   if (!checkPaymentEligibility()) return;
 
   if (!validate()) { 
-showErrorToast("Vui lòng điền đầy đủ thông tin");
+  showErrorToast("Vui lòng điền đầy đủ thông tin");
 
     return; 
   }
