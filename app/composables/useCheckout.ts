@@ -32,59 +32,65 @@ export function useCheckout() {
   // =========================
   // ✅ THÊM: PREVIEW BILL
   // =========================
-  const previewInvoice = async ({
-    province_id,
-    district_id,
-    ward_id,
-  }: {
-    province_id: number;
-    district_id: number;
-    ward_id: number;
-  }) => {
-    if (!checkoutStore.cartItems.length && !checkoutStore.buyNowItem) {
-      throw new Error("Không có sản phẩm để preview");
-    }
+ const previewInvoice = async ({
+  province_id,
+  district_id,
+  ward_id,
+  voucher_code, // ✅ thêm
+}: {
+  province_id: number;
+  district_id: number;
+  ward_id: number;
+  voucher_code?: string | null;
+}) => {
+  if (!checkoutStore.cartItems.length && !checkoutStore.buyNowItem) {
+    throw new Error("Không có sản phẩm để preview");
+  }
 
-    // 👉 phân biệt cart / buy-now
-    const items =
-      checkoutStore.checkoutMode === "buy-now"
-        ? [
-            {
-              product_id:
-                checkoutStore.buyNowItem.product_id ||
-                checkoutStore.buyNowItem.product?.id,
-              quantity: checkoutStore.buyNowItem.quantity,
-            },
-          ]
-        : checkoutStore.cartItems.map((i) => ({
-            product_id: i.product_id || i.product?.id,
-            quantity: i.quantity,
-          }));
+  // 👉 phân biệt cart / buy-now
+  const items =
+    checkoutStore.checkoutMode === "buy-now"
+      ? [
+          {
+            product_id:
+              checkoutStore.buyNowItem.product_id ||
+              checkoutStore.buyNowItem.product?.id,
+            quantity: checkoutStore.buyNowItem.quantity,
+          },
+        ]
+      : checkoutStore.cartItems.map((i) => ({
+          product_id: i.product_id || i.product?.id,
+          quantity: i.quantity,
+        }));
 
-    const payload = {
-      items,
-      address: {
-        province_id,
-        district_id,
-        ward_id,
-      },
-    };
-
-    const res: any = await $fetch(
-      "https://api.mocfurni.shop/api/client/orders/preview-invoice",
-      {
-        method: "POST",
-        headers: {
-          ...getAuthHeader(),
-          "Content-Type": "application/json",
-        },
-        body: payload,
-      }
-    );
-
-    checkoutStore.setInvoicePreview(res?.result?.data);
-    return res?.result?.data;
+  const payload: any = {
+    items,
+    shipping_address: {
+      province_id,
+      district_id,
+      ward_id,
+    },
   };
+
+  // ✅ gửi voucher nếu có
+  if (voucher_code) payload.voucher_code = voucher_code;
+
+  const res: any = await $fetch(
+    "https://api.mocfurni.shop/api/client/orders/preview-invoice",
+    {
+      method: "POST",
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json",
+      },
+      body: payload,
+    }
+  );
+
+  checkoutStore.setInvoicePreview(res?.result?.data);
+  return res?.result?.data;
+};
+
 
   // 🔥 Thanh toán 1 sản phẩm buy-now
   const buyNow = async (payload: {

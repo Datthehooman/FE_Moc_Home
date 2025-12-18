@@ -235,16 +235,18 @@
               Phương thức thanh toán
             </h3>
             <div class="flex flex-col gap-3">
-                <label class="flex items-center gap-3 cursor-pointer">
+              <label class="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
                   name="payment"
                   value="offline"
                   v-model="paymentMethod"
                   class="accent-[#A77A5D] w-5 h-5"
+                  @change="checkOfflineEligibility"
                 />
-                <span>Thanh toán khi nhận hàng </span>
+                <span>Thanh toán khi nhận hàng</span>
               </label>
+
               <label class="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
@@ -255,6 +257,18 @@
                 />
                 <span>Thanh toán Online (VNPAY)</span>
               </label>
+             <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="deposit"
+                  v-model="paymentMethod"
+                  class="accent-[#A77A5D] w-5 h-5"
+                  @change="checkDepositEligibility"
+                />
+                <span>Đặt cọc 30%</span>
+              </label>
+
             </div>
             <p v-if="errors.paymentMethod" class="text-red-500 text-xs mt-1">
               {{ errors.paymentMethod }}
@@ -318,9 +332,16 @@
 
     <div class="border-t pt-3 flex justify-between font-semibold">
       <span>Tổng cộng:</span>
-      <span>
-        {{ formatPrice(hasAddress ? invoice.total_amount : invoice.subtotal - (invoice.discount_amount || 0)) }}
-      </span>
+     <span>
+  {{
+    formatPrice(
+      paymentMethod === "deposit"
+        ? Math.ceil((hasAddress ? invoice.total_amount : invoice.subtotal - (invoice.discount_amount || 0)) * 0.3)
+        : (hasAddress ? invoice.total_amount : invoice.subtotal - (invoice.discount_amount || 0))
+    )
+  }}
+</span>
+
     </div>
   </div>
 
@@ -361,7 +382,66 @@ const checkoutStore = useCheckoutStore();
 const authStore = useAuthStore();
 const invoice = computed(() => checkoutStore.invoicePreview);
 const { addresses, createAddress, setDefaultAddress, fetchAddresses } = useAddressUser();
+  const toast = useToast();
 
+const showSuccessToast = (msg: string) => {
+  toast.add({
+    title: msg,
+    icon: "heroicons:check-circle",
+    timeout: 3000,
+    position: "bottom-right",
+    style:
+      "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+    iconColor: "#ffffff",
+    color: "success",
+  });
+};
+
+// Kiểm tra điều kiện chọn Đặt cọc
+const checkDepositEligibility = () => {
+  if (totalAmount.value < 2000000 && paymentMethod.value === "deposit") {
+    showErrorToast("Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc");
+    paymentMethod.value = "offline"; // hoặc null để reset
+  }
+};
+
+const checkPaymentEligibility = () => {
+  // Thanh toán khi nhận hàng
+  if (paymentMethod.value === "offline" && totalAmount.value >= 2000000) {
+    showErrorToast(
+      "Đơn hàng trên 2.000.000đ chỉ có thể thanh toán Online hoặc Đặt cọc"
+    );
+    paymentMethod.value = "online"; // tự active online
+    return false;
+  }
+
+  // Đặt cọc
+  if (paymentMethod.value === "deposit" && totalAmount.value < 2000000) {
+    showErrorToast(
+      "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc"
+    );
+    paymentMethod.value = "offline"; // reset
+    return false;
+  }
+
+  return true;
+};
+
+
+
+// Hàm toast error
+const showErrorToast = (msg: string) => {
+  toast.add({
+    title: msg,
+    icon: "heroicons:x-circle",
+    timeout: 3000,
+    position: "bottom-right",
+    style:
+      "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2); ",
+    iconColor: "#ffffff",
+    color: "error",
+  });
+};
 
 
 // Token
@@ -420,6 +500,17 @@ const validate = () => {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
+  // Thêm sau validate paymentMethod
+  const total = totalAmount.value;
+  if (paymentMethod.value === "offline" && total >= 2000000) {
+    errors.paymentMethod = "Đơn hàng từ 2.000.000đ trở lên vui lòng thanh toán bằng Đặt cọc hoặc Thanh toán Online";
+    valid = false;
+  }
+
+  if (paymentMethod.value === "deposit" && total < 2000000) {
+    errors.paymentMethod = "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc";
+    valid = false;
+  }
 
   if (isLoggedIn.value) {
     if (!form.full_name) { errors.full_name = "Họ và tên không được để trống"; valid = false; }
@@ -478,8 +569,11 @@ const submitPayment = async () => {
     return; 
   }
 
+  if (!checkPaymentEligibility()) return;
+
   if (!validate()) { 
-    alert("Vui lòng điền đầy đủ thông tin"); 
+showErrorToast("Vui lòng điền đầy đủ thông tin");
+
     return; 
   }
 
@@ -498,7 +592,10 @@ const submitPayment = async () => {
           province_name: provinceSearch.value,
           ward_name: wardSearch.value,
           note: form.note || "", 
-          payment_method_id: paymentMethod.value === "online" ? 3 : 1, 
+payment_method_id: paymentMethod.value === "online" ? 3 
+                  : paymentMethod.value === "deposit" ? 2 
+                  : 1, // offline
+
           items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
           voucher_code: form.voucher_code || null 
         }
@@ -512,7 +609,10 @@ const submitPayment = async () => {
           province_name: provinceSearch.value,
           ward_name: wardSearch.value,
           note: form.note || "", 
-          payment_method_id: paymentMethod.value === "online" ? 3 : 1, 
+payment_method_id: paymentMethod.value === "online" ? 3 
+                  : paymentMethod.value === "deposit" ? 2 
+                  : 1, // offline
+
           items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
           voucher_code: form.voucher_code || null 
         };
@@ -544,12 +644,23 @@ const submitPayment = async () => {
       }
     }
 
-    if (paymentMethod.value === "online") {
-      await payWithVNPAY({ order_id });
-      return;
-    }
+  if (paymentMethod.value === "online") {
+  await payWithVNPAY({ order_id });
+  return;
+}
 
-    alert("Thanh toán thành công! 🎉");
+if (paymentMethod.value === "deposit") {
+  // Tính 30% tổng tiền đơn hàng + ship - voucher
+  const subtotal = Number(invoice.total_amount || 0);
+  const depositAmount = Math.ceil(subtotal * 0.3);
+
+  await payWithVNPAY({ order_id, amount: depositAmount });
+  return;
+}
+
+
+showSuccessToast("Thanh toán thành công! 🎉");
+
     checkoutStore.clearCheckout();
     router.push({ path: "/thanks", query: { order_code: Number(orderData.order_code) } });
   } catch (err: any) {
@@ -591,6 +702,7 @@ onMounted(async () => {
       province_id: null,
       district_id: null,
       ward_id: null,
+       voucher_code: form.voucher_code || null, 
     });
   }
 });
@@ -673,6 +785,7 @@ watch(
           province_id: Number(p),
           district_id: 760, // ⚠️ tạm
           ward_id: Number(w),
+           voucher_code: form.voucher_code || null, 
         });
       } catch (e) {
         console.error("Preview invoice error", e);
@@ -685,4 +798,28 @@ watch(
 const hasAddress = computed(() => {
   return !!selectedProvince.value && !!selectedWard.value;
 });
+
+// Debounce preview khi voucher thay đổi
+watch(
+  () => form.voucher_code,
+  (newVoucher) => {
+    clearTimeout(previewTimeout);
+
+    previewTimeout = setTimeout(async () => {
+      try {
+        if (!selectedProvince.value || !selectedWard.value) return;
+
+        await previewInvoice({
+          province_id: Number(selectedProvince.value),
+          district_id: 760, // ⚠️ tạm
+          ward_id: Number(selectedWard.value),
+          voucher_code: newVoucher || null,
+        });
+      } catch (e) {
+        console.error("Preview invoice error", e);
+      }
+    }, 400);
+  }
+);
+
 </script>

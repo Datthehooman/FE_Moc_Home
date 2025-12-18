@@ -22,16 +22,17 @@ export const useAddressUser = () => {
     authStore.setAddresses(list)
   }
 
-  const showToast = (title: string, type: 'success' | 'error' | 'warn') => {
-    toast.add({
-      title,
-      icon: type === 'success' ? 'heroicons:check-circle' : 'heroicons:exclamation-circle',
-      timeout: 3000,
-      position: 'bottom-right',
-      style: `color:white; font-weight:600; color:${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#ffc107'}; box-shadow:0 4px 10px rgba(0,0,0,0.2);`,
-      iconColor: '#ffffff',
-    })
-  }
+ const showToast = (title: string, type: 'success' | 'error' | 'warn') => {
+  toast.add({
+    title,
+    icon: type === 'success' ? 'heroicons:check-circle' : 'heroicons:exclamation-circle',
+    timeout: 3000,
+    position: 'bottom-right',
+    color: type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning',
+    style: 'font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);',
+    iconColor: '#ffffff',
+  });
+};
 
   const fetchAddresses = async () => {
     if (!tokenCookie.value) return null
