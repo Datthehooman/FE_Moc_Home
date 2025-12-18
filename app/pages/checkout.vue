@@ -360,6 +360,9 @@ const { buyNow, buyNowGuest, payWithVNPAY, previewInvoice  } = useCheckout();
 const checkoutStore = useCheckoutStore();
 const authStore = useAuthStore();
 const invoice = computed(() => checkoutStore.invoicePreview);
+const { addresses, createAddress, setDefaultAddress, fetchAddresses } = useAddressUser();
+
+
 
 // Token
 let tokenCookie = useCookie("tokenLocal");
@@ -449,6 +452,23 @@ const totalAmount = computed(() => {
   return total + (selectedShipping.value === "Nhanh" ? 30000 : 0);
 });
 
+const buildAddressPayload = () => {
+  const payload: any = {
+    address_line: form.addressDetail,
+    province_code: selectedProvince.value,
+    ward_code: selectedWard.value,
+    province_name: provinces.value.find(p => p.code === selectedProvince.value)?.name || "",
+    ward_name: wards.value.find(w => w.code === selectedWard.value)?.name || "",
+    is_default: 1,
+    full_name: isLoggedIn.value ? form.full_name : `${form.firstName} ${form.lastName}`,
+    phone: form.phone,
+    ...( !isLoggedIn.value && { email: form.email } ),
+  };
+  return payload;
+};
+
+
+
 // Submit payment
 const submitPayment = async () => {
   const itemsToPay = checkoutItems.value.length ? checkoutItems.value : buyNowItem ? [buyNowItem] : [];
@@ -457,6 +477,7 @@ const submitPayment = async () => {
     router.replace("/error"); 
     return; 
   }
+
   if (!validate()) { 
     alert("Vui lòng điền đầy đủ thông tin"); 
     return; 
@@ -464,7 +485,7 @@ const submitPayment = async () => {
 
   // Tạo shipping_address dùng tên thay vì code
   const shipping_address = `${form.addressDetail}, ${wardSearch.value}, ${provinceSearch.value}`;
-  
+
   let order_id = 0;
 
   try {
@@ -477,7 +498,7 @@ const submitPayment = async () => {
           province_name: provinceSearch.value,
           ward_name: wardSearch.value,
           note: form.note || "", 
-          payment_method_id: paymentMethod.value === "online" ? 2 : 1, 
+          payment_method_id: paymentMethod.value === "online" ? 3 : 1, 
           items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
           voucher_code: form.voucher_code || null 
         }
@@ -491,13 +512,37 @@ const submitPayment = async () => {
           province_name: provinceSearch.value,
           ward_name: wardSearch.value,
           note: form.note || "", 
-          payment_method_id: paymentMethod.value === "online" ? 2 : 1, 
+          payment_method_id: paymentMethod.value === "online" ? 3 : 1, 
           items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
           voucher_code: form.voucher_code || null 
         };
 
-    const orderData = isLoggedIn.value ? await buyNow(payload) : await buyNowGuest(payload);
+    const orderData = isLoggedIn.value
+      ? await buyNow(payload)
+      : await buyNowGuest(payload);
+
     order_id = Number(orderData.order_id);
+
+    // ✅ FE: lưu & set địa chỉ mặc định (chỉ khi login)
+    if (isLoggedIn.value) {
+      const addressPayload = buildAddressPayload();
+
+      // Check trùng với addresses hiện tại
+      const isDuplicate = addresses.value.some(a => 
+        a.address_line === addressPayload.address_line &&
+        a.province.code === addressPayload.province_code &&
+        a.ward.code === addressPayload.ward_code &&
+        a.full_name === addressPayload.full_name &&
+        a.phone === addressPayload.phone
+      );
+
+      if (!isDuplicate) {
+        const newAddress = await createAddress(addressPayload);
+        if (newAddress?.id) await setDefaultAddress(newAddress.id);
+      } else {
+        console.log("Địa chỉ trùng → không lưu mới");
+      }
+    }
 
     if (paymentMethod.value === "online") {
       await payWithVNPAY({ order_id });
@@ -519,44 +564,36 @@ onMounted(async () => {
   await fetchProvinces();
 
   if (isLoggedIn.value && authStore.user) {
+    // gán thông tin user
     form.firstName = authStore.user.firstName || "";
     form.lastName = authStore.user.lastName || "";
     form.full_name = authStore.user.full_name || "";
     form.email = authStore.user.email || "";
     form.phone = authStore.user.phone || "";
 
-    // ✅ Lấy địa chỉ mặc định
+    // ✅ fetch addresses trước
+    await fetchAddresses(); // <- quan trọng
     const defaultAddress = authStore.addresses.find(a => a.is_default);
+
     if (defaultAddress) {
-      // Tỉnh
       selectedProvince.value = defaultAddress.province.code;
       provinceSearch.value = defaultAddress.province.name;
-
-      // Load wards cho tỉnh
       await fetchWards(defaultAddress.province.code);
-
-      // Xã
       selectedWard.value = defaultAddress.ward.code;
       wardSearch.value = defaultAddress.ward.name;
-
-      // Địa chỉ chi tiết
       form.addressDetail = defaultAddress.address_line || "";
     }
   }
 
   if (!checkoutItems.value.length && !buyNowItem) router.replace("/error");
-  // 🔥 Preview invoice lần đầu (chưa có địa chỉ)
-if (!checkoutStore.invoicePreview) {
-  await previewInvoice({
-    province_id: null,
-    district_id: null,
-    ward_id: null,
-  });
-}
-
+  if (!checkoutStore.invoicePreview) {
+    await previewInvoice({
+      province_id: null,
+      district_id: null,
+      ward_id: null,
+    });
+  }
 });
-
-
 
 // Format price
 function formatPrice(value: number | undefined | null) {
@@ -648,6 +685,4 @@ watch(
 const hasAddress = computed(() => {
   return !!selectedProvince.value && !!selectedWard.value;
 });
-
-
 </script>
