@@ -8,9 +8,26 @@
         Tin tức & <span class="text-info">Blog</span> mới nhất của chúng tôi
       </p>
     </div>
-    <div class="flex justify-between items-center">
-      <SharedBlogCard v-for="blog in 3" />
+
+    <div class="flex justify-between items-center gap-6">
+      <SharedBlogCard
+        v-for="article in articles.slice(0, 3)"
+        :key="article.id"
+        :article="article"
+      />
     </div>
   </div>
 </template>
-<script lang="ts" setup></script>
+
+<script setup lang="ts">
+  const props = defineProps<{
+    articles: {
+      id: number;
+      title: string;
+      content: string;
+      slug: string;
+      thumbnail: string | null;
+      created_at: string;
+    }[];
+  }>();
+</script>

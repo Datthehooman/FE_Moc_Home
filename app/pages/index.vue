@@ -718,7 +718,7 @@
       <ModulesHomeBanner5 class="mb-15.5" />
 
       <UContainer class="lg:px-0">
-        <ModulesHomeBlog class="mb-17.5" />
+        <ModulesHomeBlog class="mb-17.5" :articles="articles" />
         <ModulesHomeBanner6 class="mb-14.5" />
         <ModulesHomeFacebookImages class="mb-[51px]" />
       </UContainer>
@@ -736,6 +736,7 @@
 
   const { topDiscount, topSelling, topRated, isLoading, error } =
     useHomeProducts();
+  const { articles } = useArticle();
 
   const { setBuyNowItem } = useCheckout();
 

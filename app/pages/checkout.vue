@@ -662,7 +662,7 @@ if (paymentMethod.value === "deposit") {
 showSuccessToast("Thanh toán thành công! 🎉");
 
     checkoutStore.clearCheckout();
-    router.push({ path: "/thanks", query: { order_code: Number(orderData.order_code) } });
+    router.push({ path: "/thanks", query: { order_code: orderData.order_code } });
   } catch (err: any) {
     console.error("❌ Lỗi khi tạo order:", err);
     alert(err?.message || "Thanh toán thất bại, vui lòng thử lại sau");

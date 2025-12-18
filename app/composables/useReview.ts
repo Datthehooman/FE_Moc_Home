@@ -232,7 +232,6 @@ export function useReview() {
     fetchLatestReviews,
     fetchProductReviews,
     fetchProductRatingStats,
-    fetchUserReviews,
     checkOrderFullyReviewed,
   };
 }
