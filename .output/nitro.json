@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-  "date": "2025-12-18T16:03:59.962Z",
-=======
-  "date": "2025-12-18T05:59:42.035Z",
->>>>>>> ceddedd585c1a03c455fbe7b206c0231bacc6c96
+  "date": "2025-12-18T16:20:45.467Z",
   "preset": "static",
   "framework": {
     "name": "nuxt",
