@@ -235,16 +235,18 @@
               Phương thức thanh toán
             </h3>
             <div class="flex flex-col gap-3">
-                <label class="flex items-center gap-3 cursor-pointer">
+              <label class="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
                   name="payment"
                   value="offline"
                   v-model="paymentMethod"
                   class="accent-[#A77A5D] w-5 h-5"
+                  @change="checkOfflineEligibility"
                 />
-                <span>Thanh toán khi nhận hàng </span>
+                <span>Thanh toán khi nhận hàng</span>
               </label>
+
               <label class="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
@@ -255,6 +257,18 @@
                 />
                 <span>Thanh toán Online (VNPAY)</span>
               </label>
+             <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="deposit"
+                  v-model="paymentMethod"
+                  class="accent-[#A77A5D] w-5 h-5"
+                  @change="checkDepositEligibility"
+                />
+                <span>Đặt cọc 30%</span>
+              </label>
+
             </div>
             <p v-if="errors.paymentMethod" class="text-red-500 text-xs mt-1">
               {{ errors.paymentMethod }}
@@ -271,89 +285,91 @@
       </div>
 
       <!-- HÓA ĐƠN -->
-      <div
-        class="flex-[1] w-full max-w-[360px] bg-[#A77A5D]/10 rounded-2xl p-6 shadow-sm h-fit md:sticky md:top-10"
-      >
-        <h2 class="text-lg font-semibold mb-4 text-[#6E4E37]">Hóa đơn</h2>
+<div
+  class="flex-[1] w-full max-w-[360px] bg-[#A77A5D]/10 rounded-2xl p-6 shadow-sm h-fit md:sticky md:top-10"
+>
+  <h2 class="text-lg font-semibold mb-4 text-[#6E4E37]">Hóa đơn</h2>
 
-        <div v-if="checkoutItems.length" class="space-y-2 text-sm">
-          <div
-            v-for="item in checkoutItems"
-            :key="item.product_id"
-            class="flex justify-between"
-          >
-            <span>{{ item.product_name }} x {{ item.quantity }}</span>
-            <span>{{
-              formatPrice(
-                item.quantity * (item.product_sale || item.product_price)
-              )
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Giảm giá:</span><span class="text-red-500">-0 đ</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Vận chuyển:</span
-            ><span>{{
-              selectedShipping === "Nhanh" ? "30.000 đ" : "Miễn phí"
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Thuế:</span><span>0 đ</span>
-          </div>
-          <div class="border-t pt-3 flex justify-between font-semibold">
-            <span>Tổng tiền:</span>
-            <span>{{ formatPrice(totalAmount) }}</span>
-          </div>
-        </div>
+  <!-- PREVIEW BILL -->
+  <div v-if="invoice" class="space-y-2 text-sm">
+    <div
+      v-for="item in invoice.items"
+      :key="item.product_id"
+      class="flex justify-between"
+    >
+      <span>{{ item.product_name }} x {{ item.quantity }}</span>
+      <span>{{ formatPrice(item.subtotal) }}</span>
+    </div>
 
-        <div v-else-if="buyNowItem" class="space-y-2 text-sm">
-          <div class="flex justify-between">
-            <span
-              >{{ buyNowItem.product_name }} x {{ buyNowItem.quantity }}</span
-            >
-            <span>{{
-              formatPrice(buyNowItem.price * buyNowItem.quantity)
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Giảm giá:</span><span class="text-red-500">-0 đ</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Vận chuyển:</span
-            ><span>{{
-              selectedShipping === "Nhanh" ? "30.000 đ" : "Miễn phí"
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Thuế:</span><span>0 đ</span>
-          </div>
-          <div class="border-t pt-3 flex justify-between font-semibold">
-            <span>Tổng tiền:</span>
-            <span>{{ formatPrice(totalAmount) }}</span>
-          </div>
-        </div>
+    <hr />
 
-        <div v-else class="text-center text-red-500">
-          Không có sản phẩm để thanh toán, quay lại sản phẩm để mua
-        </div>
-<div class="mt-4">
-  <label class="text-sm font-medium">Mã giảm giá</label>
-  <input
-    v-model="form.voucher_code"
-    type="text"
-    placeholder="Nhập mã giảm giá"
-    class="w-full mt-1 px-3 py-2 border rounded-lg"
-  />
+    <div class="flex justify-between">
+      <span>Tạm tính:</span>
+      <span>{{ formatPrice(invoice.subtotal) }}</span>
+    </div>
+
+    <div class="flex justify-between">
+      <span>Giảm giá:</span>
+      <span class="text-red-500">
+        -{{ formatPrice(invoice.discount_amount || 0) }}
+      </span>
+    </div>
+
+    <div class="flex justify-between">
+      <span>Vận chuyển:</span>
+      <span>
+        {{ hasAddress ? formatPrice(invoice.shipping_fee) : "—" }}
+      </span>
+    </div>
+
+    <!-- THÔNG BÁO CHƯA CÓ ĐỊA CHỈ -->
+    <p
+      v-if="!hasAddress"
+      class="text-xs text-orange-600 italic mt-1"
+    >
+      * Vui lòng thêm địa chỉ để tính phí vận chuyển
+    </p>
+
+    <div class="border-t pt-3 flex justify-between font-semibold">
+      <span>Tổng cộng:</span>
+     <span>
+  {{
+    formatPrice(
+      paymentMethod === "deposit"
+        ? Math.ceil((hasAddress ? invoice.total_amount : invoice.subtotal - (invoice.discount_amount || 0)) * 0.3)
+        : (hasAddress ? invoice.total_amount : invoice.subtotal - (invoice.discount_amount || 0))
+    )
+  }}
+</span>
+
+    </div>
+  </div>
+
+  <!-- FALLBACK -->
+  <div v-else class="text-center text-gray-500 text-sm">
+    Đang tính hóa đơn...
+  </div>
+
+  <!-- Voucher -->
+  <div class="mt-4">
+    <label class="text-sm font-medium">Mã giảm giá</label>
+    <input
+      v-model="form.voucher_code"
+      type="text"
+      placeholder="Nhập mã giảm giá"
+      class="w-full mt-1 px-3 py-2 border rounded-lg"
+    />
+  </div>
+
+  <a
+    href="/cart"
+    class="flex items-center gap-2 text-sm mt-3 text-gray-600 hover:underline"
+  >
+    ← Quay lại giỏ hàng
+  </a>
 </div>
 
-        <a
-          href="/cart"
-          class="flex items-center gap-2 text-sm mt-3 text-gray-600 hover:underline"
-        >
-          ← Quay lại giỏ hàng
-        </a>
-      </div>
+
     </div>
   </section>
 </template>
@@ -361,9 +377,72 @@
 
 
 const router = useRouter();
-const { buyNow, buyNowGuest, payWithVNPAY } = useCheckout();
+const { buyNow, buyNowGuest, payWithVNPAY, previewInvoice  } = useCheckout();
 const checkoutStore = useCheckoutStore();
 const authStore = useAuthStore();
+const invoice = computed(() => checkoutStore.invoicePreview);
+const { addresses, createAddress, setDefaultAddress, fetchAddresses } = useAddressUser();
+  const toast = useToast();
+
+const showSuccessToast = (msg: string) => {
+  toast.add({
+    title: msg,
+    icon: "heroicons:check-circle",
+    timeout: 3000,
+    position: "bottom-right",
+    style:
+      "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
+    iconColor: "#ffffff",
+    color: "success",
+  });
+};
+
+// Kiểm tra điều kiện chọn Đặt cọc
+const checkDepositEligibility = () => {
+  if (totalAmount.value < 2000000 && paymentMethod.value === "deposit") {
+    showErrorToast("Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc");
+    paymentMethod.value = "offline"; // hoặc null để reset
+  }
+};
+
+const checkPaymentEligibility = () => {
+  // Thanh toán khi nhận hàng
+  if (paymentMethod.value === "offline" && totalAmount.value >= 2000000) {
+    showErrorToast(
+      "Đơn hàng trên 2.000.000đ chỉ có thể thanh toán Online hoặc Đặt cọc"
+    );
+    paymentMethod.value = "online"; // tự active online
+    return false;
+  }
+
+  // Đặt cọc
+  if (paymentMethod.value === "deposit" && totalAmount.value < 2000000) {
+    showErrorToast(
+      "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc"
+    );
+    paymentMethod.value = "offline"; // reset
+    return false;
+  }
+
+  return true;
+};
+
+
+
+// Hàm toast error
+const showErrorToast = (msg: string) => {
+  toast.add({
+    title: msg,
+    icon: "heroicons:x-circle",
+    timeout: 3000,
+    position: "bottom-right",
+    style:
+      "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2); ",
+    iconColor: "#ffffff",
+    color: "error",
+  });
+};
+
 
 // Token
 let tokenCookie = useCookie("tokenLocal");
@@ -421,6 +500,17 @@ const validate = () => {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
+  // Thêm sau validate paymentMethod
+  const total = totalAmount.value;
+  if (paymentMethod.value === "offline" && total >= 2000000) {
+    errors.paymentMethod = "Đơn hàng từ 2.000.000đ trở lên vui lòng thanh toán bằng Đặt cọc hoặc Thanh toán Online";
+    valid = false;
+  }
+
+  if (paymentMethod.value === "deposit" && total < 2000000) {
+    errors.paymentMethod = "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc";
+    valid = false;
+  }
 
   if (isLoggedIn.value) {
     if (!form.full_name) { errors.full_name = "Họ và tên không được để trống"; valid = false; }
@@ -453,6 +543,23 @@ const totalAmount = computed(() => {
   return total + (selectedShipping.value === "Nhanh" ? 30000 : 0);
 });
 
+const buildAddressPayload = () => {
+  const payload: any = {
+    address_line: form.addressDetail,
+    province_code: selectedProvince.value,
+    ward_code: selectedWard.value,
+    province_name: provinces.value.find(p => p.code === selectedProvince.value)?.name || "",
+    ward_name: wards.value.find(w => w.code === selectedWard.value)?.name || "",
+    is_default: 1,
+    full_name: isLoggedIn.value ? form.full_name : `${form.firstName} ${form.lastName}`,
+    phone: form.phone,
+    ...( !isLoggedIn.value && { email: form.email } ),
+  };
+  return payload;
+};
+
+
+
 // Submit payment
 const submitPayment = async () => {
   const itemsToPay = checkoutItems.value.length ? checkoutItems.value : buyNowItem ? [buyNowItem] : [];
@@ -461,14 +568,18 @@ const submitPayment = async () => {
     router.replace("/error"); 
     return; 
   }
+
+  if (!checkPaymentEligibility()) return;
+
   if (!validate()) { 
-    alert("Vui lòng điền đầy đủ thông tin"); 
+showErrorToast("Vui lòng điền đầy đủ thông tin");
+
     return; 
   }
 
   // Tạo shipping_address dùng tên thay vì code
   const shipping_address = `${form.addressDetail}, ${wardSearch.value}, ${provinceSearch.value}`;
-  
+
   let order_id = 0;
 
   try {
@@ -481,7 +592,10 @@ const submitPayment = async () => {
           province_name: provinceSearch.value,
           ward_name: wardSearch.value,
           note: form.note || "", 
-          payment_method_id: paymentMethod.value === "online" ? 2 : 1, 
+payment_method_id: paymentMethod.value === "online" ? 3 
+                  : paymentMethod.value === "deposit" ? 2 
+                  : 1, // offline
+
           items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
           voucher_code: form.voucher_code || null 
         }
@@ -495,20 +609,58 @@ const submitPayment = async () => {
           province_name: provinceSearch.value,
           ward_name: wardSearch.value,
           note: form.note || "", 
-          payment_method_id: paymentMethod.value === "online" ? 2 : 1, 
+payment_method_id: paymentMethod.value === "online" ? 3 
+                  : paymentMethod.value === "deposit" ? 2 
+                  : 1, // offline
+
           items: itemsToPay.map(i => ({ product_id: i.product_id, quantity: i.quantity })), 
           voucher_code: form.voucher_code || null 
         };
 
-    const orderData = isLoggedIn.value ? await buyNow(payload) : await buyNowGuest(payload);
+    const orderData = isLoggedIn.value
+      ? await buyNow(payload)
+      : await buyNowGuest(payload);
+
     order_id = Number(orderData.order_id);
 
-    if (paymentMethod.value === "online") {
-      await payWithVNPAY({ order_id });
-      return;
+    // ✅ FE: lưu & set địa chỉ mặc định (chỉ khi login)
+    if (isLoggedIn.value) {
+      const addressPayload = buildAddressPayload();
+
+      // Check trùng với addresses hiện tại
+      const isDuplicate = addresses.value.some(a => 
+        a.address_line === addressPayload.address_line &&
+        a.province.code === addressPayload.province_code &&
+        a.ward.code === addressPayload.ward_code &&
+        a.full_name === addressPayload.full_name &&
+        a.phone === addressPayload.phone
+      );
+
+      if (!isDuplicate) {
+        const newAddress = await createAddress(addressPayload);
+        if (newAddress?.id) await setDefaultAddress(newAddress.id);
+      } else {
+        console.log("Địa chỉ trùng → không lưu mới");
+      }
     }
 
-    alert("Thanh toán thành công! 🎉");
+  if (paymentMethod.value === "online") {
+  await payWithVNPAY({ order_id });
+  return;
+}
+
+if (paymentMethod.value === "deposit") {
+  // Tính 30% tổng tiền đơn hàng + ship - voucher
+  const subtotal = Number(invoice.total_amount || 0);
+  const depositAmount = Math.ceil(subtotal * 0.3);
+
+  await payWithVNPAY({ order_id, amount: depositAmount });
+  return;
+}
+
+
+showSuccessToast("Thanh toán thành công! 🎉");
+
     checkoutStore.clearCheckout();
     router.push({ path: "/thanks", query: { order_code: orderData.order_code } });
   } catch (err: any) {
@@ -523,35 +675,37 @@ onMounted(async () => {
   await fetchProvinces();
 
   if (isLoggedIn.value && authStore.user) {
+    // gán thông tin user
     form.firstName = authStore.user.firstName || "";
     form.lastName = authStore.user.lastName || "";
     form.full_name = authStore.user.full_name || "";
     form.email = authStore.user.email || "";
     form.phone = authStore.user.phone || "";
 
-    // ✅ Lấy địa chỉ mặc định
+    // ✅ fetch addresses trước
+    await fetchAddresses(); // <- quan trọng
     const defaultAddress = authStore.addresses.find(a => a.is_default);
+
     if (defaultAddress) {
-      // Tỉnh
       selectedProvince.value = defaultAddress.province.code;
       provinceSearch.value = defaultAddress.province.name;
-
-      // Load wards cho tỉnh
       await fetchWards(defaultAddress.province.code);
-
-      // Xã
       selectedWard.value = defaultAddress.ward.code;
       wardSearch.value = defaultAddress.ward.name;
-
-      // Địa chỉ chi tiết
       form.addressDetail = defaultAddress.address_line || "";
     }
   }
 
   if (!checkoutItems.value.length && !buyNowItem) router.replace("/error");
+  if (!checkoutStore.invoicePreview) {
+    await previewInvoice({
+      province_id: null,
+      district_id: null,
+      ward_id: null,
+       voucher_code: form.voucher_code || null, 
+    });
+  }
 });
-
-
 
 // Format price
 function formatPrice(value: number | undefined | null) {
@@ -603,5 +757,69 @@ const selectWard = (ward: any) => {
   wardSearch.value = ward.name;
   showWardList.value = false;
 };
+let previewTimeout: any = null;
+
+watch(
+  () => [selectedProvince.value, selectedWard.value],
+  async ([p, w]) => {
+    clearTimeout(previewTimeout);
+
+    // ❌ Chưa đủ địa chỉ → reset phí ship
+    if (!p || !w) {
+      if (checkoutStore.invoicePreview) {
+        checkoutStore.setInvoicePreview({
+          ...checkoutStore.invoicePreview,
+          shipping_fee: 0,
+          total_amount:
+            checkoutStore.invoicePreview.subtotal -
+            (checkoutStore.invoicePreview.discount_amount || 0),
+        });
+      }
+      return;
+    }
+
+    // ✅ Có địa chỉ → debounce gọi API
+    previewTimeout = setTimeout(async () => {
+      try {
+        await previewInvoice({
+          province_id: Number(p),
+          district_id: 760, // ⚠️ tạm
+          ward_id: Number(w),
+           voucher_code: form.voucher_code || null, 
+        });
+      } catch (e) {
+        console.error("Preview invoice error", e);
+      }
+    }, 400);
+  }
+);
+
+
+const hasAddress = computed(() => {
+  return !!selectedProvince.value && !!selectedWard.value;
+});
+
+// Debounce preview khi voucher thay đổi
+watch(
+  () => form.voucher_code,
+  (newVoucher) => {
+    clearTimeout(previewTimeout);
+
+    previewTimeout = setTimeout(async () => {
+      try {
+        if (!selectedProvince.value || !selectedWard.value) return;
+
+        await previewInvoice({
+          province_id: Number(selectedProvince.value),
+          district_id: 760, // ⚠️ tạm
+          ward_id: Number(selectedWard.value),
+          voucher_code: newVoucher || null,
+        });
+      } catch (e) {
+        console.error("Preview invoice error", e);
+      }
+    }, 400);
+  }
+);
 
 </script>

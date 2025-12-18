@@ -10,7 +10,6 @@ export const useAddressUser = () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  // Lấy token
   let tokenCookie = useCookie('tokenLocal')
   if (!tokenCookie.value) {
     tokenCookie = useCookie('token', { path: '/', domain: '.mocfurni.shop' })
@@ -23,16 +22,17 @@ export const useAddressUser = () => {
     authStore.setAddresses(list)
   }
 
-  const showToast = (title: string, type: 'success' | 'error' | 'warn') => {
-    toast.add({
-      title,
-      icon: type === 'success' ? 'heroicons:check-circle' : 'heroicons:exclamation-circle',
-      timeout: 3000,
-      position: 'bottom-right',
-      style: `color:white; font-weight:600; olor:${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#ffc107'}; box-shadow:0 4px 10px rgba(0,0,0,0.2);`,
-      iconColor: '#ffffff',
-    })
-  }
+ const showToast = (title: string, type: 'success' | 'error' | 'warn') => {
+  toast.add({
+    title,
+    icon: type === 'success' ? 'heroicons:check-circle' : 'heroicons:exclamation-circle',
+    timeout: 3000,
+    position: 'bottom-right',
+    color: type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning',
+    style: 'font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);',
+    iconColor: '#ffffff',
+  });
+};
 
   const fetchAddresses = async () => {
     if (!tokenCookie.value) return null
@@ -73,8 +73,9 @@ export const useAddressUser = () => {
     }
   }
 
+  // 🔥 FIX createAddress: trả về object mới, không phải true/false
   const createAddress = async (data: any) => {
-    if (!tokenCookie.value) { showToast('Vui lòng đăng nhập', 'warn'); return false }
+    if (!tokenCookie.value) { showToast('Vui lòng đăng nhập', 'warn'); return null }
     loading.value = true
     try {
       const res: any = await $fetch('https://api.mocfurni.shop/api/client/useraddress/create', {
@@ -82,13 +83,19 @@ export const useAddressUser = () => {
         body: data,
         headers: getAuthHeader()
       })
-      syncAddresses([...addresses.value, res.result])
-      showToast('Đã thêm địa chỉ mới!', 'success')
-      return true
+
+      if (res?.result) {
+        // update store
+        syncAddresses([...addresses.value, res.result])
+        showToast('Đã thêm địa chỉ mới!', 'success')
+        return res.result // 🔥 trả về object address
+      }
+
+      return null
     } catch (err: any) {
       error.value = err?.data?.message || 'Thêm địa chỉ thất bại'
       showToast(error.value, 'error')
-      return false
+      return null
     } finally { loading.value = false }
   }
 
@@ -102,11 +109,11 @@ export const useAddressUser = () => {
       const updatedList = addresses.value.map(a => a.id === id ? res.result : a)
       syncAddresses(updatedList)
       showToast('Đã cập nhật địa chỉ!', 'success')
-      return true
+      return res.result
     } catch (err: any) {
       error.value = err?.data?.message || 'Cập nhật thất bại'
       showToast(error.value, 'error')
-      return false
+      return null
     } finally { loading.value = false }
   }
 
