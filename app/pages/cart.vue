@@ -1,5 +1,5 @@
 <template>
-  <section class="bg-[#FFF8F3] min-h-screen py-10">
+  <section class="bg-[#FFF8F3] min-h-screen py-10 animate-fadeIn">
     <div class="max-w-[85%] mx-auto flex flex-col md:flex-row gap-10">
 
       <!-- BẢNG SẢN PHẨM -->
@@ -16,21 +16,24 @@
             </tr>
           </thead>
 
-          <tbody>
+          <!-- QUAN TRỌNG: transition-group = tbody -->
+          <transition-group name="list" tag="tbody">
             <template v-for="(item, index) in cart" :key="item.cart_id">
-              <tr>
+              <tr
+                class="transition-all duration-300 "
+              >
                 <td class="py-4">
-                  <div class="w-22 h-22 flex items-center justify-center rounded-[10px] border border-[#FED8B3] overflow-hidden">
+                  <div
+                    class="w-22 h-22 flex items-center justify-center rounded-[10px] border border-[#FED8B3] overflow-hidden"
+                  >
                     <img
                       :src="item.thumbnail || '/placeholder.png'"
-                      class="object-contain max-w-full max-h-full p-2"
+                      class="object-contain max-w-full max-h-full p-2 transition-transform duration-300 hover:scale-110"
                     />
                   </div>
                 </td>
 
-                <td class="font-semibold">
-                  {{ item.product_name }}
-                </td>
+                <td class="font-semibold">{{ item.product_name }}</td>
 
                 <td class="font-semibold">
                   {{ formatPrice(item.product_sale || item.product_price) }} đ
@@ -38,26 +41,16 @@
 
                 <td>
                   <div class="flex items-center gap-3">
-                    <button
-                      @click="decreaseQty(item)"
-                      class="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFE8D9] text-[#6E4E37] text-lg font-semibold"
-                    >
-                      –
-                    </button>
+                    <button @click="decreaseQty(item)" class="qty-btn">–</button>
 
                     <input
                       v-model.number="item.quantity"
                       type="number"
                       min="1"
-                      class="w-10 h-8 text-center text-sm border border-gray-300 rounded outline-none"
+                      class="qty-input"
                     />
 
-                    <button
-                      @click="increaseQty(item)"
-                      class="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFE8D9] text-[#6E4E37] text-lg font-semibold"
-                    >
-                      +
-                    </button>
+                    <button @click="increaseQty(item)" class="qty-btn">+</button>
                   </div>
                 </td>
 
@@ -68,53 +61,55 @@
                 <td class="text-center">
                   <button
                     @click="removeItemFromCart(item.cart_id)"
-                    class="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 hover:border-red-500 transition"
+                    class="remove-btn"
                   >
                     ×
                   </button>
                 </td>
               </tr>
 
-              <tr v-if="index < cart.length - 1">
+              <tr v-if="index < cart.length - 1" :key="'hr-' + item.cart_id">
                 <td colspan="6">
                   <hr class="border-t border-gray-200 my-2" />
                 </td>
               </tr>
             </template>
-          </tbody>
+          </transition-group>
         </table>
 
-        <div v-if="cart.length === 0" class="flex flex-col items-center justify-center py-5 text-center text-gray-600">
-          <div class="w-24 h-24 text-gray-300">
-            <UIcon name="i-lucide-shopping-cart" class="text-6xl text-gray-300" />
-          </div>
-
-          <h3 class="text-lg font-semibold text-[#6E4E37]">Giỏ hàng của bạn đang trống</h3>
-          <p class="text-sm text-gray-400 mt-1">Hãy thêm vài món đồ yêu thích để tiếp tục nhé!</p>
-
-          <a href="/" class="mt-5 bg-[#F7C59F] hover:bg-[#E8B58C] text-[#6E4E37] font-semibold py-2 px-6 rounded-lg transition">
+        <!-- EMPTY CART -->
+        <div
+          v-if="cart.length === 0"
+          class="flex flex-col items-center justify-center py-10 text-center text-gray-600 animate-fadeIn"
+        >
+          <UIcon name="i-lucide-shopping-cart" class="text-6xl text-gray-300" />
+          <h3 class="text-lg font-semibold text-[#6E4E37] mt-3">
+            Giỏ hàng của bạn đang trống
+          </h3>
+          <p class="text-sm text-gray-400 mt-1">
+            Hãy thêm vài món đồ yêu thích để tiếp tục nhé!
+          </p>
+          <a
+            href="/"
+            class="mt-5 bg-[#F7C59F] hover:bg-[#E8B58C] text-[#6E4E37] font-semibold py-2 px-6 rounded-lg transition"
+          >
             Tiếp tục mua sắm
           </a>
         </div>
       </div>
 
       <!-- HÓA ĐƠN -->
-      <div class="w-full md:w-[350px] bg-[#A77A5D]/10 rounded-2xl p-6 shadow-sm h-fit md:sticky md:top-10">
+      <div
+        class="w-full md:w-[350px] bg-[#A77A5D]/10 rounded-2xl p-6 shadow-sm h-fit md:sticky md:top-10
+        transition-all duration-300 "
+      >
         <h2 class="text-lg font-semibold mb-4">Hóa đơn</h2>
 
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
-            <span>Tạm tính:</span><span>{{ formatPrice(apiTotal) }}</span>
+            <span>Tạm tính:</span>
+            <span>{{ formatPrice(apiTotal) }}</span>
           </div>
-
-          <!-- <div class="flex justify-between">
-            <span>Giảm giá:</span>
-            <span class="text-red-500">-{{ formatPrice(discount) }}</span>
-          </div>
-
-          <div class="flex justify-between">
-            <span>Vận chuyển:</span><span>Miễn phí</span>
-          </div> -->
 
           <div class="border-t pt-3 flex justify-between font-semibold">
             <span>Tổng thanh toán:</span>
@@ -122,11 +117,7 @@
           </div>
         </div>
 
-        <!-- NÚT THANH TOÁN -->
-        <button
-          @click="goCheckout"
-          class="w-full bg-[#F7C59F] hover:bg-[#E8B58C] text-[#6E4E37] font-semibold py-2 mt-5 rounded-lg transition"
-        >
+        <button @click="goCheckout" class="checkout-btn">
           Tiến hành thanh toán
         </button>
 
@@ -134,7 +125,6 @@
           ← Tiếp tục mua sắm
         </a>
       </div>
-
     </div>
   </section>
 </template>
@@ -148,10 +138,8 @@ const toast = useToast();
 
 const { cart, getCart, removeItem, updateQuantity } = useCart();
 const { setCartItems } = useCheckout();
-const { products, fetchProducts } = useProduct();
 
 const discount = ref(0);
-const discountCode = ref("");
 const apiTotal = ref(0);
 
 function formatPrice(num: number) {
@@ -163,11 +151,9 @@ async function fetchCartData() {
 
   if (data && data.items) {
     apiTotal.value = data.total;
-
     cart.value = data.items.map((item: any) => {
       const price = Number(item.product_sale || item.product_price);
       const quantity = Number(item.quantity);
-
       return {
         ...item,
         thumbnail: item.product_image || "/placeholder.png",
@@ -205,14 +191,9 @@ async function removeItemFromCart(cart_id: number) {
 function goCheckout() {
   if (!cart.value.length) {
     toast.add({
-      title: "Giỏ hàng trống! Vui lòng thêm sản phẩm để tiếp tục.",
-      icon: "heroicons:exclamation-circle",
-      timeout: 3000,
-      position: "bottom-right",
+      title: "Giỏ hàng trống!",
+      timeout: 2500,
       color: "error",
-      iconColor: "#ffffff",
-      style:
-        "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",
     });
     return;
   }
@@ -222,13 +203,66 @@ function goCheckout() {
 }
 </script>
 
-<style>
+<style scoped>
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: #ffe8d9;
+  color: #6e4e37;
+  font-size: 18px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.qty-btn:hover { transform: scale(1.1); }
+.qty-btn:active { transform: scale(0.95); }
+
+.qty-input {
+  width: 40px;
+  height: 32px;
+  text-align: center;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.remove-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d1d5db;
+  border-radius: 9999px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+.remove-btn:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.checkout-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 10px 0;
+  border-radius: 10px;
+  font-weight: 600;
+  color: #6e4e37;
+  background: linear-gradient(90deg, #f7c59f, #e8b58c);
+  transition: all 0.3s ease;
+}
+
+
+.list-enter-active,
+.list-leave-active { transition: all .3s ease; }
+.list-enter-from,
+.list-leave-to { opacity: 0; transform: translateY(10px); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn { animation: fadeIn .6s ease-out; }
+
 input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type="number"] {
-  -moz-appearance: textfield;
-}
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+input[type="number"] { -moz-appearance: textfield; }
 </style>
