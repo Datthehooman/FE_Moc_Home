@@ -130,7 +130,7 @@
       alt="Google"
       class="w-5 h-5"
     />
-    <span>Đăng nhập với Google</span>
+    <span>Đăng ký với Google</span>
   </button>
 </div>
 
