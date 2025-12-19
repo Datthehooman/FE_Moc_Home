@@ -5,18 +5,28 @@
     >
       <!-- FORM THANH TOÁN -->
      <!-- FORM THANH TOÁN -->
+     
       <div
         class="flex-[2.3] bg-white rounded-2xl border border-gray-200 p-6 shadow-sm w-full"
       >
         <h2 class="text-xl font-semibold text-[#6E4E37] mb-6">
           Địa chỉ thanh toán của bạn
         </h2>
+       <p
+  v-if="!isLoggedIn"
+  class="flex gap-2 items-start text-sm bg-[#FFF7ED] border border-[#FFE4C7] text-[#8A5A2B] rounded-lg p-3 mb-6"
+>
+  <UIcon name="heroicons:information-circle" class="w-5 h-5 mt-[2px]" />
+ <span> Bạn đang mua hàng với tư cách <b>khách</b>. Vui lòng điền đầy đủ thông tin để hoàn tất đơn hàng và nhận thông báo trạng thái đơn mua. </span>
+</p>
 
         <form class="space-y-6 text-[14px]" @submit.prevent="submitPayment">
           <!-- Họ và tên, email, phone (chỉ hiển thị khi guest) -->
           <div v-if="isLoggedIn">
             <div>
-              <label class="block font-medium mb-1 text-[#6E4E37]">Họ và tên</label>
+              <label class="block font-medium mb-1 text-[#6E4E37]">
+                Họ và tên <span class="text-red-500">*</span>
+              </label>
               <input
                 v-model="form.full_name"
                 placeholder="Nhập họ và tên"
@@ -29,7 +39,9 @@
 
             <div class="grid grid-cols-2 gap-4 mt-3">
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Email</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]">
+                  Email <span class="text-red-500">*</span>
+                </label>
                 <input
                   v-model="form.email"
                   placeholder="Nhập email"
@@ -40,7 +52,9 @@
                 </p>
               </div>
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]">
+                  Số điện thoại <span class="text-red-500">*</span>
+                </label>
                 <input
                   v-model="form.phone"
                   placeholder="Nhập số điện thoại"
@@ -56,7 +70,7 @@
           <div v-else>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Họ</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]">Họ <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.firstName"
                   placeholder="Nhập họ"
@@ -67,7 +81,7 @@
                 </p>
               </div>
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Tên</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]">Tên <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.lastName"
                   placeholder="Nhập tên"
@@ -81,7 +95,7 @@
 
             <div class="grid grid-cols-2 gap-4 mt-3">
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Email</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]">Email <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.email"
                   placeholder="Nhập email"
@@ -92,7 +106,7 @@
                 </p>
               </div>
               <div>
-                <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại</label>
+                <label class="block font-medium mb-1 text-[#6E4E37]">Số điện thoại <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.phone"
                   placeholder="Nhập số điện thoại"
@@ -107,7 +121,10 @@
 
           <!-- Địa chỉ -->
           <div>
-            <label class="block font-medium mb-1 text-[#6E4E37]">Địa chỉ</label>
+            <label class="block font-medium mb-1 text-[#6E4E37]">
+              Địa chỉ <span class="text-red-500">*</span>
+            </label>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
               <div class="relative">
               <input
@@ -195,44 +212,54 @@
           </div>
 
           <!-- Hình thức vận chuyển -->
-          <div>
+          <!-- <div>
             <h3 class="font-medium text-[#6E4E37] mb-3">
-              Hình thức vận chuyển
+              Hình thức vận chuyển <span class="text-red-500">*</span>
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <label
-                v-for="(ship, i) in shippingMethods"
-                :key="i"
-                class="relative border rounded-xl p-4 cursor-pointer flex flex-col gap-1 items-start"
-                :class="
-                  selectedShipping === ship.name
-                    ? 'border-[#A77A5D] bg-[#A77A5D]/10'
-                    : ''
-                "
-              >
-                <input
-                  type="radio"
-                  name="shipping"
-                  :value="ship.name"
-                  v-model="selectedShipping"
-                  class="absolute top-3 right-3 w-4 h-4 accent-[#A77A5D]"
-                />
+             <label
+              v-for="(ship, i) in shippingMethods"
+              :key="i"
+              class="relative border rounded-xl p-4 cursor-pointer flex flex-col gap-1 items-start"
+              :class="[
+                selectedShipping === ship.name
+                  ? 'border-[#A77A5D] bg-[#A77A5D]/10'
+                  : '',
+                !hasAddress ? 'opacity-60 cursor-not-allowed' : ''
+              ]"
+            >
+              <input
+                type="radio"
+                name="shipping"
+                :value="ship.name"
+                v-model="selectedShipping"
+                class="absolute top-3 right-3 w-4 h-4 accent-[#A77A5D]"
+                :disabled="!hasAddress"
+              />
                 <strong>{{ ship.name }}</strong>
                 <p class="text-xs text-gray-600">{{ ship.desc }}</p>
-                <span class="text-sm font-medium text-[#A77A5D]">{{
-                  ship.price
-                }}</span>
+               <span class="text-sm font-medium text-[#A77A5D]">
+                  {{
+                    hasAddress && invoice
+                      ? formatPrice(invoice.shipping_fee)
+                      : "Chưa tính"
+                  }}
+                </span>
               </label>
             </div>
+            <p v-if="!hasAddress" class="text-xs  mt-1 text-red-500">
+* Vui lòng thêm địa chỉ để tính phí vận chuyển
+</p>
+
             <p v-if="errors.shipping" class="text-red-500 text-xs mt-1">
               {{ errors.shipping }}
             </p>
-          </div>
+          </div> -->
 
           <!-- Phương thức thanh toán -->
           <div>
             <h3 class="font-medium text-[#6E4E37] mb-3">
-              Phương thức thanh toán
+              Phương thức thanh toán <span class="text-red-500">*</span>
             </h3>
             <div class="flex flex-col gap-3">
               <label class="flex items-center gap-3 cursor-pointer">
@@ -398,6 +425,7 @@ const showSuccessToast = (msg: string) => {
   });
 };
 
+
 // Kiểm tra điều kiện chọn Đặt cọc
 const checkDepositEligibility = () => {
   if (totalAmount.value < 2000000 && paymentMethod.value === "deposit") {
@@ -471,8 +499,9 @@ const form = reactive({
 const paymentMethod = ref("offline");
 const selectedShipping = ref("Tiêu chuẩn");
 const shippingMethods = [
-  { name: "Tiêu chuẩn", desc: "6–7 ngày", price: "Miễn phí" },
+  { name: "Tiêu chuẩn", desc: "6–7 ngày" },
 ];
+
 
 // Address
 const { provinces, wards, fetchProvinces, fetchWards } = useAddress();
