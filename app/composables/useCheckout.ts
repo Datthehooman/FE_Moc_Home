@@ -29,6 +29,69 @@ export function useCheckout() {
     checkoutStore.setCartItems(items);
   };
 
+  // =========================
+  // ✅ THÊM: PREVIEW BILL
+  // =========================
+ const previewInvoice = async ({
+  province_id,
+  district_id,
+  ward_id,
+  voucher_code, // ✅ thêm
+}: {
+  province_id: number;
+  district_id: number;
+  ward_id: number;
+  voucher_code?: string | null;
+}) => {
+  if (!checkoutStore.cartItems.length && !checkoutStore.buyNowItem) {
+    throw new Error("Không có sản phẩm để preview");
+  }
+
+  // 👉 phân biệt cart / buy-now
+  const items =
+    checkoutStore.checkoutMode === "buy-now"
+      ? [
+          {
+            product_id:
+              checkoutStore.buyNowItem.product_id ||
+              checkoutStore.buyNowItem.product?.id,
+            quantity: checkoutStore.buyNowItem.quantity,
+          },
+        ]
+      : checkoutStore.cartItems.map((i) => ({
+          product_id: i.product_id || i.product?.id,
+          quantity: i.quantity,
+        }));
+
+  const payload: any = {
+    items,
+    shipping_address: {
+      province_id,
+      district_id,
+      ward_id,
+    },
+  };
+
+  // ✅ gửi voucher nếu có
+  if (voucher_code) payload.voucher_code = voucher_code;
+
+  const res: any = await $fetch(
+    "https://api.mocfurni.shop/api/client/orders/preview-invoice",
+    {
+      method: "POST",
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json",
+      },
+      body: payload,
+    }
+  );
+
+  checkoutStore.setInvoicePreview(res?.result?.data);
+  return res?.result?.data;
+};
+
+
   // 🔥 Thanh toán 1 sản phẩm buy-now
   const buyNow = async (payload: {
     product_id: number;
@@ -36,7 +99,7 @@ export function useCheckout() {
     shipping_address: string;
     note?: string;
     payment_method_id: number;
-      voucher_code?: string | null;   // <<< THÊM
+    voucher_code?: string | null;
   }) => {
     if (!tokenCookie.value) throw new Error("Vui lòng đăng nhập để thanh toán");
 
@@ -48,8 +111,7 @@ export function useCheckout() {
       headers: { ...getAuthHeader(), "Content-Type": "application/json" },
       body,
     });
-    
-    // ✅ FIX: Trả về đối tượng data nằm trong result.
+
     return res?.result?.data || res;
   };
 
@@ -63,20 +125,17 @@ export function useCheckout() {
     shipping_address: string;
     note?: string;
     payment_method_id: number;
-      voucher_code?: string | null;  // <<< THÊM
+    voucher_code?: string | null;
   }) => {
     try {
       const res: any = await $fetch(
         "https://api.mocfurni.shop/api/client/buy-now/guest",
-
         {
           method: "POST",
           body: payload,
         }
       );
-      // ✅ FIX: Trả về đối tượng data nằm trong result.
       return res?.result?.data || res;
-      
     } catch (error: any) {
       console.error("❌ Lỗi server guest:", error.data || error);
       throw new Error("Lỗi server");
@@ -94,7 +153,7 @@ export function useCheckout() {
     const payload = {
       user_id: authStore.user?.user_id || null,
       items: checkoutStore.cartItems.map((i) => ({
-        product_id: i.product_id,
+        product_id: i.product_id || i.product?.id,
         quantity: i.quantity,
       })),
       shipping_address,
@@ -109,48 +168,33 @@ export function useCheckout() {
         body: payload,
       });
     } else {
-      // Guest cart
-      const guestPayload = {
-        items: checkoutStore.cartItems.map((i) => ({
-          product_id: i.product_id,
-          quantity: i.quantity,
-        })),
-        shipping_address,
-        note,
-        payment_method_id,
-      };
       return await $fetch(
         "https://api.mocfurni.shop/api/client/buy-now/guest-cart",
         {
           method: "POST",
-          body: guestPayload,
+          body: payload,
         }
       );
     }
   };
 
   // 💳 Thanh toán online qua VNPAY
-// 💳 Thanh toán online qua VNPAY
-const payWithVNPAY = async (payload) => {
-  const formData = new URLSearchParams();
-  formData.append("order_id", String(payload.order_id));
+  const payWithVNPAY = async (payload) => {
+    const formData = new URLSearchParams();
+    formData.append("order_id", String(payload.order_id));
 
-  const res = await $fetch("https://api.mocfurni.shop/api/client/vnpay-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: formData.toString(),
-  });
+    const res = await $fetch(
+      "https://api.mocfurni.shop/api/client/vnpay-payment",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
+      }
+    );
 
-  const url = res?.data || res;
-
-  console.log("Redirect URL:", url);
-
-  // 👉 Vì backend trả FULL URL rồi, chỉ redirect luôn
-  window.location.href = url;
-};
-
-
-
+    const url = res?.data || res;
+    window.location.href = url;
+  };
 
   const clearCheckout = () => {
     checkoutStore.clearCheckout();
@@ -159,6 +203,10 @@ const payWithVNPAY = async (payload) => {
   return {
     setBuyNowItem,
     setCartItems,
+
+    // ✅ expose thêm
+    previewInvoice,
+
     buyNow,
     buyNowGuest,
     checkoutCart,
