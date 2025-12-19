@@ -117,19 +117,22 @@
         </div>
 
         <!-- Social buttons -->
-        <div class="flex space-x-3">
-          <button class="w-full py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition">
-            Facebook
-          </button>
-
-          <!-- KEEP Tien-Quan version (Google + function call) -->
-          <button
-            @click="auth.loginGoogle()"
-            class="w-full py-2 border border-red-500 text-red-500 rounded-md hover:bg-red-50 transition"
-          >
-            Google
-          </button>
-        </div>
+        <div class="flex justify-center">
+  <button
+    @click="auth.loginGoogle()"
+    class="flex items-center gap-3 px-6 py-2.5 border border-gray-300 rounded-lg
+           text-gray-700 font-medium
+           hover:bg-gray-50 hover:border-gray-400
+           transition-all duration-200"
+  >
+    <img
+      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+      alt="Google"
+      class="w-5 h-5"
+    />
+    <span>Đăng nhập với Google</span>
+  </button>
+</div>
 
       </div>
     </div>
