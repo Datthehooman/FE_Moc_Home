@@ -330,23 +330,12 @@
           title: "✅ Sản phẩm đã có trong yêu thích!",
           color: "info",
         });
-        return;c
+        return;
       }
 
       const success = await addToWishlist(productId);
-      if (success) {
-        toast.add({
-          title: "✅ Đã thêm sản phẩm vào yêu thích!",
-          color: "success",
-        });
-      } else {
-        toast.add({
-          title: "❌ Không thể thêm vào yêu thích!",
-          color: "error",
-        });
-      }
     } catch (error) {
-      toast.add({ title: "❌ Lỗi khi thêm vào yêu thích!", color: "error" });
+      console.log(error);
     }
   };
 </script>
