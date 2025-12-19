@@ -2,8 +2,8 @@
 deployment:
   tasks:
     # Define paths
-    - export REPOPATH=/home/eal236bnt9pe/repositories/FE_Moc_Home/
-    - export DEPLOYPATH=/home/eal236bnt9pe/public_html/
+    - export REPOPATH=/home2/eal236bnt9pe/repositories/FE_Moc_Home/
+    - export DEPLOYPATH=/home2/eal236bnt9pe/public_html/
 
     # Remove old files from public_html
     - /bin/rm -rf $DEPLOYPATH/*
