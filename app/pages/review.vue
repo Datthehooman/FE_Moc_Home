@@ -1,165 +1,130 @@
 <template>
-  <div
-    class="bg-gray-50 p-6 sm:p-8 min-h-screen flex justify-center items-start"
-  >
-    <div
-      div
-      class="review-container w-full max-w-[80%] bg-white shadow-2xl rounded-xl overflow-hidden"
-    >
-      <div
-        class="bg-[#AC8972] text-white p-5 sm:p-6 flex justify-between items-start"
-      >
-        <div>
-          <h1 class="text-4xl font-extrabold mb-1">
-            Đánh Giá Sản Phẩm Nội Thất
-          </h1>
-          <p class="opacity-90 text-lg">
-            Chia sẻ trải nghiệm của bạn để giúp chúng tôi tốt hơn!
-          </p>
+  <div class="bg-gray-50 min-h-screen w-full">
+    <div class="review-container w-full bg-white shadow-sm min-h-screen flex flex-col">
+      <div class="bg-[#AC8972] text-white p-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <span class="font-bold uppercase tracking-wider text-sm">Đánh giá sản phẩm</span>
         </div>
 
         <NuxtLink
           to="/user/orders/list"
-          class="ml-4 px-4 py-2 bg-[#FEE1C7] rounded-lg text-black font-medium shadow hover:bg-[#FCD8B9] transition text-sm flex-shrink-0"
+          class="px-3 py-1.5 bg-[#FEE1C7] rounded text-black font-medium shadow-sm hover:bg-[#FCD8B9] transition text-xs flex-shrink-0"
         >
           &larr; Quay lại đơn hàng
         </NuxtLink>
       </div>
 
-      <div v-if="loading" class="p-10 text-center text-xl text-gray-500">
-        <p>Đang tải thông tin sản phẩm...</p>
+      <div v-if="loading" class="flex-grow flex items-center justify-center p-10 text-gray-500">
+        <p class="text-lg">Đang tải thông tin sản phẩm...</p>
       </div>
 
-      <div v-else-if="error" class="p-10 text-center text-xl text-red-600">
-        <p class="text-base text-gray-600">Bạn đã đánh giá sản phẩm này rồi!</p>
+      <div v-else-if="error" class="flex-grow flex items-center justify-center p-10 text-red-600">
+        <p class="text-base text-gray-600 font-medium">Bạn đã đánh giá sản phẩm này rồi!</p>
       </div>
 
-      <div v-else-if="detailToReview" class="p-6 sm:p-8">
-        <div
-          class="p-6 border-b border-gray-200 flex items-center space-x-6 bg-gray-50 rounded-lg mb-8"
-        >
-          <div
-            class="w-32 h-32 flex-shrink-0 bg-white flex items-center justify-center rounded-lg overflow-hidden shadow-md border border-gray-200"
-          >
-            <img
-              v-if="detailToReview.image"
-              :src="detailToReview.image"
-              :alt="detailToReview.name"
-              class="object-cover w-full h-full"
-            />
-            <span v-else class="text-sm text-gray-400 p-2 text-center"
-              >Không ảnh sản phẩm</span
-            >
-          </div>
-          <div>
-            <h3 class="font-extrabold text-2xl text-gray-800 mb-1">
-              {{ detailToReview.name }}
-            </h3>
-            <p class="text-md text-gray-600">
-              Màu sắc:
-              <span class="font-medium">{{
-                detailToReview.color ?? "N/A"
-              }}</span>
-            </p>
-            <p class="text-md text-gray-600">
-              Số lượng:
-              <span class="font-medium">{{ detailToReview.quantity }}</span>
-            </p>
-            <p class="font-bold text-red-600 text-xl mt-2">
-              Giá: {{ detailToReview.price }} ₫
-            </p>
-            <p class="text-sm text-gray-400 mt-2">
-              Mã đơn hàng:
-              <span class="font-semibold text-gray-500"
-                >#{{ detailToReview.order_code }}</span
-              >
-            </p>
-          </div>
-        </div>
-
-        <form @submit.prevent="submitReview" class="space-y-8">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            <div>
-              <label class="block text-gray-700 text-lg font-bold mb-3"
-                >Chất lượng sản phẩm <span class="text-red-500">*</span></label
-              >
-              <div class="flex items-center space-x-1">
-                <span
-                  v-for="star in 5"
-                  :key="star"
-                  @click="reviewForm.rating = star"
-                  :class="[
-                    'cursor-pointer transition-colors',
-                    reviewForm.rating >= star
-                      ? 'text-yellow-500'
-                      : 'text-gray-300',
-                  ]"
-                >
-                  <svg
-                    class="w-10 h-10 fill-current"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <polygon
-                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                    ></polygon>
-                  </svg>
-                </span>
+      <div v-else-if="detailToReview" class="p-4 sm:p-8 max-w-7xl mx-auto w-full flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <div class="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-100 pb-6 lg:pb-0 lg:pr-8">
+            <div class="sticky top-8">
+              <div class="w-full aspect-square max-w-[250px] mx-auto bg-white flex items-center justify-center rounded-xl overflow-hidden shadow-sm border border-gray-200 mb-4">
+                <img
+                  v-if="detailToReview.image"
+                  :src="detailToReview.image"
+                  :alt="detailToReview.name"
+                  class="object-cover w-full h-full"
+                />
+                <span v-else class="text-sm text-gray-400">Không ảnh sản phẩm</span>
+              </div>
+              <div class="text-center lg:text-left">
+                <h3 class="font-bold text-2xl text-gray-800 mb-3 leading-tight">
+                  {{ detailToReview.name }}
+                </h3>
+                
+                <div class="space-y-2 text-lg text-gray-600">
+                  <p>
+                    Màu sắc: 
+                    <span class="font-semibold text-gray-900">{{ detailToReview.color ?? "N/A" }}</span>
+                  </p>
+                  <p>
+                    Số lượng: 
+                    <span class="font-semibold text-gray-900">{{ detailToReview.quantity }}</span>
+                  </p>
+                  
+                  <p class="font-bold text-red-600 text-2xl mt-4">
+                    Giá: {{ detailToReview.price }} ₫
+                  </p>
+                  
+                  <p class="text-xm text-gray-400 mt-6 uppercase tracking-wider">
+                    Mã đơn: #{{ detailToReview.order_code }}
+                  </p>
+                </div>
               </div>
             </div>
-
-            <div
-              v-if="reviewForm.rating > 0"
-              class="p-4 bg-yellow-50/50 border border-yellow-200 rounded-lg transition-opacity duration-300"
-            >
-              <label class="block text-gray-700 text-lg font-bold mb-2"
-                >Đánh giá chung:</label
-              >
-              <p class="text-xl font-semibold text-gray-800">
-                {{ ratingComment }}
-              </p>
-            </div>
           </div>
 
-          <div>
-            <label
-              for="comment"
-              class="block text-gray-700 text-lg font-bold mb-3"
-              >Ý kiến chi tiết của bạn
-              <span class="text-red-500">*</span></label
-            >
-            <textarea
-              id="comment"
-              v-model="reviewForm.comment"
-              rows="5"
-              class="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-[#AC8972] focus:border-[#AC8972] transition duration-200 text-base"
-              placeholder="Hãy chia sẻ cảm nhận chi tiết của bạn về chất lượng sản phẩm, dịch vụ giao hàng và đóng gói..."
-              maxlength="500"
-            ></textarea>
-            <p class="text-sm text-gray-500 mt-2 text-right">
-              Giới hạn 500 ký tự (Đã nhập:
-              {{ reviewForm.comment.trim().length }})
-            </p>
-          </div>
+          <div class="lg:col-span-2">
+            <form @submit.prevent="submitReview" class="space-y-6">
+              <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                <label class="block text-gray-800 text-sm font-bold mb-4 uppercase tracking-wide">
+                  Chất lượng sản phẩm <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center space-x-2 mb-4">
+                  <span
+                    v-for="star in 5"
+                    :key="star"
+                    @click="reviewForm.rating = star"
+                    :class="[
+                      'cursor-pointer transition-transform hover:scale-110',
+                      reviewForm.rating >= star ? 'text-yellow-400' : 'text-gray-300',
+                    ]"
+                  >
+                    <svg class="w-10 h-10 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
+                  </span>
+                </div>
+                <p v-if="reviewForm.rating > 0" class="text-sm font-medium text-[#AC8972] italic">
+                  "{{ ratingComment }}"
+                </p>
+              </div>
 
-          <button
-            type="submit"
-            :disabled="!isFormValid || creatingReview"
-            :class="[
-              'w-full py-4 rounded-xl text-white font-extrabold text-xl transition duration-300 transform hover:scale-[1.005] focus:outline-none focus:ring-4 focus:ring-[#AC8972]/50',
-              isFormValid && !creatingReview
-                ? 'bg-[#AC8972] hover:bg-[#8e7362] shadow-lg'
-                : 'bg-gray-400 cursor-not-allowed',
-            ]"
-          >
-            <span v-if="creatingReview">Đang gửi đánh giá...</span>
-            <span v-else>HOÀN TẤT VÀ GỬI ĐÁNH GIÁ</span>
-          </button>
-        </form>
+              <div>
+                <label for="comment" class="block text-gray-800 text-sm font-bold mb-3 uppercase tracking-wide">
+                  Ý kiến chi tiết <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="comment"
+                  v-model="reviewForm.comment"
+                  rows="6"
+                  class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#AC8972] focus:border-transparent outline-none transition text-base shadow-sm"
+                  placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
+                  maxlength="500"
+                ></textarea>
+                <p class="text-[11px] text-gray-400 mt-2 text-right">
+                  Ký tự: {{ reviewForm.comment.trim().length }}/500
+                </p>
+              </div>
+
+              <div class="flex justify-end pt-4">
+                <button
+                  type="submit"
+                  :disabled="!isFormValid || creatingReview"
+                  :class="[
+                    'px-8 py-2.5 rounded-lg text-white font-bold text-sm transition-all duration-200 shadow-md',
+                    isFormValid && !creatingReview
+                      ? 'bg-[#AC8972] hover:bg-[#8e7362] active:scale-95'
+                      : 'bg-gray-300 cursor-not-allowed',
+                  ]"
+                >
+                  <span v-if="creatingReview">Đang gửi...</span>
+                  <span v-else>GỬI ĐÁNH GIÁ</span>
+                </button>
+              </div>
+            </form>
+          </div>
+          
+        </div>
       </div>
     </div>
   </div>
