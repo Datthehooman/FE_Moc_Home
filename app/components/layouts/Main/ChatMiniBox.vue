@@ -118,14 +118,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 
 const authStore = useAuthStore()
-const { messages, getConversation, getMessages, sendMessage } = useChat()
 const router = useRouter()
 
 const conversationId = ref<number | null>(null)
+const messages = ref<any[]>([])
 const newMessage = ref('')
 const selectedImages = ref<File[]>([])
 const previewImages = ref<string[]>([])
@@ -133,14 +132,23 @@ const isOpen = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
 const previewModal = ref<string | null>(null)
 
+let pollingInterval: any = null
+
+const { getConversation, getMessages, sendMessage } = useChat()
+
+// --- INIT ---
 onMounted(async () => {
   if (!authStore.isLogged) return
   const convo = await getConversation()
   if (convo?.id) {
     conversationId.value = convo.id
-    await getMessages(convo.id)
-    nextTick(scrollToBottom)
+    await loadMessages()
   }
+  startPolling()
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 
 watch(messages, () => nextTick(scrollToBottom))
@@ -155,6 +163,30 @@ function scrollToBottom() {
   if (messagesContainer.value) messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
 }
 
+// --- LOAD MESSAGES ---
+async function loadMessages() {
+  if (!conversationId.value) return
+  messages.value = await getMessages(conversationId.value)
+  nextTick(scrollToBottom)
+}
+
+// --- POLLING ---
+function startPolling() {
+  pollingInterval = setInterval(async () => {
+    if (!conversationId.value) return
+    const newMsgs = await getMessages(conversationId.value)
+    if (newMsgs.length !== messages.value.length) {
+      messages.value = newMsgs
+      nextTick(scrollToBottom)
+    }
+  }, 3000)
+}
+
+function stopPolling() {
+  if (pollingInterval) clearInterval(pollingInterval)
+}
+
+// --- IMAGE ---
 function handleSelectImages(e: Event) {
   const input = e.target as HTMLInputElement
   const files = Array.from(input.files || [])
@@ -170,24 +202,30 @@ function removeImage(i: number) {
   previewImages.value.splice(i, 1)
 }
 
+// --- SEND MESSAGE ---
 async function handleSendMessage() {
   if (!conversationId.value || (!newMessage.value.trim() && !selectedImages.value.length)) return
 
   await sendMessage(conversationId.value, {
     message: newMessage.value || undefined,
-    images: selectedImages.value,
+    images: selectedImages.value
   })
 
   newMessage.value = ''
   selectedImages.value = []
   previewImages.value = []
-
   nextTick(scrollToBottom)
 }
 
+// --- PREVIEW ---
 function openPreview(img: string) { previewModal.value = img }
 function closePreview() { previewModal.value = null }
-function goToMainChat() { isOpen.value = false; router.push('/user/messages') }
+
+// --- GO TO MAIN CHAT ---
+function goToMainChat() {
+  isOpen.value = false
+  router.push('/user/messages')
+}
 </script>
 
 <style scoped>
@@ -195,7 +233,6 @@ function goToMainChat() { isOpen.value = false; router.push('/user/messages') }
 .custom-scroll { scrollbar-width: none; }
 .hide-scroll::-webkit-scrollbar { display: none; }
 .hide-scroll { scrollbar-width: none; }
-
 .bubble-safe { min-width: 0; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; white-space: pre-wrap; }
 
 @keyframes ripple {
