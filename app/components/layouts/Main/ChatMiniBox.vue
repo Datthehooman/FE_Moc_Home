@@ -37,7 +37,7 @@
 
             <!-- MESSAGE BUBBLE -->
             <div class="bubble-safe px-3 py-2 rounded-2xl text-sm flex flex-col gap-1 max-w-[70%]"
-                 :class="msg.is_admin_sender ? 'bg-[#EAD6C4] text-[#50392B]' : 'bg-[#6E4E37] text-white'">
+                 :class="msg.is_admin_sender ? 'bg-[#FFFFFF] text-[#50392B]' : 'bg-[#FED8B3] text-black'">
               <span class="text-xs font-semibold">
                 {{ msg.is_admin_sender ? 'Mộc Home' : msg.sender.full_name }}
               </span>

@@ -67,7 +67,7 @@
                <!-- MESSAGE BUBBLE -->
 <div
   class="bubble-safe px-3 py-2 rounded-2xl text-sm flex flex-col gap-1 max-w-[70%]"
-  :class="msg.is_admin_sender ? 'bg-[#F1F1F1]' : 'bg-[#DCF8C6]'"
+  :class="msg.is_admin_sender ? 'bg-[#F1F1F1]' : 'bg-[#FED8B3]'"
 >
   <!-- Tên người gửi -->
   <span class="text-xs font-semibold text-gray-600">
