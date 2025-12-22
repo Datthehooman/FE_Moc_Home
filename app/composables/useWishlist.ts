@@ -4,7 +4,7 @@ import { useCookie } from "#app";
 
 export const useWishlist = () => {
   const toast = useToast();
-  const wishlists = ref<any[]>([]);
+  const wishlists = useState<any[]>('wishlists_data', () => []);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -77,9 +77,13 @@ export const useWishlist = () => {
       return false;
     }
 
-    isLoading.value = true;
-    error.value = null;
+    // 🔥 CHẶN TẠI ĐÂY: Nếu đã có trong mảng local thì không gọi API nữa
+    if (isInWishlist(product_id)) {
+      toast.add({ title: "Sản phẩm đã có trong yêu thích!", color: "info" });
+      return false;
+    }
 
+    isLoading.value = true;
     try {
       await $fetch("https://api.mocfurni.shop/api/client/wishlists", {
         method: "POST",
@@ -87,10 +91,11 @@ export const useWishlist = () => {
         headers: getAuthHeader(),
       });
 
-      await fetchWishlist();
+      await fetchWishlist(); // Cập nhật lại danh sách mới nhất
       showSuccessToast("Thêm vào danh sách yêu thích thành công!");
       return true;
     } catch (err: any) {
+      // Nếu Server trả về lỗi "đã tồn tại" (tùy vào API của bạn)
       error.value = err?.data?.message || "Thêm vào yêu thích thất bại";
       showErrorToast(error.value);
       return false;

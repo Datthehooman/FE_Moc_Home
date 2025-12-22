@@ -143,10 +143,13 @@ const categoryName = computed(() => {
 // API
 const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()
 // 🟢 SỬA: Thêm isInWishlist từ useWishlist
-const { addToWishlist, isInWishlist } = useWishlist()
+const { addToWishlist, isInWishlist, fetchWishlist } = useWishlist()
 const toast = useToast()
 
-onMounted(() => fetchProductDetail(slug))
+onMounted(async () => {
+  fetchProductDetail(slug);
+  await fetchWishlist(); // 🔥 QUAN TRỌNG: Phải lấy danh sách về thì isInWishlist mới chạy đúng
+})
 
 // UI
 const quantity = ref(1)
@@ -218,17 +221,7 @@ const handleAddToWishlist = async () => {
 
     const success = await addToWishlist(productDetail.value.product_id)
     
-    if (success) {
-      toast.add({ 
-        title: "✅ Đã thêm sản phẩm vào yêu thích!", 
-        color: "success" 
-      })
-    } else {
-      toast.add({ 
-        title: "❌ Không thể thêm vào yêu thích!", 
-        color: "error" 
-      })
-    }
+    
   } catch (error: any) {
     toast.add({ 
       title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || 'Không rõ nguyên nhân'), 

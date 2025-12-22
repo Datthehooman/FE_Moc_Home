@@ -326,7 +326,7 @@
                 <p class="font-bold text-xl text-amber-900 mt-2">
                   Bùi Nguyên Đạt
                 </p>
-                <p class="text-md text-gray-600 mb-4">Quản lý cấp cao</p>
+                <p class="text-md text-gray-600 mb-4">Good General Knowledge</p>
 
                 <div class="flex justify-center space-x-3 pb-2">
                   <a
@@ -371,7 +371,7 @@
                 <p class="font-bold text-xl text-amber-900 mt-2">
                   Lê Phùng Tiến Quân
                 </p>
-                <p class="text-md text-gray-600 mb-4">Quản lý cấp cao</p>
+                <p class="text-md text-gray-600 mb-4">Good Research</p>
                 <div class="flex justify-center space-x-3 pb-2">
                   <a
                     href="#"
@@ -411,7 +411,7 @@
                 <p class="font-bold text-xl text-amber-900 mt-2">
                   Huỳnh Anh Quốc
                 </p>
-                <p class="text-md text-gray-600 mb-4">Quản lý cấp cao</p>
+                <p class="text-md text-gray-600 mb-4">Good Morning</p>
                 <div class="flex justify-center space-x-3 pb-2">
                   <a
                     href="#"
@@ -451,7 +451,7 @@
                 <p class="font-bold text-xl text-amber-900 mt-2">
                   Đỗ Thành Nhựt
                 </p>
-                <p class="text-md text-gray-600 mb-4">Quản lý cấp cao</p>
+                <p class="text-md text-gray-600 mb-4">Good Leadership</p>
                 <div class="flex justify-center space-x-3 pb-2">
                   <a
                     href="#"
@@ -578,7 +578,7 @@
       </div>
     </div>
 
-    <div>
+    <div class="mb-20">
       <p class="font-semibold text-[30px] mb-[29px] text-center p-8">
         Facebook <span class="text-primary">@MộcHome</span>
       </p>
@@ -588,8 +588,8 @@
         :slides-to-scroll="1"
         :autoplay="{ delay: 2000 }"
         :ui="{
-          container: 'gap-[10px]',
-          item: 'basis-[calc(20%-10px)]',
+          container: 'gap-4', 
+          item: 'basis-full sm:basis-1/3 md:basis-1/4 lg:basis-1/5',
         }"
       >
         <div class="size-[250px] rounded-xl overflow-hidden relative group">
