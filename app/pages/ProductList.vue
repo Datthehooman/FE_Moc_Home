@@ -85,6 +85,7 @@ import { ref, computed, watch, onMounted } from "vue";
   const searchQuery = ref<string>((route.query.search as string) || "");
   const selectedCategories = ref<string[]>([]);
   const selectedBrands = ref<string[]>([]);
+  const selectedRatings = ref<string[]>([]); 
   const sortOption = ref("Mặc định");
   const currentPage = ref(1);
   const itemsPerPage = 18;

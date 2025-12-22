@@ -163,35 +163,15 @@
   };
 
   const handleAddToCart = async () => {
-    if (!props.product.product_id) {
-      toast.add({
-        title: "Sản phẩm không hợp lệ",
-        color: "warning",
-      });
-      return;
-    }
+  if (!props.product.product_id) {
+    return;
+  }
 
-    try {
-      const result = await addToCart(props.product.product_id, 1);
+  try {
+    await addToCart(props.product.product_id, 1);
+  } catch (error) {
+    console.error("Lỗi khi thêm vào giỏ hàng:", error);
+  }
+};
 
-      if (result) {
-        toast.add({
-          title: "Đã thêm vào giỏ hàng!",
-          color: "success",
-        });
-      } else {
-        toast.add({
-          title: "Thêm giỏ hàng thất bại!",
-          color: "warning",
-        });
-      }
-    } catch (error: any) {
-      toast.add({
-        title:
-          "Lỗi khi thêm vào giỏ hàng: " +
-          (error?.message || "Không rõ nguyên nhân"),
-        color: "warning",
-      });
-    }
-  };
 </script>

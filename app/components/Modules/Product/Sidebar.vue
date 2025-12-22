@@ -133,9 +133,8 @@
     </div>
   </aside>
 </template>
-
 <script setup lang="ts">
-  import { ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 
 /* ================= PROPS & EMITS ================= */
 const props = defineProps<{
@@ -155,35 +154,23 @@ const emit = defineEmits([
 /* ================= TOGGLE ================= */
 const toggleCategory = (id: string) => {
   const newData = props.selectedCategories.includes(id)
-    ? props.selectedCategories.filter((c) => c !== id)
+    ? props.selectedCategories.filter(c => c !== id)
     : [...props.selectedCategories, id];
 
   emit("update:selectedCategories", newData);
 };
-  const toggleCategory = (id: string) => {
-    const newCats = props.selectedCategories.includes(id)
-      ? props.selectedCategories.filter((c) => c !== id)
-      : [...props.selectedCategories, id];
-    emit("update:selectedCategories", newCats);
-  };
 
 const toggleBrand = (brand: string) => {
   const newData = props.selectedBrands.includes(brand)
-    ? props.selectedBrands.filter((b) => b !== brand)
+    ? props.selectedBrands.filter(b => b !== brand)
     : [...props.selectedBrands, brand];
 
   emit("update:selectedBrands", newData);
 };
-  const toggleBrand = (brand: string) => {
-    const newBrands = props.selectedBrands.includes(brand)
-      ? props.selectedBrands.filter((b) => b !== brand)
-      : [...props.selectedBrands, brand];
-    emit("update:selectedBrands", newBrands);
-  };
 
 const toggleRating = (rating: string) => {
   const newData = props.selectedRatings.includes(rating)
-    ? props.selectedRatings.filter((r) => r !== rating)
+    ? props.selectedRatings.filter(r => r !== rating)
     : [...props.selectedRatings, rating];
 
   emit("update:selectedRatings", newData);
@@ -193,59 +180,42 @@ const toggleRating = (rating: string) => {
 const categories = ref<{ id: number; category_name: string }[]>([]);
 const brands = ref<{ name: string; count: number }[]>([]);
 
-  // ----- Fetch danh mục -----
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch("https://api.mocfurni.shop/api/client/category");
-      const json = await res.json();
-      categories.value = json?.result?.data || [];
-    } catch (err) {
-      console.error("❌ Lỗi fetch category:", err);
-    }
-  };
-
-  // ----- Fetch sản phẩm và tạo danh sách thương hiệu -----
-  const fetchBrandsFromProducts = async () => {
-    try {
-      const res = await fetch("https://api.mocfurni.shop/api/client/products");
-      const json = await res.json();
-      const products = json?.result?.data || [];
-const fetchBrandsFromProducts = async () => {
-  const res = await fetch("https://api.mocfurni.shop/api/client/products");
-  const json = await res.json();
-  const products = json?.result?.data || [];
-
-  const brandMap: Record<string, number> = {};
-  products.forEach((p: any) => {
-    if (p.brand) {
-      brandMap[p.brand] = (brandMap[p.brand] || 0) + 1;
-    }
-  });
-      // Tạo map đếm số sản phẩm theo brand
-      const brandMap: Record<string, number> = {};
-      products.forEach((p: any) => {
-        if (p.brand) {
-          brandMap[p.brand] = (brandMap[p.brand] || 0) + 1;
-        }
-      });
-
-  brands.value = Object.entries(brandMap).map(([name, count]) => ({
-    name,
-    count,
-  }));
+/* ================= API ================= */
+const fetchCategories = async () => {
+  try {
+    const res = await fetch("https://api.mocfurni.shop/api/client/category");
+    const json = await res.json();
+    categories.value = json?.result?.data || [];
+  } catch (err) {
+    console.error("❌ Lỗi fetch category:", err);
+  }
 };
-      // Chuyển map sang array để render
-      brands.value = Object.entries(brandMap).map(([name, count]) => ({
-        name,
-        count,
-      }));
-    } catch (err) {
-      console.error("❌ Lỗi fetch brands từ products:", err);
-    }
-  };
 
-  onMounted(() => {
-    fetchCategories();
-    fetchBrandsFromProducts();
-  });
+const fetchBrandsFromProducts = async () => {
+  try {
+    const res = await fetch("https://api.mocfurni.shop/api/client/products");
+    const json = await res.json();
+    const products = json?.result?.data || [];
+
+    const brandMap: Record<string, number> = {};
+    products.forEach((p: any) => {
+      if (p.brand) {
+        brandMap[p.brand] = (brandMap[p.brand] || 0) + 1;
+      }
+    });
+
+    brands.value = Object.entries(brandMap).map(([name, count]) => ({
+      name,
+      count,
+    }));
+  } catch (err) {
+    console.error("❌ Lỗi fetch brands:", err);
+  }
+};
+
+/* ================= LIFECYCLE ================= */
+onMounted(() => {
+  fetchCategories();
+  fetchBrandsFromProducts();
+});
 </script>

@@ -265,72 +265,52 @@ const handleWishlistUpdated = async () => {
  await fetchWishlist()
 }
 
-const removeSelected = async () => {
-  if (!selectedList.value.length) return
-  if (!confirm(`Xóa ${selectedList.value.length} sản phẩm đã chọn?`)) return
-
-  const ids = selectedList.value.map(i => i.product_id)
-  const ok = await removeMultipleFromWishlist(ids)
-
-  const toast = useToast()
-  ok
-    ? toast.add({ title: `✅ Đã xóa ${ids.length} sản phẩm`, color: 'success' })
-    : toast.add({ title: '❌ Xóa thất bại', color: 'warning' })
-
-  if (ok) {
-    selectedList.value = []
-    isSelecting.value = false
-
-// 🟢 GIỮ NGUYÊN TÊN HÀM: Xóa các mục đã chọn
 const removeSelected = async (closePopover?: any) => {
   if (selectedList.value.length === 0) return
-  
-  const productIds = selectedList.value.map(item => item.product_id)
-  
+
   isLoading.value = true
   try {
+    const productIds = selectedList.value.map(i => i.product_id)
     const success = await removeMultipleFromWishlist(productIds)
+
     if (success) {
       selectedList.value = []
       isSelecting.value = false
-      // Đóng popover nếu có hàm close truyền vào
       if (closePopover) closePopover()
+
+      useToast().add({
+        title: `✅ Đã xóa ${productIds.length} sản phẩm`,
+        color: 'success'
+      })
+    } else {
+      useToast().add({ title: '❌ Xóa thất bại', color: 'warning' })
     }
-  } catch (e) {
-    console.error(e)
   } finally {
     isLoading.value = false
   }
 }
 
-const removeAllWishlist = async () => {
-  if (!wishlists.value.length) return
-  if (!confirm('Xóa TẤT CẢ sản phẩm yêu thích?')) return
 
-  const ok = await clearWishlist()
-  const toast = useToast()
-
-  ok
-    ? toast.add({ title: '✅ Đã xóa tất cả sản phẩm', color: 'success' })
-    : toast.add({ title: '❌ Xóa thất bại', color: 'warning' })
-// 🟢 SỬA: Dùng hàm mới clearWishlist
 const removeAllWishlist = async (closePopover?: any) => {
-  if (wishlists.value.length === 0) return
-  
+  if (!wishlists.value.length) return
+
   isLoading.value = true
   try {
     const success = await clearWishlist()
     if (success) {
-
-      // Đóng popover nếu có hàm close truyền vào
       if (closePopover) closePopover()
+      useToast().add({
+        title: '✅ Đã xóa tất cả sản phẩm yêu thích',
+        color: 'success'
+      })
+    } else {
+      useToast().add({ title: '❌ Xóa thất bại', color: 'warning' })
     }
-  } catch (e) {
-    console.error(e)
   } finally {
     isLoading.value = false
   }
 }
+
 
 /* ================== WATCH ================== */
 watch(
