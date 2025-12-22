@@ -456,11 +456,14 @@ const checkPaymentEligibility = () => {
   const total = totalAmount.value;
 
   // 🚫 COD trên 5tr
-  if (paymentMethod.value === "offline" && total >= LIMIT_AMOUNT) {
-    submitWarning.value =
-      "Đơn hàng từ 5.000.000đ trở lên vui lòng chọn Thanh toán Online hoặc Đặt cọc.";
-    return false;
-  }
+if (paymentMethod.value === "offline" && total >= LIMIT_AMOUNT) {
+  submitWarning.value =
+    "Đơn hàng từ 5.000.000đ trở lên vui lòng chọn Thanh toán Online hoặc Đặt cọc.";
+
+  showErrorToast("Vui lòng đổi phương thức thanh toán");
+  return false;
+}
+
 
   // 🚫 Đặt cọc dưới 5tr
   if (paymentMethod.value === "deposit" && total < LIMIT_AMOUNT) {
