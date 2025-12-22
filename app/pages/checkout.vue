@@ -429,7 +429,7 @@
 
 
 const router = useRouter();
-const { buyNow, buyNowGuest, payWithVNPAY, previewInvoice  } = useCheckout();
+const { buyNow, buyNowGuest, payWithVNPAY, previewInvoice, previewInvoiceGuest   } = useCheckout();
 const checkoutStore = useCheckoutStore();
 const authStore = useAuthStore();
 const invoice = computed(() => checkoutStore.invoicePreview);
@@ -619,7 +619,6 @@ const submitPayment = async () => {
     return;
   }
 
-  // ⚠️ CHỈ CẢNH BÁO KHI NHẤN MUA
   if (!checkPaymentEligibility()) return;
 
   if (!validate()) {
@@ -681,7 +680,7 @@ const submitPayment = async () => {
 
     order_id = Number(orderData.order_id);
 
-    // ✅ LƯU ĐỊA CHỈ MẶC ĐỊNH (CHỈ KHI LOGIN)
+    // Lưu địa chỉ mặc định khi login
     if (isLoggedIn.value) {
       const addressPayload = buildAddressPayload();
 
@@ -700,13 +699,23 @@ const submitPayment = async () => {
       }
     }
 
-    // 💳 ONLINE
+    // Chỉ redirect khi offline
+    if (paymentMethod.value === "offline") {
+      showSuccessToast("Thanh toán thành công! 🎉");
+      checkoutStore.clearCheckout();
+      router.push({
+        path: "/thanks",
+        query: { order_code: orderData.order_code || orderData.order_id },
+      });
+      return;
+    }
+
+    // Với online hoặc deposit → vẫn gọi VNPAY
     if (paymentMethod.value === "online") {
       await payWithVNPAY({ order_id });
       return;
     }
 
-    // 💳 ĐẶT CỌC 30%
     if (paymentMethod.value === "deposit") {
       const subtotal = Number(invoice.value?.total_amount || 0);
       const depositAmount = Math.ceil(subtotal * 0.3);
@@ -718,13 +727,6 @@ const submitPayment = async () => {
       return;
     }
 
-    // ✅ OFFLINE
-    showSuccessToast("Thanh toán thành công! 🎉");
-    checkoutStore.clearCheckout();
-    router.push({
-      path: "/thanks",
-      query: { order_code: orderData.order_code },
-    });
   } catch (err: any) {
     console.error("❌ Lỗi khi tạo order:", err);
     showErrorToast(err?.message || "Thanh toán thất bại, vui lòng thử lại");
@@ -732,9 +734,9 @@ const submitPayment = async () => {
 };
 
 
-
 // On mounted
 onMounted(async () => {
+  
   await fetchProvinces();
 
   if (isLoggedIn.value && authStore.user) {
@@ -760,14 +762,24 @@ onMounted(async () => {
   }
 
   if (!checkoutItems.value.length && !buyNowItem) router.replace("/error");
-  if (!checkoutStore.invoicePreview) {
+ if (!checkoutStore.invoicePreview) {
+  if (isLoggedIn.value) {
     await previewInvoice({
       province_id: null,
       district_id: null,
       ward_id: null,
-       voucher_code: form.voucher_code || null, 
+      voucher_code: form.voucher_code || null,
+    });
+  } else {
+    await previewInvoiceGuest({
+      province_id: null,
+      district_id: null,
+      ward_id: null,
+      voucher_code: form.voucher_code || null,
     });
   }
+}
+
 });
 
 // Format price
@@ -841,19 +853,28 @@ watch(
       return;
     }
 
-    // ✅ Có địa chỉ → debounce gọi API
-    previewTimeout = setTimeout(async () => {
-      try {
-        await previewInvoice({
-          province_id: Number(p),
-          district_id: 760, // ⚠️ tạm
-          ward_id: Number(w),
-           voucher_code: form.voucher_code || null, 
-        });
-      } catch (e) {
-        console.error("Preview invoice error", e);
-      }
-    }, 400);
+   previewTimeout = setTimeout(async () => {
+  try {
+    if (isLoggedIn.value) {
+      await previewInvoice({
+        province_id: Number(p),
+        district_id: 760, // tạm
+        ward_id: Number(w),
+        voucher_code: form.voucher_code || null,
+      });
+    } else {
+      await previewInvoiceGuest({
+        province_id: Number(p),
+        district_id: 760, // tạm
+        ward_id: Number(w),
+        voucher_code: form.voucher_code || null,
+      });
+    }
+  } catch (e) {
+    console.error("Preview invoice error", e);
+  }
+}, 400);
+
   }
 );
 
@@ -872,17 +893,27 @@ watch(
       try {
         if (!selectedProvince.value || !selectedWard.value) return;
 
-        await previewInvoice({
-          province_id: Number(selectedProvince.value),
-          district_id: 760, // ⚠️ tạm
-          ward_id: Number(selectedWard.value),
-          voucher_code: newVoucher || null,
-        });
+        if (isLoggedIn.value) {
+          await previewInvoice({
+            province_id: Number(selectedProvince.value),
+            district_id: 760,
+            ward_id: Number(selectedWard.value),
+            voucher_code: newVoucher || null,
+          });
+        } else {
+          await previewInvoiceGuest({
+            province_id: Number(selectedProvince.value),
+            district_id: 760,
+            ward_id: Number(selectedWard.value),
+            voucher_code: newVoucher || null,
+          });
+        }
       } catch (e) {
         console.error("Preview invoice error", e);
       }
     }, 400);
   }
 );
+
 
 </script>
