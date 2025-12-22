@@ -66,15 +66,32 @@
           </UTooltip>
 
           <!-- ❌ Xóa yêu thích -->
-          <UTooltip text="Xóa yêu thích">
+          <UPopover :popper="{ placement: 'top' }">
             <button
-              @click="removeFromWishlistHandler"
-              class="w-[38px] h-[38px] rounded-full bg-red-500 flex justify-center items-center text-white shadow-md hover:bg-red-600 transition"
+              class="w-[38px] h-[38px] rounded-full bg-red-500 flex justify-center items-center text-white shadow-md hover:bg-red-600 transition disabled:opacity-50"
               :disabled="isDeleting"
             >
               <UIcon name="i-heroicons-x-mark" class="w-5 h-5 text-white" />
             </button>
-          </UTooltip>
+
+            <template #content="{ close }: { close: any }"> 
+              <div class="p-4 w-52 text-center">
+                <p class="text-sm font-semibold text-gray-800 mb-3">
+                  Bạn có chắc muốn xóa?
+                </p>
+                <div class="flex justify-center gap-2">
+                  
+                  <UButton
+                    label="Xác nhận"
+                    color="error"
+                    size="xs"
+                    :loading="isDeleting"
+                    @click="handleDelete(close)"
+                  />
+                </div>
+              </div>
+            </template>
+          </UPopover>
         </div>
       </div>
 
@@ -226,28 +243,22 @@
   };
 
   // 🟢 SỬA: Dùng hàm mới removeFromWishlist
-  const removeFromWishlistHandler = async () => {
-    if (confirm("Bạn có chắc muốn xoá sản phẩm này khỏi yêu thích?")) {
-      isDeleting.value = true;
-      try {
-        const success = await removeFromWishlist(props.item.product.product_id);
-        if (success) {
-          console.log("🟢 Product removed from wishlist");
-
-          // 🟢 HIỂN THỊ THÔNG BÁO THÀNH CÔNG
-          // toast.add({ title: "✅ Đã xóa khỏi yêu thích!", color: "success" });
-
-          // 🟢 EMIT EVENT ĐỂ PARENT BIẾT CÓ THAY ĐỔI
-          emit("wishlist-updated");
-        } else {
-          // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
+  const handleDelete = async (closePopover: any) => { // Dùng any hoặc () => void
+    isDeleting.value = true;
+    try {
+      const productId = props.item.product.product_id;
+      const success = await removeFromWishlist(productId);
+      
+      if (success) {
+        if (typeof closePopover === 'function') {
+          closePopover(); // Gọi hàm đóng của Popover
         }
-      } catch (error) {
-        console.error("❌ Error removing from wishlist:", error);
-        // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
-      } finally {
-        isDeleting.value = false;
+        emit('removed', productId);
       }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      isDeleting.value = false;
     }
   };
 </script>
