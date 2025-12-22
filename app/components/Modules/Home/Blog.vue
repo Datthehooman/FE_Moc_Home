@@ -26,7 +26,7 @@
       title: string;
       content: string;
       slug: string;
-      thumbnail: string | null;
+      image: string | null;
       created_at: string;
     }[];
   }>();

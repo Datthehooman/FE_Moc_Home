@@ -6,7 +6,7 @@ interface Article {
   title: string;
   content: string;
   slug: string;
-  thumbnail: string | null;
+  image: string | null;
   created_at: string; // ISO 8601 string
   category: {
     id: number;
@@ -29,10 +29,6 @@ export function useArticle() {
   const error = ref<string | null>(null);
 
   const BASE_URL = "https://api.mocfurni.shop/api/client";
-  const mapThumbnail = (thumbnail: string | null) => {
-    if (!thumbnail) return null;
-    return `https://api.mocfurni.shop/storage/system/articles/images/${thumbnail}`;
-  };
 
   /**
    * Lấy danh sách tất cả bài viết hoặc bài viết theo trang/số lượng (mặc định)
@@ -54,7 +50,6 @@ export function useArticle() {
 
       articles.value = raw.map((a: any) => ({
         ...a,
-        thumbnail: mapThumbnail(a.thumbnail),
         // Format ngày tạo cho dễ đọc
         created_at: a.created_at
           ? new Date(a.created_at).toLocaleDateString("vi-VN")
@@ -95,7 +90,6 @@ export function useArticle() {
 
       articles.value = raw.map((a: any) => ({
         ...a,
-        thumbnail: mapThumbnail(a.thumbnail),
         // Format ngày tạo
         created_at: a.created_at
           ? new Date(a.created_at).toLocaleDateString("vi-VN")
@@ -126,16 +120,13 @@ export function useArticle() {
 
       const articleData = res?.result?.data;
 
-      // Map dữ liệu chi tiết
-      if (articleData && articleData.article) {
+      // Map dữ liệu chi tiết - article data is directly at res.result.data
+      if (articleData) {
         articleDetail.value = {
           article: {
-            ...articleData.article,
-            thumbnail: mapThumbnail(articleData.article.thumbnail),
-            created_at: articleData.article.created_at
-              ? new Date(articleData.article.created_at).toLocaleDateString(
-                  "vi-VN"
-                )
+            ...articleData,
+            created_at: articleData.created_at
+              ? new Date(articleData.created_at).toLocaleDateString("vi-VN")
               : "",
           },
           // Ánh xạ các bài viết liên quan nếu có

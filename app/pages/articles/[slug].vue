@@ -1,13 +1,16 @@
 <template>
   <UContainer class="lg:px-0 pt-16.5 flex justify-between">
     <div class="flex-1 pr-10">
-      <div v-if="pending || loading" class="text-center py-20">
+      <div v-if="isLoading" class="text-center py-20">
         <p>Đang tải bài viết...</p>
       </div>
       <div v-else-if="error" class="text-red-500 text-center py-20">
         {{ error }}
       </div>
-      <div v-else-if="!article" class="text-gray-500 text-center py-20">
+      <div
+        v-else-if="!articleDetail?.article"
+        class="text-gray-500 text-center py-20"
+      >
         Không tìm thấy bài viết.
       </div>
       <div v-else>
@@ -15,7 +18,7 @@
           class="w-full h-auto rounded-md mb-[23px] flex justify-center items-center"
         >
           <NuxtImg
-            :src="article.thumbnail || '/Blog 2.png'"
+            :src="articleDetail.article.image || '/Blog 2.png'"
             alt="Hình ảnh bài viết"
           />
         </div>
@@ -27,7 +30,7 @@
               size="xs"
               color="primary"
               icon="i-lucide-calendar-days"
-              :label="article.created_at"
+              :label="articleDetail.article.created_at"
               :ui="{
                 base: 'hover:!text-black',
                 leadingIcon: '!text-primary !size-3',
@@ -67,9 +70,11 @@
           </div>
         </div>
 
-        <h1 class="text-[32px] font-bold mb-7">{{ article.title }}</h1>
+        <h1 class="text-[32px] font-bold mb-7">
+          {{ articleDetail.article.title }}
+        </h1>
 
-        <MdPreview :id="id" :modelValue="article?.content || ''" />
+        <MdPreview :id="id" :modelValue="articleDetail.article.content || ''" />
       </div>
     </div>
 
@@ -105,7 +110,7 @@
           >
             <div class="w-20 h-20 flex-shrink-0 overflow-hidden rounded-md">
               <NuxtImg
-                :src="relArticle.thumbnail || '/blog 1.png'"
+                :src="relArticle.image || '/blog 1.png'"
                 class="w-full h-full object-cover"
                 alt="Hình ảnh bài viết liên quan"
               />
@@ -130,31 +135,43 @@
   import { useRoute } from "vue-router";
   import { useArticle } from "~/composables/useArticle";
   import { useArticleCategory } from "~/composables/useArticleCategory";
-  import { computed } from "vue";
-  import { useAsyncData } from "#app";
+  import { computed, watch, ref } from "vue";
   import { MdPreview } from "md-editor-v3";
   import "md-editor-v3/lib/preview.css";
 
   const id = "preview-only";
   const route = useRoute();
-  const articleSlug = route.params.slug as string;
 
-  const { articleDetail, fetchArticleDetail, loading, error } = useArticle();
+  const { articleDetail, fetchArticleDetail, error } = useArticle();
   const { categories, fetchCategories } = useArticleCategory();
 
-  const { pending } = useAsyncData(
-    `article-detail-${articleSlug}`,
-    async () => {
-      await fetchArticleDetail(articleSlug);
-      await fetchCategories();
-    },
-    {
-      server: false,
-      lazy: true,
+  // Use local loading state to properly track fetch status
+  const isLoading = ref(true);
+
+  // Fetch data when slug changes
+  const fetchData = async () => {
+    const slug = route.params.slug as string;
+    if (slug) {
+      isLoading.value = true;
+      await Promise.all([fetchArticleDetail(slug), fetchCategories()]);
+      isLoading.value = false;
     }
+  };
+
+  // Initial fetch
+  fetchData();
+
+  // Watch for slug changes (when navigating between articles)
+  watch(
+    () => route.params.slug,
+    (newSlug, oldSlug) => {
+      if (newSlug && newSlug !== oldSlug) {
+        fetchData();
+      }
+    },
+    { immediate: false }
   );
 
-  const article = computed(() => articleDetail.value?.article);
   const relatedArticles = computed(
     () => articleDetail.value?.related_articles ?? []
   );
