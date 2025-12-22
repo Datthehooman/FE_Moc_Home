@@ -69,7 +69,7 @@
   const roomId = Number(route.query.room_id);
 
   // If route has room_id → useRoomProducts, otherwise useProduct
-  const { products, loading, fetchProducts } = useProduct();
+  const { products: initialProducts, loading, fetchProducts } = useProduct();
   const {
     roomProducts,
     isLoading: roomLoading,
@@ -77,6 +77,9 @@
   } = useRoomProducts(roomId);
 
   const isRoomPage = computed(() => !!roomId);
+
+  // Local products state for search results
+  const localProducts = ref<any[]>([]);
 
   // These are shared reactive states
   const searchQuery = ref<string>((route.query.search as string) || "");
@@ -86,22 +89,40 @@
   const currentPage = ref(1);
   const itemsPerPage = 18;
 
+  // Watch for route query changes (when searching from header while on this page)
+  watch(
+    () => route.query.search,
+    (newSearch) => {
+      searchQuery.value = (newSearch as string) || "";
+    }
+  );
+
   const parsePrice = (price: number | string) =>
     Number(String(price).replace(/\D/g, ""));
 
+  // Normalize Vietnamese text (remove diacritics for accent-insensitive search)
+  const normalizeVietnamese = (str: string) =>
+    str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .toLowerCase();
+
   // Choose correct product source
   const allProducts = computed(() =>
-    isRoomPage.value ? roomProducts.value : products.value
+    isRoomPage.value ? roomProducts.value : localProducts.value
   );
 
   // --- Filter + Sort ---
   const filteredProducts = computed(() => {
     let result = allProducts.value || [];
 
-    if (searchQuery.value.trim()) {
-      const keyword = searchQuery.value.toLowerCase();
+    // Only apply local search filter for room pages (API search handles it otherwise)
+    if (searchQuery.value.trim() && isRoomPage.value) {
+      const keyword = normalizeVietnamese(searchQuery.value);
       result = result.filter((p) =>
-        p.product_name.toLowerCase().includes(keyword)
+        normalizeVietnamese(p.product_name).includes(keyword)
       );
     }
 
@@ -173,16 +194,16 @@
         loading.value = true;
         try {
           let url = "https://api.mocfurni.shop/api/client/products";
-          if (keyword) {
+          if (keyword.trim()) {
             url = `https://api.mocfurni.shop/api/client/product-search?keyword=${encodeURIComponent(
-              keyword
+              keyword.trim()
             )}`;
           }
           const res = await fetch(url);
           const json = await res.json();
-          const list = json?.result?.data || [];
+          const list = json?.result?.data || json?.data || json?.result || [];
 
-          products.value = list.map((p: any) => ({
+          localProducts.value = list.map((p: any) => ({
             ...p,
             price: Number(p.price),
             price_down: p.price_down ? Number(p.price_down) : undefined,
@@ -193,8 +214,8 @@
                 : "/placeholder.png"),
           }));
         } catch (err) {
-          console.error("❌ Lỗi search sản phẩm:", err);
-          products.value = [];
+          console.error("Lỗi search sản phẩm:", err);
+          localProducts.value = [];
         } finally {
           loading.value = false;
         }
@@ -204,9 +225,13 @@
   );
 
   // --- Load once ---
-  onMounted(() => {
-    if (isRoomPage.value) fetchRoomProducts(roomId);
-    else if (!searchQuery.value) fetchProducts();
+  onMounted(async () => {
+    if (isRoomPage.value) {
+      fetchRoomProducts(roomId);
+    } else if (!searchQuery.value) {
+      await fetchProducts();
+      localProducts.value = initialProducts.value;
+    }
   });
 </script>
 <style scoped>
