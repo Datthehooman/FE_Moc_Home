@@ -2,8 +2,8 @@
   <div class="w-[411px] h-135">
     <div class="w-full h-70 rounded-xl overflow-hidden relative mb-[9px]">
       <NuxtImg
-        :key="article.thumbnail + article.id"
-        :src="article.thumbnail || '/images/default-thumbnail.jpg'"
+        :key="article.image + article.id"
+        :src="article.image || '/images/default-image.jpg'"
         :modifiers="{ v: article.id }"
         class="w-full h-full object-cover z-0"
         alt="Blog Image"
@@ -75,7 +75,7 @@
       title: string;
       content: string;
       slug: string;
-      thumbnail: string | null;
+      image: string | null;
       created_at: string; // Đã được format từ index.vue
       // ... các trường khác
     };
