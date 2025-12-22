@@ -14,32 +14,60 @@
             </h3>
 
             <div class="flex items-center gap-3">
-              <!-- XÓA TẤT CẢ -->
+              <UPopover v-if="wishlists.length > 0">
+                <button
+                  class="px-4 py-2 bg-orange-500 text-white rounded-lg shadow hover:bg-orange-600 transition disabled:opacity-50"
+                  :disabled="isLoading"
+                >
+                  Xóa tất cả
+                </button>
+
+                <template #content="{ close }">
+                  <div class="p-4 text-center w-56">
+                    <p class="text-sm font-semibold mb-3 text-gray-700">Xóa sạch danh sách?</p>
+                    <UButton
+                      label="Xác nhận"
+                      color="neutral"
+                      size="xs"
+                      block
+                      :loading="isLoading"
+                      @click="removeAllWishlist(close as any)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
+
+              <UPopover v-if="isSelecting && selectedList.length > 0">
+                <button
+                  class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition disabled:opacity-50"
+                  :disabled="isLoading"
+                >
+                  Xóa mục đã chọn ({{ selectedList.length }})
+                </button>
+
+                <template #content="{ close }">
+                  <div class="p-4 text-center w-56">
+                    <p class="text-sm font-semibold mb-3 text-gray-700">
+                      Xóa {{ selectedList.length }} sản phẩm?
+                    </p>
+                    <UButton
+                      label="Xác nhận xóa"
+                      color="error"
+                      size="xs"
+                      block
+                      :loading="isLoading"
+                      @click="removeSelected(close as any)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
+
               <button
                 v-if="wishlists.length > 0"
-                @click="removeAllWishlist"
-                class="px-4 py-2 bg-orange-500 text-white rounded-lg shadow hover:bg-orange-600 transition"
-                :disabled="isLoading"
+                @click="isSelecting = !isSelecting"
+                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 transition"
               >
-                Xóa tất cả
-              </button>
-              <!-- XÓA ĐÃ CHỌN -->
-              <button
-                v-if="isSelecting && selectedList.length > 0"
-                @click="removeSelected"
-                class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
-                :disabled="isLoading"
-              >
-                Xóa {{ selectedList.length }} sản phẩm đã chọn
-              </button>
-
-              <!-- CHỌN -->
-              <button
-                class="px-5 py-2 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow transition"
-                @click="toggleSelectMode"
-                :disabled="isLoading"
-              >
-                {{ isSelecting ? 'Hủy chọn' : 'Chọn sản phẩm' }}
+                {{ isSelecting ? 'Hủy chọn' : 'Chọn mục' }}
               </button>
             </div>
           </div>
@@ -65,7 +93,7 @@
             {{ error.message || 'Không thể tải dữ liệu' }}
             <UButton 
               @click="fetchWishlist" 
-              color="red" 
+              color="error" 
               variant="ghost"
               class="mt-2"
             >
@@ -148,7 +176,6 @@
 definePageMeta({ middleware: 'auth' })
 
 import { ref, computed, onMounted, watch } from 'vue'
-import type { Wishlist } from '~/types/wishlist'
 
 // 🟢 SỬA: Dùng composable mới với hàm đã đổi tên
 const { 
@@ -203,49 +230,48 @@ const toggleSelectItem = (item: Wishlist) => {
 
 const handleWishlistUpdated = async () => {
   console.log('🟢 Received wishlist-updated event, refetching data...')
-  await fetchWishlist()
+ await fetchWishlist()
 }
 
 
-// 🟢 SỬA: Dùng hàm mới removeMultipleFromWishlist
-const removeSelected = async () => {
+// 🟢 GIỮ NGUYÊN TÊN HÀM: Xóa các mục đã chọn
+const removeSelected = async (closePopover?: any) => {
   if (selectedList.value.length === 0) return
   
-  if (confirm(`Bạn có chắc muốn xóa ${selectedList.value.length} sản phẩm khỏi yêu thích?`)) {
-    const productIds = selectedList.value.map(item => item.product_id)
-    
+  const productIds = selectedList.value.map(item => item.product_id)
+  
+  isLoading.value = true
+  try {
     const success = await removeMultipleFromWishlist(productIds)
     if (success) {
       selectedList.value = []
       isSelecting.value = false
-      console.log('🟢 Multiple products removed successfully')
-      
-      // 🟢 HIỂN THỊ THÔNG BÁO
-      const toast = useToast()
-      toast.add({ title: `✅ Đã xóa ${productIds.length} sản phẩm khỏi yêu thích!`, color: "success" })
-    } else {
-      const toast = useToast()
-      toast.add({ title: '❌ Xóa sản phẩm thất bại!', color: "error" })
+      // Đóng popover nếu có hàm close truyền vào
+      if (closePopover) closePopover()
     }
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isLoading.value = false
   }
 }
 
 // 🟢 SỬA: Dùng hàm mới clearWishlist
-const removeAllWishlist = async () => {
+const removeAllWishlist = async (closePopover?: any) => {
   if (wishlists.value.length === 0) return
   
-  if (confirm('Bạn có chắc muốn xóa TẤT CẢ sản phẩm khỏi yêu thích?')) {
+  isLoading.value = true
+  try {
     const success = await clearWishlist()
     if (success) {
-      console.log('🟢 All products removed successfully')
-      
-      // 🟢 HIỂN THỊ THÔNG BÁO
-      const toast = useToast()
-      toast.add({ title: '✅ Đã xóa tất cả sản phẩm khỏi yêu thích!', color: "success" })
-    } else {
-      const toast = useToast()
-      toast.add({ title: '❌ Xóa tất cả sản phẩm thất bại!', color: "error" })
+
+      // Đóng popover nếu có hàm close truyền vào
+      if (closePopover) closePopover()
     }
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isLoading.value = false
   }
 }
 
