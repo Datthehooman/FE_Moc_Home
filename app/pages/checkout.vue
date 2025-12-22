@@ -427,32 +427,32 @@ const showSuccessToast = (msg: string) => {
 
 
 // Kiểm tra điều kiện chọn Đặt cọc
-const reminderMessage =
-  "Lưu ý: Đơn từ 2.000.000đ vui lòng chọn Thanh toán Online hoặc Đặt cọc nhé ";
-
 const checkDepositEligibility = () => {
   if (totalAmount.value < 2000000 && paymentMethod.value === "deposit") {
-    showErrorToast(reminderMessage);
-    paymentMethod.value = "offline";
+    showErrorToast("Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc");
+    paymentMethod.value = "offline"; // hoặc null để reset
   }
 };
 
 const checkPaymentEligibility = () => {
-  if (
-    (paymentMethod.value === "offline" && totalAmount.value >= 2000000) ||
-    (paymentMethod.value === "deposit" && totalAmount.value < 2000000)
-  ) {
-    showErrorToast(reminderMessage);
+  if (paymentMethod.value === "offline" && totalAmount.value >= 2000000) {
+    showErrorToast(
+      "Đơn hàng trên 2.000.000đ chỉ có thể thanh toán Online hoặc Đặt cọc"
+    );
+    paymentMethod.value = "online"; // tự active online
+    return false;
+  }
 
-    paymentMethod.value =
-      totalAmount.value >= 2000000 ? "online" : "offline";
-
+  if (paymentMethod.value === "deposit" && totalAmount.value < 2000000) {
+    showErrorToast(
+      "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc"
+    );
+    paymentMethod.value = "offline"; // reset
     return false;
   }
 
   return true;
 };
-
 
 
 
@@ -467,7 +467,7 @@ const showErrorToast = (msg: string) => {
     style:
       "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
     iconColor: "#ffffff",
-    color: "info",
+    color: "warning",
   });
 };
 
@@ -531,17 +531,16 @@ const validate = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
   // Thêm sau validate paymentMethod
-const total = totalAmount.value;
-
-if (
-  (paymentMethod.value === "offline" && total >= 2000000) ||
-  (paymentMethod.value === "deposit" && total < 2000000)
-) {
-errors.paymentMethod =
-  "Lưu ý: Đơn từ 2.000.000đ vui lòng thanh toán Online, Đặt cọc chỉ áp dụng cho đơn từ 2.000.000đ nhé";
+  const total = totalAmount.value;
+if (paymentMethod.value === "offline" && totalAmount.value >= 2000000) {
+  errors.paymentMethod = "Đơn hàng trên 2.000.000đ vui lòng thanh toán Online hoặc Đặt cọc";
   valid = false;
 }
 
+if (paymentMethod.value === "deposit" && totalAmount.value < 2000000) {
+  errors.paymentMethod = "Đơn hàng dưới 2.000.000đ không thể chọn phương thức Đặt cọc";
+  valid = false;
+}
 
 
   if (isLoggedIn.value) {
@@ -691,7 +690,7 @@ if (paymentMethod.value === "deposit") {
 }
 
 
-showSuccessToast("Thanh toán thành công! ");
+showSuccessToast("Thanh toán thành công! 🎉");
 
     checkoutStore.clearCheckout();
     router.push({ path: "/thanks", query: { order_code: orderData.order_code } });
