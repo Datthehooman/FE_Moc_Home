@@ -225,7 +225,7 @@ const removeSelected = async () => {
       toast.add({ title: `✅ Đã xóa ${productIds.length} sản phẩm khỏi yêu thích!`, color: "success" })
     } else {
       const toast = useToast()
-      toast.add({ title: '❌ Xóa sản phẩm thất bại!', color: "error" })
+      toast.add({ title: '❌ Xóa sản phẩm thất bại!', color: "warning" })
     }
   }
 }
@@ -244,7 +244,7 @@ const removeAllWishlist = async () => {
       toast.add({ title: '✅ Đã xóa tất cả sản phẩm khỏi yêu thích!', color: "success" })
     } else {
       const toast = useToast()
-      toast.add({ title: '❌ Xóa tất cả sản phẩm thất bại!', color: "error" })
+      toast.add({ title: '❌ Xóa tất cả sản phẩm thất bại!', color: "warning" })
     }
   }
 }

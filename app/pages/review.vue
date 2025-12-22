@@ -254,7 +254,7 @@
       console.error("Lỗi khi gửi đánh giá:", e); //
       toast.add({
         title: `Lỗi: ${e.message}`,
-        color: "error",
+        color: "warning",
       });
     }
   };

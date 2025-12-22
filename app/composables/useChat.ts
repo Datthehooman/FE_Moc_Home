@@ -28,7 +28,7 @@ export const useChat = () => {
       icon: "heroicons:exclamation-circle",
       timeout: 3000,
       position: "bottom-right",
-      color: "error",
+      color: "warning",
     })
   }
 

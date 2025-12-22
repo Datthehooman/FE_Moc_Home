@@ -154,7 +154,7 @@ const goToDetail = () => {
 
 const handleAddToCart = async () => {
   if (!props.item.product_id) {
-    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" });
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "warning" });
     return;
   }
   try {
@@ -163,7 +163,7 @@ const handleAddToCart = async () => {
   } catch (error: any) {
     toast.add({
       title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"),
-      color: "error",
+      color: "warning",
     });
   }
 };

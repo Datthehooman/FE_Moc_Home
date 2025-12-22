@@ -214,13 +214,13 @@
       } else {
         toast.add({
           title: "Thêm giỏ hàng thất bại!",
-          color: "error",
+          color: "warning",
         });
       }
     } catch (e: any) {
       toast.add({
         title: "Lỗi: " + (e?.message || "Không rõ"),
-        color: "error",
+        color: "warning",
       });
     }
   };
@@ -240,11 +240,11 @@
           // 🟢 EMIT EVENT ĐỂ PARENT BIẾT CÓ THAY ĐỔI
           emit("wishlist-updated");
         } else {
-          // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
+          // toast.add({ title: "❌ Xóa thất bại!", color: "warning" });
         }
       } catch (error) {
         console.error("❌ Error removing from wishlist:", error);
-        // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
+        // toast.add({ title: "❌ Xóa thất bại!", color: "warning" });
       } finally {
         isDeleting.value = false;
       }

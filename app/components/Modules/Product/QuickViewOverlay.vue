@@ -182,7 +182,7 @@
       } else {
         toast.add({
           title: "Thêm giỏ hàng thất bại!",
-          color: "error",
+          color: "warning",
         });
       }
     } catch (error: any) {
@@ -190,7 +190,7 @@
         title:
           "Lỗi khi thêm vào giỏ hàng: " +
           (error?.message || "Không rõ nguyên nhân"),
-        color: "error",
+        color: "warning",
       });
     }
   };
