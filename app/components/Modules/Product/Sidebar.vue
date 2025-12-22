@@ -76,7 +76,7 @@
 
 
 
-    <!-- KHUYẾN MÃI -->
+    KHUYẾN MÃI
     <div class="bg-white p-4 rounded-lg shadow-sm">
       <h3 class="text-lg font-semibold mb-3">Khuyến mãi</h3>
       <div class="space-y-2 text-gray-700">
