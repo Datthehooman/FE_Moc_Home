@@ -27,6 +27,7 @@ export function useReview() {
   const productReviews = ref<any[]>([]);
   const ratingStats = ref<any>(null);
   const userReviews = ref<any[]>([]);
+  const productsToReview = ref<DetailToReview[]>([]);
 
   // AUTH
   let tokenCookie = useCookie("tokenLocal");
@@ -42,6 +43,57 @@ export function useReview() {
     tokenCookie.value ? { Authorization: `Bearer ${tokenCookie.value}` } : {};
 
   const BASE_URL = "https://api.mocfurni.shop/api/client";
+
+  const fetchAllProductsToReview = async (orderId: number) => {
+    loading.value = true;
+    productsToReview.value = []; // Reset danh sách trước khi load
+    
+    // Lấy giá trị chuỗi từ Ref
+    const token = tokenCookie.value; 
+
+    try {
+      // 1. Lấy chi tiết đơn hàng
+      const res: any = await $fetch(`${BASE_URL}/orders/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Lưu ý: Kiểm tra đúng cấu trúc trả về của API của bạn
+      const details = res.result.data.order_details || [];
+
+      const filteredProducts = [];
+      
+      // 2. Kiểm tra từng sản phẩm
+      for (const d of details) {
+        const detailId = d.order_detail_id || d.id;
+        try {
+          const checkRes: any = await $fetch(
+            `${BASE_URL}/reviews/order-detail/${detailId}/check`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          
+          // CHỈ thêm vào nếu reviewed là false
+          if (checkRes?.result?.data?.reviewed === false) {
+            filteredProducts.push({
+              order_detail_id: detailId,
+              name: d.product.product_name,
+              image: d.product.thumbnail || "https://via.placeholder.com/150",
+              color: d.product.color,
+              quantity: d.quantity
+            });
+          }
+        } catch (e) {
+          console.error("Lỗi check sản phẩm:", detailId, e);
+        }
+      }
+      
+      productsToReview.value = filteredProducts;
+    } catch (err) {
+      console.error("Lỗi tải đơn hàng:", err);
+      error.value = "Không thể tải dữ liệu đơn hàng.";
+    } finally {
+      loading.value = false;
+    }
+  };
 
   // ---------------------
   // FETCH DETAIL TO REVIEW
@@ -225,6 +277,7 @@ export function useReview() {
     productReviews,
     ratingStats,
     userReviews,
+    productsToReview,
 
     createReview,
     fetchDetailToReview,
@@ -233,5 +286,6 @@ export function useReview() {
     fetchProductReviews,
     fetchProductRatingStats,
     checkOrderFullyReviewed,
+    fetchAllProductsToReview,
   };
 }

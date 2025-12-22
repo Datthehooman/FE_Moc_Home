@@ -262,17 +262,7 @@ const handleAddToWishlist = async (item: ProductItem) => {
     }
 
     const success = await addToWishlist(item.product_id)
-    if (success) {
-      toast.add({
-        title: "✅ Đã thêm sản phẩm vào yêu thích!",
-        color: "success"
-      })
-    } else {
-      toast.add({
-        title: "❌ Không thể thêm vào yêu thích!",
-        color: "error"
-      })
-    }
+    
   } catch (error: any) {
     toast.add({ 
       title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || 'Không rõ nguyên nhân'), 

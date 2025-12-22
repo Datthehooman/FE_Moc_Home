@@ -35,10 +35,19 @@
   </span>
 </p>
 
-              </div>
-
-              <div class="flex gap-3 items-center">
-               <div class="relative" v-if="order.status === 'pending'">
+    </div>
+    <div class="flex gap-3 items-center">
+      <button
+        v-if="order.status === 'completed' || order.status === 'paid'"
+        @click="router.push({ path: '/review', query: { orderId: order.id } })"
+        class="px-4 py-2 bg-[#A77A5D] text-white rounded-lg hover:bg-[#8e6a50] transition text-sm font-medium shadow-sm"
+      >
+        Đánh giá tất cả sản phẩm
+      </button>
+    </div>  
+      <div class="flex gap-3 items-center">
+      <div class="relative" v-if="order.status === 'pending'">
+        
   <button
     @click="showFilter = !showFilter"
     class="flex items-center gap-2 h-10 px-4 text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
@@ -183,11 +192,7 @@
                 </div>
 
                 <div class="w-28 text-center">
-                  <template
-                    v-if="
-                      order.status === 'paid' || order.status === 'completed'
-                    "
-                  >
+                  <template v-if="order.status === 'paid' || order.status === 'completed'">
                     <button
                       v-if="!product.isReviewed"
                       @click="goToReview(product.orderDetailId)"

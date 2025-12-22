@@ -8,6 +8,8 @@
       </div>
     </div>
     <LayoutsMainFooter />
+    <!-- Chat mini luôn hiển thị trừ login & register -->
+    <LayoutsMainChatMiniBox v-if="!['/login', '/register','/checkout','/cart'].includes(route.path)" />
   </div>
 </template>
 

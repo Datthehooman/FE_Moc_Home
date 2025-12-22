@@ -13,7 +13,7 @@ const addressId = route.params.id as string
 const { addresses, updateAddress, fetchAddresses } = useAddressUser()
 const { provinces, wards, fetchProvinces, fetchWards } = useAddress()
 
-// Form
+// ================= FORM =================
 const form = ref({
   fullName: '',
   phone: '',
@@ -22,98 +22,139 @@ const form = ref({
 
 const formError = ref('')
 
-// Search & dropdown
+// ================= SEARCH =================
 const provinceSearch = ref('')
-const showProvinceList = ref(false)
 const wardSearch = ref('')
+const showProvinceList = ref(false)
 const showWardList = ref(false)
 
-const selectedProvince = ref('')
-const selectedWard = ref('')
+const selectedProvince = ref<number | null>(null)
+const selectedWard = ref<number | null>(null)
 
-// Remove Vietnamese tones
-function removeVietnameseTones(str: string) {
-  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
-}
+// ================= FLAGS =================
+const isInit = ref(true)
+const originalAddress = ref<any>(null)
 
-// Filter provinces & wards by name OR name_en
+// ================= UTILS =================
+const removeVietnameseTones = (str: string) =>
+  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
+// ================= FILTER =================
 const filteredProvinces = computed(() => {
-  const keyword = removeVietnameseTones(provinceSearch.value)
-  return provinces.value.filter(p => 
-    removeVietnameseTones(p.name).includes(keyword) ||
-    removeVietnameseTones(p.name_en).includes(keyword)
+  const key = removeVietnameseTones(provinceSearch.value)
+  return provinces.value.filter(
+    p =>
+      removeVietnameseTones(p.name).includes(key) ||
+      removeVietnameseTones(p.name_en).includes(key)
   )
 })
 
 const filteredWards = computed(() => {
-  const keyword = removeVietnameseTones(wardSearch.value)
-  return wards.value.filter(w => 
-    removeVietnameseTones(w.name).includes(keyword) ||
-    removeVietnameseTones(w.name_en).includes(keyword)
+  const key = removeVietnameseTones(wardSearch.value)
+  return wards.value.filter(
+    w =>
+      removeVietnameseTones(w.name).includes(key) ||
+      removeVietnameseTones(w.name_en).includes(key)
   )
 })
 
-// Load provinces on mount
+// ================= LIFECYCLE =================
 onMounted(async () => {
   await fetchProvinces()
   await fetchAddresses()
 
-  // Load current address data
   const addr = addresses.value.find(a => a.id === +addressId)
-  if (addr) {
-    form.value.fullName = addr.full_name
-    form.value.phone = addr.phone
-    form.value.address = addr.address_line
-    selectedProvince.value = addr.province_code
-    provinceSearch.value = addr.province?.name || ''
-    await fetchWards(addr.province_code)
-    selectedWard.value = addr.ward_code
-    wardSearch.value = addr.ward?.name || ''
+  if (!addr) return
+
+  // fill form
+  form.value.fullName = addr.full_name
+  form.value.phone = addr.phone
+  form.value.address = addr.address_line
+
+  selectedProvince.value = addr.province.code
+  provinceSearch.value = addr.province.name
+
+  await fetchWards(addr.province.code)
+
+  selectedWard.value = addr.ward.code
+  wardSearch.value = addr.ward.name
+
+  // lưu data gốc để check trùng
+  originalAddress.value = {
+    full_name: addr.full_name,
+    phone: addr.phone,
+    province_code: addr.province.code,
+    ward_code: addr.ward.code,
+    address_line: addr.address_line
   }
+
+  isInit.value = false
 })
 
-// Khi chọn tỉnh -> load wards
-watch(() => selectedProvince.value, (newCode) => {
-  if (!newCode) return
-  fetchWards(newCode)
-  selectedWard.value = ''
+// ================= WATCH =================
+watch(selectedProvince, async (newCode) => {
+  if (!newCode || isInit.value) return
+  await fetchWards(newCode)
+  selectedWard.value = null
   wardSearch.value = ''
 })
 
-// Chọn tỉnh / xã
-const selectProvince = async (province: any) => {
-  selectedProvince.value = province.code
-  provinceSearch.value = province.name
+// ================= SELECT =================
+const selectProvince = (p: any) => {
+  selectedProvince.value = p.code
+  provinceSearch.value = p.name
   showProvinceList.value = false
 }
 
-const selectWard = (ward: any) => {
-  selectedWard.value = ward.code
-  wardSearch.value = ward.name
+const selectWard = (w: any) => {
+  selectedWard.value = w.code
+  wardSearch.value = w.name
   showWardList.value = false
 }
 
-// Lưu địa chỉ
+// ================= SAVE =================
 const saveAddress = async () => {
-  if (!form.value.fullName || !form.value.phone || !form.value.address || !selectedProvince.value || !selectedWard.value) {
+  // validate rỗng
+  if (
+    !form.value.fullName.trim() ||
+    !form.value.phone.trim() ||
+    !form.value.address.trim() ||
+    !selectedProvince.value ||
+    !selectedWard.value
+  ) {
     formError.value = 'Vui lòng nhập đầy đủ thông tin.'
     return
   }
-  if (!/^[0-9]{9,11}$/.test(form.value.phone)) {
+
+  // validate phone
+  if (!/^0\d{9,10}$/.test(form.value.phone)) {
     formError.value = 'Số điện thoại không hợp lệ.'
+    return
+  }
+
+  // check không thay đổi gì
+  const isSame =
+    originalAddress.value &&
+    originalAddress.value.full_name === form.value.fullName &&
+    originalAddress.value.phone === form.value.phone &&
+    originalAddress.value.province_code === selectedProvince.value &&
+    originalAddress.value.ward_code === selectedWard.value &&
+    originalAddress.value.address_line === form.value.address
+
+  if (isSame) {
+    formError.value = 'Địa chỉ này đã tồn tại, không có thay đổi để lưu.'
     return
   }
 
   formError.value = ''
 
   const success = await updateAddress(addressId, {
-    full_name: form.value.fullName,
-    phone: form.value.phone,
+    full_name: form.value.fullName.trim(),
+    phone: form.value.phone.trim(),
     province_code: selectedProvince.value,
     ward_code: selectedWard.value,
-    address_line: form.value.address,
-    address_type: 'shipping',
-    is_default: 1
+    address_line: form.value.address.trim(),
+    address_type: 'shipping'
   })
 
   if (success) router.push('/user/address')
@@ -121,91 +162,104 @@ const saveAddress = async () => {
 </script>
 
 <template>
-<div class="flex justify-center bg-[#FFFBF8] min-h-screen">
-  <div class="flex w-full max-w-[85%]">
-    <ModulesUserAccountSidebar />
-    <main class="flex-1 p-6">
+  <div class="flex justify-center bg-[#FFFBF8] min-h-screen">
+    <div class="flex w-full max-w-[85%]">
+      <ModulesUserAccountSidebar />
 
-      <section class="bg-white rounded-xl p-5 shadow mb-6">
-        <h3 class="font-semibold text-gray-700 text-[20px]">Chỉnh sửa địa chỉ</h3>
-        <hr class="border-t border-gray-200 my-4">
+      <main class="flex-1 p-6">
+        <section class="bg-white rounded-xl p-5 shadow mb-6">
+          <h3 class="font-semibold text-gray-700 text-[20px]">
+            Chỉnh sửa địa chỉ
+          </h3>
+          <hr class="border-t border-gray-200 my-4" />
 
-        <form @submit.prevent="saveAddress" class="space-y-4">
+          <form @submit.prevent="saveAddress" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <input
+                v-model="form.fullName"
+                placeholder="Họ và tên"
+                class="h-[50px] px-4 border border-gray-300 rounded-[10px] outline-none"
+              />
+              <input
+                v-model="form.phone"
+                placeholder="Số điện thoại"
+                class="h-[50px] px-4 border border-gray-300 rounded-[10px] outline-none"
+              />
+            </div>
 
-          <!-- Họ và tên + SĐT -->
-          <div class="grid grid-cols-2 gap-4">
-            <input v-model="form.fullName" type="text" placeholder="Họ và tên"
-              class="h-[50px] px-4 border border-gray-300 rounded-[10px] outline-none">
-            <input v-model="form.phone" type="text" placeholder="Số điện thoại"
-              class="h-[50px] px-4 border border-gray-300 rounded-[10px] outline-none">
-          </div>
-
-          <!-- Địa chỉ cụ thể -->
-          <input v-model="form.address" type="text" placeholder="Địa chỉ cụ thể"
-            class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px] outline-none">
-
-          <!-- Tỉnh / Thành phố -->
-          <div class="relative">
             <input
-              type="text"
-              v-model="provinceSearch"
-              @focus="showProvinceList = true"
-              placeholder="Tìm tỉnh / thành phố..."
+              v-model="form.address"
+              placeholder="Địa chỉ cụ thể"
               class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px] outline-none"
             />
-            <ul v-if="showProvinceList"
-                class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50">
-              <li v-for="p in filteredProvinces" :key="p.code"
+
+            <!-- Province -->
+            <div class="relative">
+              <input
+                v-model="provinceSearch"
+                @focus="showProvinceList = true"
+                placeholder="Tỉnh / thành phố"
+                class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px] outline-none"
+              />
+              <ul
+                v-if="showProvinceList"
+                class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
+              >
+                <li
+                  v-for="p in filteredProvinces"
+                  :key="p.code"
                   @click="selectProvince(p)"
-                  class="px-3 py-2 hover:bg-gray-100 cursor-pointer">
-                {{ p.name }}
-              </li>
-            </ul>
-          </div>
+                  class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  {{ p.name }}
+                </li>
+              </ul>
+            </div>
 
-          <!-- Xã / Phường -->
-          <div class="relative">
-            <input
-              type="text"
-              v-model="wardSearch"
-              @focus="showWardList = true"
-              placeholder="Tìm xã / phường..."
-              class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px] outline-none"
-            />
-            <ul v-if="showWardList"
-                class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50">
-              <li v-for="w in filteredWards" :key="w.code"
+            <!-- Ward -->
+            <div class="relative">
+              <input
+                v-model="wardSearch"
+                @focus="showWardList = true"
+                placeholder="Xã / phường"
+                class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px] outline-none"
+              />
+              <ul
+                v-if="showWardList"
+                class="absolute top-full left-0 right-0 bg-white border rounded-xl shadow max-h-52 overflow-auto z-50"
+              >
+                <li
+                  v-for="w in filteredWards"
+                  :key="w.code"
                   @click="selectWard(w)"
-                  class="px-3 py-2 hover:bg-gray-100 cursor-pointer">
-                {{ w.name }}
-              </li>
-            </ul>
-          </div>
+                  class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  {{ w.name }}
+                </li>
+              </ul>
+            </div>
 
-          <!-- Nút quay lại & lưu -->
-          <div class="flex items-center gap-3 pt-2">
-            <NuxtLink
-              to="/user/address"
-              class="px-6 py-3 bg-gray-200 rounded-[10px] text-gray-700 font-medium shadow hover:bg-gray-300 transition">
-              Quay lại
-            </NuxtLink>
+            <div class="flex items-center gap-3 pt-2">
+              <NuxtLink
+                to="/user/address"
+                class="px-6 py-3 bg-gray-200 rounded-[10px] font-medium"
+              >
+                Quay lại
+              </NuxtLink>
 
-            <button
-              class="relative overflow-hidden px-6 py-3 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow flex justify-center items-center group transition-colors duration-500">
-              <span class="absolute inset-0 flex justify-center items-center">
-                <span class="w-1 h-1 bg-black rounded-full opacity-0 scale-0 transition-all duration-500 ease-out group-hover:scale-[150] group-hover:opacity-100"></span>
-              </span>
-              <span class="relative z-10 group-hover:text-white text-[15px] transition-colors duration-300">
+              <button
+                class="px-6 py-3 bg-[#FED8B2] rounded-[10px] font-medium shadow"
+              >
                 Lưu địa chỉ
-              </span>
-            </button>
-          </div>
+              </button>
+            </div>
 
-          <p v-if="formError" class="text-red-500 text-sm">{{ formError }}</p>
-        </form>
-      </section>
-
-    </main>
+            <p v-if="formError" class="text-red-500 text-sm">
+              {{ formError }}
+            </p>
+          </form>
+        </section>
+      </main>
+    </div>
   </div>
-</div>
 </template>
