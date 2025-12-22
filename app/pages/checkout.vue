@@ -700,15 +700,23 @@ const submitPayment = async () => {
     }
 
     // Chỉ redirect khi offline
-    if (paymentMethod.value === "offline") {
-      showSuccessToast("Thanh toán thành công! 🎉");
-      checkoutStore.clearCheckout();
-      router.push({
-        path: "/thanks",
-        query: { order_code: orderData.order_code || orderData.order_id },
-      });
-      return;
-    }
+if (paymentMethod.value === "offline") {
+  showSuccessToast("Thanh toán thành công! 🎉");
+  checkoutStore.clearCheckout();
+
+  // kiểm tra order_code fallback sang order_id
+  const orderCode = orderData.order_code || orderData.order_id;
+
+  // dùng await + nextTick để đảm bảo redirect chạy
+  await nextTick(() => {
+    router.push({
+      path: "/thanks",
+      query: { order_code: orderCode },
+    });
+  });
+  return;
+}
+
 
     // Với online hoặc deposit → vẫn gọi VNPAY
     if (paymentMethod.value === "online") {
