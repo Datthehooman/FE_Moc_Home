@@ -117,8 +117,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import { useCart } from "~/composables/useCart";
-import { useWishlist } from "~/composables/useWishlist";
 
 const props = defineProps<{
   item: any;

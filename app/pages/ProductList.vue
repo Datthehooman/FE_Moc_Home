@@ -10,8 +10,10 @@
             v-model:searchQuery="searchQuery"
             v-model:selectedCategories="selectedCategories"
             v-model:selectedBrands="selectedBrands"
+            v-model:selectedRatings="selectedRatings"
           />
         </aside>
+
         <!-- PRODUCT GRID -->
         <div class="flex-1">
           <!-- Sort -->
@@ -50,7 +52,7 @@
         </div>
       </div>
 
-      <!-- Quick View Overlay -->
+      <!-- Quick View -->
       <ModulesProductQuickViewOverlay
         :show="showQuickView"
         :product="selectedProduct"
@@ -59,163 +61,166 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-  import { ref, computed, watch, onMounted } from "vue";
-  import { useProduct } from "~/composables/useProduct";
-  import { useRoomProducts } from "~/composables/useRoomProducts";
-  import { useRoute } from "vue-router";
+import { ref, computed, watch, onMounted } from "vue";
 
-  const route = useRoute();
-  const roomId = Number(route.query.room_id);
+/* ================= ROUTE ================= */
+const route = useRoute();
+const roomId = Number(route.query.room_id);
+const isRoomPage = computed(() => !!roomId);
 
-  // If route has room_id → useRoomProducts, otherwise useProduct
-  const { products, loading, fetchProducts } = useProduct();
-  const {
-    roomProducts,
-    isLoading: roomLoading,
-    fetchRoomProducts,
-  } = useRoomProducts(roomId);
+/* ================= DATA SOURCE ================= */
+const { products, loading, fetchProducts } = useProduct();
+const { roomProducts, fetchRoomProducts } = useRoomProducts(roomId);
 
-  const isRoomPage = computed(() => !!roomId);
+const allProducts = computed(() =>
+  isRoomPage.value ? roomProducts.value : products.value
+);
 
-  // These are shared reactive states
-  const searchQuery = ref<string>((route.query.search as string) || "");
-  const selectedCategories = ref<string[]>([]);
-  const selectedBrands = ref<string[]>([]);
-  const sortOption = ref("Mặc định");
-  const currentPage = ref(1);
-  const itemsPerPage = 18;
+/* ================= FILTER STATE ================= */
+const searchQuery = ref<string>((route.query.search as string) || "");
+const selectedCategories = ref<string[]>([]);
+const selectedBrands = ref<string[]>([]);
+const selectedRatings = ref<string[]>([]);
+const sortOption = ref("Mặc định");
 
-  const parsePrice = (price: number | string) =>
-    Number(String(price).replace(/\D/g, ""));
+/* ================= PAGINATION ================= */
+const currentPage = ref(1);
+const itemsPerPage = 18;
 
-  // Choose correct product source
-  const allProducts = computed(() =>
-    isRoomPage.value ? roomProducts.value : products.value
-  );
+/* ================= UTILS ================= */
+const parsePrice = (price: number | string) =>
+  Number(String(price).replace(/\D/g, ""));
 
-  // --- Filter + Sort ---
-  const filteredProducts = computed(() => {
-    let result = allProducts.value || [];
+/* ================= FILTER + SORT ================= */
+const filteredProducts = computed(() => {
+  let result = allProducts.value || [];
 
-    if (searchQuery.value.trim()) {
-      const keyword = searchQuery.value.toLowerCase();
-      result = result.filter((p) =>
-        p.product_name.toLowerCase().includes(keyword)
-      );
-    }
+  // SEARCH
+  if (searchQuery.value.trim()) {
+    const keyword = searchQuery.value.toLowerCase();
+    result = result.filter((p) =>
+      p.product_name.toLowerCase().includes(keyword)
+    );
+  }
 
-    if (selectedBrands.value.length) {
-      result = result.filter((p) =>
-        selectedBrands.value.includes(p.brand ?? "")
-      );
-    }
+  // BRAND
+  if (selectedBrands.value.length) {
+    result = result.filter((p) =>
+      selectedBrands.value.includes(p.brand ?? "")
+    );
+  }
 
-    if (selectedCategories.value.length) {
-      result = result.filter((p) =>
-        selectedCategories.value.includes(String(p.category_id))
-      );
-    }
+  // CATEGORY
+  if (selectedCategories.value.length) {
+    result = result.filter((p) =>
+      selectedCategories.value.includes(String(p.category_id))
+    );
+  }
 
-    if (sortOption.value === "Tên A-Z") {
-      result = [...result].sort((a, b) =>
-        a.product_name.localeCompare(b.product_name, "vi", {
-          sensitivity: "base",
-        })
-      );
-    } else if (sortOption.value === "Tên Z-A") {
-      result = [...result].sort((a, b) =>
-        b.product_name.localeCompare(a.product_name, "vi", {
-          sensitivity: "base",
-        })
-      );
-    } else if (sortOption.value === "Giá tăng dần") {
-      result = [...result].sort(
-        (a, b) => parsePrice(a.price) - parsePrice(b.price)
-      );
-    } else if (sortOption.value === "Giá giảm dần") {
-      result = [...result].sort(
-        (a, b) => parsePrice(b.price) - parsePrice(a.price)
-      );
-    }
+  // ⭐ RATING (API trả string)
+  if (selectedRatings.value.length) {
+    result = result.filter((p) =>
+      selectedRatings.value.some(
+        (r) => Number(p.rating) >= Number(r)
+      )
+    );
+  }
 
-    return result;
-  });
+  // SORT
+  if (sortOption.value === "Tên A-Z") {
+    result = [...result].sort((a, b) =>
+      a.product_name.localeCompare(b.product_name, "vi", {
+        sensitivity: "base",
+      })
+    );
+  } else if (sortOption.value === "Tên Z-A") {
+    result = [...result].sort((a, b) =>
+      b.product_name.localeCompare(a.product_name, "vi", {
+        sensitivity: "base",
+      })
+    );
+  } else if (sortOption.value === "Giá tăng dần") {
+    result = [...result].sort(
+      (a, b) => parsePrice(a.price) - parsePrice(b.price)
+    );
+  } else if (sortOption.value === "Giá giảm dần") {
+    result = [...result].sort(
+      (a, b) => parsePrice(b.price) - parsePrice(a.price)
+    );
+  }
 
-  // --- Pagination ---
-  const totalPages = computed(() =>
-    Math.ceil(filteredProducts.value.length / itemsPerPage)
-  );
-  const paginatedProducts = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage;
-    return filteredProducts.value.slice(start, start + itemsPerPage);
-  });
+  return result;
+});
 
-  // --- Quick view ---
-  const showQuickView = ref(false);
-  const selectedProduct = ref<any>(null);
-  const openQuickView = (product: any) => {
-    selectedProduct.value = product;
-    showQuickView.value = true;
-  };
-  const closeQuickView = () => (showQuickView.value = false);
+/* ================= PAGINATION ================= */
+const totalPages = computed(() =>
+  Math.ceil(filteredProducts.value.length / itemsPerPage)
+);
 
-  // --- Watch searchQuery ---
-  let timeout: any = null;
-  watch(
-    searchQuery,
-    (keyword) => {
-      if (isRoomPage.value) return; // skip if viewing room products
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return filteredProducts.value.slice(start, start + itemsPerPage);
+});
 
-      clearTimeout(timeout);
-      timeout = setTimeout(async () => {
-        currentPage.value = 1;
-        loading.value = true;
-        try {
-          let url = "https://api.mocfurni.shop/api/client/products";
-          if (keyword) {
-            url = `https://api.mocfurni.shop/api/client/product-search?keyword=${encodeURIComponent(
-              keyword
-            )}`;
-          }
-          const res = await fetch(url);
-          const json = await res.json();
-          const list = json?.result?.data || [];
+/* ================= QUICK VIEW ================= */
+const showQuickView = ref(false);
+const selectedProduct = ref<any>(null);
 
-          products.value = list.map((p: any) => ({
-            ...p,
-            price: Number(p.price),
-            price_down: p.price_down ? Number(p.price_down) : undefined,
-            thumbnail:
-              p.thumbnail ??
-              (p.images?.[0]?.image_url
-                ? `https://api.mocfurni.shop/storage/${p.images[0].image_url}`
-                : "/placeholder.png"),
-          }));
-        } catch (err) {
-          console.error("❌ Lỗi search sản phẩm:", err);
-          products.value = [];
-        } finally {
-          loading.value = false;
+const openQuickView = (product: any) => {
+  selectedProduct.value = product;
+  showQuickView.value = true;
+};
+const closeQuickView = () => (showQuickView.value = false);
+
+/* ================= WATCH SEARCH ================= */
+let timeout: any = null;
+watch(
+  searchQuery,
+  (keyword) => {
+    if (isRoomPage.value) return;
+
+    clearTimeout(timeout);
+    timeout = setTimeout(async () => {
+      currentPage.value = 1;
+      loading.value = true;
+
+      try {
+        let url = "https://api.mocfurni.shop/api/client/products";
+        if (keyword) {
+          url = `https://api.mocfurni.shop/api/client/product-search?keyword=${encodeURIComponent(
+            keyword
+          )}`;
         }
-      }, 300);
-    },
-    { immediate: true }
-  );
 
-  // --- Load once ---
-  onMounted(() => {
-    if (isRoomPage.value) fetchRoomProducts(roomId);
-    else if (!searchQuery.value) fetchProducts();
-  });
+        const res = await fetch(url);
+        const json = await res.json();
+        products.value = json?.result?.data || [];
+      } catch (err) {
+        console.error("❌ Lỗi search:", err);
+        products.value = [];
+      } finally {
+        loading.value = false;
+      }
+    }, 300);
+  },
+  { immediate: true }
+);
+
+/* ================= INIT ================= */
+onMounted(() => {
+  if (isRoomPage.value) fetchRoomProducts(roomId);
+  else if (!searchQuery.value) fetchProducts();
+});
 </script>
+
 <style scoped>
-  /* Ẩn scrollbar nhưng vẫn scroll được */
-  .scrollbar-none::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
-  }
-  .scrollbar-none {
-    -ms-overflow-style: none; /* IE 10+ */
-    scrollbar-width: none; /* Firefox */
-  }
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 </style>
