@@ -193,7 +193,7 @@ function goCheckout() {
     toast.add({
       title: "Giỏ hàng trống!",
       timeout: 2500,
-      color: "error",
+      color: "warning",
     });
     return;
   }

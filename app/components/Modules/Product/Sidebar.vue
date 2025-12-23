@@ -12,13 +12,12 @@
       <ul class="space-y-1">
         <li
           v-for="cat in categories"
-          :key="cat.category_name"
+          :key="cat.id"
           class="flex items-center gap-2"
         >
           <input
             :id="'cat-' + cat.id"
             type="checkbox"
-            :value="cat.id"
             :checked="selectedCategories.includes(String(cat.id))"
             @change="toggleCategory(String(cat.id))"
           />
@@ -30,6 +29,7 @@
             {{ cat.category_name }}
           </label>
         </li>
+
         <li
           class="mt-2 cursor-pointer text-sm text-gray-500 hover:text-primary"
           @click="emit('update:selectedCategories', [])"
@@ -51,7 +51,6 @@
           <input
             :id="'brand-' + brand.name"
             type="checkbox"
-            :value="brand.name"
             :checked="selectedBrands.includes(brand.name)"
             @change="toggleBrand(brand.name)"
           />
@@ -65,6 +64,7 @@
 
           <span class="text-gray-400">({{ brand.count }})</span>
         </li>
+
         <li
           class="mt-2 cursor-pointer text-sm text-gray-500 hover:text-primary"
           @click="emit('update:selectedBrands', [])"
@@ -74,36 +74,30 @@
       </ul>
     </div>
 
-    <!-- KHUYẾN MÃI -->
-    <div class="bg-white p-4 rounded-lg shadow-sm">
-      <h3 class="text-lg font-semibold mb-3">Khuyến mãi</h3>
-      <div class="space-y-2 text-gray-700">
-        <label
-          class="flex items-center space-x-2"
-          v-for="sale in sales"
-          :key="sale"
-        >
-          <input type="checkbox" />
-          <span>{{ sale }}</span>
-        </label>
-      </div>
-    </div>
-
     <!-- ĐÁNH GIÁ -->
     <div class="bg-white p-4 rounded-lg shadow-sm">
-      <h3 class="text-lg font-semibold mb-3">Đánh giá</h3>
+      <h3 class="font-semibold mb-3">Đánh giá</h3>
+
       <div class="space-y-2">
-        <div v-for="n in 3" :key="n" class="flex items-center space-x-2">
-          <input type="checkbox" />
+        <div
+          v-for="r in ['5','4','3','2','1']"
+          :key="r"
+          class="flex items-center gap-2 cursor-pointer"
+        >
+          <input
+            type="checkbox"
+            :checked="selectedRatings.includes(r)"
+            @change="toggleRating(r)"
+          />
+
           <div class="flex">
             <svg
               v-for="i in 5"
               :key="i"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
               class="w-5 h-5"
-              :class="i <= 6 - n ? 'text-yellow-400' : 'text-gray-300'"
+              :class="i <= Number(r) ? 'text-yellow-400' : 'text-gray-300'"
+              fill="currentColor"
+              viewBox="0 0 20 20"
             >
               <path
                 fill-rule="evenodd"
@@ -111,55 +105,16 @@
               />
             </svg>
           </div>
+
+          <span class="text-sm text-gray-500">từ {{ r }} sao</span>
         </div>
-      </div>
-    </div>
 
-    <!-- MÀU SẮC -->
-    <div class="bg-white p-4 rounded-lg shadow-sm">
-      <h3 class="text-lg font-semibold mb-3">Màu sắc</h3>
-      <div class="flex space-x-3">
-        <label
-          v-for="color in colors"
-          :key="color"
-          class="relative cursor-pointer"
+        <p
+          class="mt-2 cursor-pointer text-sm text-gray-500 hover:text-primary"
+          @click="emit('update:selectedRatings', [])"
         >
-          <input type="checkbox" class="absolute opacity-0 peer" />
-          <span
-            :style="{ backgroundColor: color }"
-            class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-gray-400 transition-transform peer-checked:scale-110"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="3"
-              stroke="white"
-              class="w-3.5 h-3.5 opacity-0 peer-checked:opacity-100 transition"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M4.5 12.75l6 6 9-13.5"
-              />
-            </svg>
-          </span>
-        </label>
-      </div>
-    </div>
-
-    <!-- KÍCH CỠ -->
-    <div class="bg-white p-4 rounded-lg shadow-sm">
-      <h3 class="text-lg font-semibold mb-3">Kích cỡ</h3>
-      <div class="space-y-2 text-gray-700">
-        <label
-          v-for="size in sizes"
-          :key="size"
-          class="flex items-center space-x-2"
-        >
-          <input type="checkbox" />
-          <span>{{ size }}</span>
-        </label>
+          Xóa lọc đánh giá
+        </p>
       </div>
     </div>
 
@@ -167,96 +122,100 @@
     <div class="relative rounded-lg overflow-hidden h-[360px]">
       <img
         src="https://live.themewild.com/fameo/assets/img/blog/03.jpg"
-        alt="banner"
-        class="w-full h-full object-cover rounded-lg"
+        class="w-full h-full object-cover"
       />
       <div
         class="absolute inset-0 bg-black/30 flex flex-col justify-center items-center text-white text-center uppercase"
       >
-        <div class="flex items-center gap-4 mb-2">
-          <span class="h-[2px] w-10 bg-white"></span>
-          <p class="text-[18px] font-semibold tracking-wide">GIẢM GIÁ 35%</p>
-          <span class="h-[2px] w-10 bg-white"></span>
-        </div>
-        <h3 class="text-[28px] font-bold">BỘ SƯU TẬP NỘI THẤT MỚI</h3>
+        <p class="text-lg font-semibold">GIẢM GIÁ 35%</p>
+        <h3 class="text-2xl font-bold">BỘ SƯU TẬP NỘI THẤT MỚI</h3>
       </div>
     </div>
   </aside>
 </template>
 <script setup lang="ts">
-  import { ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 
-  const props = defineProps<{
-    searchQuery: string;
-    selectedCategories: string[];
-    selectedBrands: string[];
-  }>();
+/* ================= PROPS & EMITS ================= */
+const props = defineProps<{
+  searchQuery: string;
+  selectedCategories: string[];
+  selectedBrands: string[];
+  selectedRatings: string[];
+}>();
 
-  const emit = defineEmits([
-    "update:searchQuery",
-    "update:selectedCategories",
-    "update:selectedBrands",
-  ]);
+const emit = defineEmits([
+  "update:searchQuery",
+  "update:selectedCategories",
+  "update:selectedBrands",
+  "update:selectedRatings",
+]);
 
-  const toggleCategory = (id: string) => {
-    const newCats = props.selectedCategories.includes(id)
-      ? props.selectedCategories.filter((c) => c !== id)
-      : [...props.selectedCategories, id];
-    emit("update:selectedCategories", newCats);
-  };
+/* ================= TOGGLE ================= */
+const toggleCategory = (id: string) => {
+  const newData = props.selectedCategories.includes(id)
+    ? props.selectedCategories.filter(c => c !== id)
+    : [...props.selectedCategories, id];
 
-  const toggleBrand = (brand: string) => {
-    const newBrands = props.selectedBrands.includes(brand)
-      ? props.selectedBrands.filter((b) => b !== brand)
-      : [...props.selectedBrands, brand];
-    emit("update:selectedBrands", newBrands);
-  };
+  emit("update:selectedCategories", newData);
+};
 
-  // ----- Dữ liệu động + tĩnh -----
-  const categories = ref<{ category_name: string; id: number }[]>([]);
-  const brands = ref<{ name: string; count: number }[]>([]);
-  const colors = ["#3B82F6", "#22C55E", "#FACC15", "#F87171", "#EF4444"];
-  const sizes = ["Cực nhỏ", "Nhỏ", "Vừa", "Lớn", "Cực lớn"];
-  const sales = ["Đang giảm giá", "Còn hàng", "Hết hàng", "Giảm giá"];
+const toggleBrand = (brand: string) => {
+  const newData = props.selectedBrands.includes(brand)
+    ? props.selectedBrands.filter(b => b !== brand)
+    : [...props.selectedBrands, brand];
 
-  // ----- Fetch danh mục -----
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch("https://api.mocfurni.shop/api/client/category");
-      const json = await res.json();
-      categories.value = json?.result?.data || [];
-    } catch (err) {
-      console.error("❌ Lỗi fetch category:", err);
-    }
-  };
+  emit("update:selectedBrands", newData);
+};
 
-  // ----- Fetch sản phẩm và tạo danh sách thương hiệu -----
-  const fetchBrandsFromProducts = async () => {
-    try {
-      const res = await fetch("https://api.mocfurni.shop/api/client/products");
-      const json = await res.json();
-      const products = json?.result?.data || [];
+const toggleRating = (rating: string) => {
+  const newData = props.selectedRatings.includes(rating)
+    ? props.selectedRatings.filter(r => r !== rating)
+    : [...props.selectedRatings, rating];
 
-      // Tạo map đếm số sản phẩm theo brand
-      const brandMap: Record<string, number> = {};
-      products.forEach((p: any) => {
-        if (p.brand) {
-          brandMap[p.brand] = (brandMap[p.brand] || 0) + 1;
-        }
-      });
+  emit("update:selectedRatings", newData);
+};
 
-      // Chuyển map sang array để render
-      brands.value = Object.entries(brandMap).map(([name, count]) => ({
-        name,
-        count,
-      }));
-    } catch (err) {
-      console.error("❌ Lỗi fetch brands từ products:", err);
-    }
-  };
+/* ================= DATA ================= */
+const categories = ref<{ id: number; category_name: string }[]>([]);
+const brands = ref<{ name: string; count: number }[]>([]);
 
-  onMounted(() => {
-    fetchCategories();
-    fetchBrandsFromProducts();
-  });
+/* ================= API ================= */
+const fetchCategories = async () => {
+  try {
+    const res = await fetch("https://api.mocfurni.shop/api/client/category");
+    const json = await res.json();
+    categories.value = json?.result?.data || [];
+  } catch (err) {
+    console.error("❌ Lỗi fetch category:", err);
+  }
+};
+
+const fetchBrandsFromProducts = async () => {
+  try {
+    const res = await fetch("https://api.mocfurni.shop/api/client/products");
+    const json = await res.json();
+    const products = json?.result?.data || [];
+
+    const brandMap: Record<string, number> = {};
+    products.forEach((p: any) => {
+      if (p.brand) {
+        brandMap[p.brand] = (brandMap[p.brand] || 0) + 1;
+      }
+    });
+
+    brands.value = Object.entries(brandMap).map(([name, count]) => ({
+      name,
+      count,
+    }));
+  } catch (err) {
+    console.error("❌ Lỗi fetch brands:", err);
+  }
+};
+
+/* ================= LIFECYCLE ================= */
+onMounted(() => {
+  fetchCategories();
+  fetchBrandsFromProducts();
+});
 </script>

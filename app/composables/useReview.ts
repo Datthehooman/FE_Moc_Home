@@ -123,7 +123,7 @@ export function useReview() {
 
       toast.add({
         title: msg,
-        color: "error",
+        color: "warning",
       });
     } finally {
       loading.value = false;
@@ -162,7 +162,7 @@ export function useReview() {
 
       toast.add({
         title: message,
-        color: "error",
+        color: "warning",
       });
 
       throw new Error(message);
@@ -232,7 +232,7 @@ export function useReview() {
         error.value = "Lỗi dữ liệu server: Thiếu result.data";
         toast.add({
           title: error.value,
-          color: "error",
+          color: "warning",
         });
       }
     } catch (err: any) {
@@ -243,7 +243,7 @@ export function useReview() {
 
       toast.add({
         title: msg,
-        color: "error",
+        color: "warning",
       });
     } finally {
       loading.value = false;

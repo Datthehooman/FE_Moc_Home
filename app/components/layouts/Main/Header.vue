@@ -314,7 +314,7 @@
         position: "top-right",
         style: "color:white; font-weight:600;",
         iconColor: "#ffffff",
-        color: "error",
+        color: "warning",
       });
       router.push("/login");
     } else router.push("/user/wishlist");

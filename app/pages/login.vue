@@ -161,11 +161,11 @@ const handleLogin = async () => {
   errors.password = "";
 
   if (!email.value) {
-    toast.add({ title: "Vui lòng nhập email", color: "error" });
+    toast.add({ title: "Vui lòng nhập email", color: "warning" });
     return;
   }
   if (!password.value) {
-    toast.add({ title: "Vui lòng nhập mật khẩu", color: "error" });
+    toast.add({ title: "Vui lòng nhập mật khẩu", color: "warning" });
     return;
   }
 
@@ -193,7 +193,7 @@ const handleLogin = async () => {
           error.data?.email?.[0] ||
           error.data?.password_hash?.[0] ||
           "Dữ liệu không hợp lệ",
-        color: "error",
+        color: "warning",
       });
     } else if (error.statusCode === 401) {
       errors.email = "Email hoặc mật khẩu không đúng";
@@ -201,12 +201,12 @@ const handleLogin = async () => {
 
       toast.add({
         title: "Email hoặc mật khẩu không đúng",
-        color: "error",
+        color: "warning",
       });
     } else {
       toast.add({
         title: error.message || "Lỗi không xác định",
-        color: "error",
+        color: "warning",
       });
     }
 

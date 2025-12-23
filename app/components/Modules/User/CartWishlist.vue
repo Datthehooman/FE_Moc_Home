@@ -198,13 +198,14 @@
     errorImage.value = true;
   };
 
-  const formatPrice = (price: number | string | undefined) => {
-    if (!price) return "";
-    const numericPrice = typeof price === "number" ? price : parseFloat(price);
-    return (
-      numericPrice.toLocaleString("vi-VN", { minimumFractionDigits: 0 }) + "₫"
-    );
-  };
+const formatPrice = (price: number | string | undefined) => {
+  if (!price) return "";
+  const numericPrice = typeof price === "number" ? price : parseFloat(price);
+  return (
+    numericPrice.toLocaleString("vi-VN", { minimumFractionDigits: 0 }) + "₫"
+  );
+};
+
 
   const goToDetail = () => {
     router.push(`/san-pham/${props.item.product.slug}`);
@@ -231,34 +232,40 @@
       } else {
         toast.add({
           title: "Thêm giỏ hàng thất bại!",
-          color: "error",
+          color: "warning",
         });
       }
     } catch (e: any) {
       toast.add({
         title: "Lỗi: " + (e?.message || "Không rõ"),
-        color: "error",
+        color: "warning",
       });
     }
   };
 
   // 🟢 SỬA: Dùng hàm mới removeFromWishlist
-  const handleDelete = async (closePopover: any) => { // Dùng any hoặc () => void
-    isDeleting.value = true;
-    try {
-      const productId = props.item.product.product_id;
-      const success = await removeFromWishlist(productId);
-      
-      if (success) {
-        if (typeof closePopover === 'function') {
-          closePopover(); // Gọi hàm đóng của Popover
+  const removeFromWishlistHandler = async () => {
+    if (confirm("Bạn có chắc muốn xoá sản phẩm này khỏi yêu thích?")) {
+      isDeleting.value = true;
+      try {
+        const success = await removeFromWishlist(props.item.product.product_id);
+        if (success) {
+          console.log("🟢 Product removed from wishlist");
+
+          // 🟢 HIỂN THỊ THÔNG BÁO THÀNH CÔNG
+          // toast.add({ title: "✅ Đã xóa khỏi yêu thích!", color: "success" });
+
+          // 🟢 EMIT EVENT ĐỂ PARENT BIẾT CÓ THAY ĐỔI
+          emit("wishlist-updated");
+        } else {
+          // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
         }
-        emit('removed', productId);
+      } catch (error) {
+        console.error("❌ Error removing from wishlist:", error);
+        // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
+      } finally {
+        isDeleting.value = false;
       }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      isDeleting.value = false;
     }
   };
 </script>

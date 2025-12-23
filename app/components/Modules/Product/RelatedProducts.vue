@@ -226,7 +226,7 @@ const goToDetail = (item: ProductItem) => {
 
 const handleAddToCart = async (item: ProductItem) => {
   if (!item.product_id) {
-    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" })
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "warning" })
     return
   }
   try {
@@ -234,12 +234,12 @@ const handleAddToCart = async (item: ProductItem) => {
     if (result) {
       toast.add({ title: "✅ Đã thêm vào giỏ hàng!", color: "success" })
     } else {
-      toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "error" })
+      toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "warning" })
     }
   } catch (error: any) {
     toast.add({ 
       title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || 'Không rõ nguyên nhân'), 
-      color: "error" 
+      color: "warning" 
     })
   }
 }
@@ -247,7 +247,7 @@ const handleAddToCart = async (item: ProductItem) => {
 // 🟢 SỬA: Hàm thêm vào yêu thích với kiểm tra isInWishlist
 const handleAddToWishlist = async (item: ProductItem) => {
   if (!item.product_id) {
-    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" })
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "warning" })
     return
   }
 
@@ -262,11 +262,21 @@ const handleAddToWishlist = async (item: ProductItem) => {
     }
 
     const success = await addToWishlist(item.product_id)
-    
+    if (success) {
+      toast.add({
+        title: "✅ Đã thêm sản phẩm vào yêu thích!",
+        color: "success"
+      })
+    } else {
+      toast.add({
+        title: "❌ Không thể thêm vào yêu thích!",
+        color: "warning"
+      })
+    }
   } catch (error: any) {
     toast.add({ 
       title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || 'Không rõ nguyên nhân'), 
-      color: "error" 
+      color: "warning" 
     })
   }
 }

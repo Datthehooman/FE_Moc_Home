@@ -32,6 +32,7 @@ export const useWishlist = () => {
       style:
         "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
       iconColor: "#ffffff",
+      color: "warning",
     });
   };
 
@@ -44,6 +45,7 @@ export const useWishlist = () => {
       style:
         "color:white; font-weight:600; box-shadow:0 4px 10px rgba(0,0,0,0.2);",
       iconColor: "#ffffff",
+      color: "success",
     });
   };
 
