@@ -198,13 +198,14 @@
     errorImage.value = true;
   };
 
-  const formatPrice = (price: number | string | undefined) => {
-    if (!price) return "";
-    const numericPrice = typeof price === "number" ? price : parseFloat(price);
-    return (
-      numericPrice.toLocaleString("vi-VN", { minimumFractionDigits: 0 }) + "₫"
-    );
-  };
+const formatPrice = (price: number | string | undefined) => {
+  if (!price) return "";
+  const numericPrice = typeof price === "number" ? price : parseFloat(price);
+  return (
+    numericPrice.toLocaleString("vi-VN", { minimumFractionDigits: 0 }) + "₫"
+  );
+};
+
 
   const goToDetail = () => {
     router.push(`/san-pham/${props.item.product.slug}`);

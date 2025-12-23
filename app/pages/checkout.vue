@@ -31,17 +31,7 @@
   </div>
 </div>
 
-<!-- ⚠️ CẢNH BÁO KHI SUBMIT -->
-<div
-  v-if="submitWarning"
-  class="bg-[#FFF7ED] border border-[#FFE4C7] text-[#8A5A2B]
-         rounded-lg p-3 mb-6 text-sm flex gap-2 items-start"
->
-  <UIcon name="heroicons:exclamation-triangle" class="w-5 h-5 mt-[2px]" />
-  <span class="italic">
-    {{ submitWarning }}
-  </span>
-</div>
+
 
 
 
@@ -281,6 +271,18 @@
             </p>
           </div> -->
 
+
+<!-- ⚠️ CẢNH BÁO KHI SUBMIT -->
+<div
+  v-if="submitWarning"
+  class="bg-[#FFF7ED] border border-[#FFE4C7] text-[#8A5A2B]
+         rounded-lg p-3 mb-6 text-sm flex gap-2 items-start"
+>
+  <UIcon name="heroicons:exclamation-triangle" class="w-5 h-5 mt-[2px]" />
+  <span class="italic">
+    {{ submitWarning }}
+  </span>
+</div>
           <!-- Phương thức thanh toán -->
           <div>
             <h3 class="font-medium text-[#6E4E37] mb-3">
