@@ -14,7 +14,7 @@
       <UCarousel
         v-slot="{ item }"
         :duration="150"
-        :items="items"
+        :items="reviews.length > 0 ? reviews : defaultItems"
         dots
         :slides-to-scroll="2"
         :autoplay="{
@@ -32,33 +32,37 @@
             'data-[state=active]:bg-primary',
           ],
           dots: 'bottom-9',
-          container: 'gap-7.5', // Add gap between items
-          item: 'basis-[calc(25%-30px)]', // Adjust basis to account for gap
+          container: 'gap-7.5',
+          item: 'basis-[calc(25%-30px)]',
         }"
       >
         <div class="w-full h-[330px] bg-white rounded-lg p-7.5">
           <div class="flex items-center mb-8">
-            <UAvatar src="/avatar.png" class="size-[65px] mr-3" />
+            <UAvatar
+              :src="item.user?.avatar || '/avatar.png'"
+              class="size-[65px] mr-3"
+            />
             <div class="font-bold">
-              <p>Lê Phùng Tiến Quân</p>
+              <p>{{ item.user?.name || "Khách hàng" }}</p>
               <p class="text-secondary text-[13px]">Khách hàng</p>
             </div>
           </div>
-          <p class="text-[13px] font-medium text-muted mb-5">
-            Nội thất ở đây vừa đẹp vừa chắc chắn, thiết kế tinh tế đúng như mô
-            tả. Giá cả hợp lý, giao hàng nhanh và đóng gói cẩn thận, rất đáng để
-            tin tưởng và lựa chọn lâu dài.
+          <p class="text-[13px] font-medium text-muted mb-5 line-clamp-4">
+            {{
+              item.comment ||
+              "Nội thất ở đây vừa đẹp vừa chắc chắn, thiết kế tinh tế đúng như mô tả. Giá cả hợp lý, giao hàng nhanh và đóng gói cẩn thận, rất đáng để tin tưởng và lựa chọn lâu dài."
+            }}
           </p>
 
           <div class="flex items-center gap-1">
             <template v-for="star in 5" :key="star">
               <UIcon
-                v-if="star <= Math.floor(stars || 0)"
+                v-if="star <= Math.floor(item.rating || 5)"
                 name="i-heroicons-star-solid"
                 class="size-4 text-yellow-400"
               />
               <div
-                v-else-if="star - 0.5 <= (stars || 0)"
+                v-else-if="star - 0.5 <= (item.rating || 5)"
                 class="relative size-4"
               >
                 <UIcon
@@ -85,13 +89,33 @@
 </template>
 
 <script setup lang="ts">
-  const items = [
-    { id: 1, title: "Card 1", content: "..." },
-    { id: 2, title: "Card 2", content: "..." },
-    { id: 3, title: "Card 3", content: "..." },
-    { id: 4, title: "Card 4", content: "..." },
-    { id: 5, title: "Card 5", content: "..." },
-    { id: 6, title: "Card 6", content: "..." },
+  interface Review {
+    id: number;
+    rating: number;
+    comment: string;
+    user?: {
+      name: string;
+      avatar?: string;
+    };
+  }
+
+  const props = defineProps<{
+    reviews: Review[];
+  }>();
+
+  const defaultItems = [
+    {
+      id: 1,
+      rating: 5,
+      comment:
+        "Nội thất ở đây vừa đẹp vừa chắc chắn, thiết kế tinh tế đúng như mô tả.",
+    },
+    {
+      id: 2,
+      rating: 5,
+      comment: "Giá cả hợp lý, giao hàng nhanh và đóng gói cẩn thận.",
+    },
+    { id: 3, rating: 5, comment: "Rất đáng để tin tưởng và lựa chọn lâu dài." },
+    { id: 4, rating: 5, comment: "Sản phẩm chất lượng, dịch vụ tuyệt vời!" },
   ];
-  const stars = ref(5);
 </script>

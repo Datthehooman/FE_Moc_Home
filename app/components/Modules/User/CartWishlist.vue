@@ -86,7 +86,7 @@
                     color="error"
                     size="xs"
                     :loading="isDeleting"
-                    @click="handleDelete(close)"
+                    @click="removeFromWishlistHandler(close)" 
                   />
                 </div>
               </div>
@@ -244,28 +244,17 @@ const formatPrice = (price: number | string | undefined) => {
   };
 
   // 🟢 SỬA: Dùng hàm mới removeFromWishlist
-  const removeFromWishlistHandler = async () => {
-    if (confirm("Bạn có chắc muốn xoá sản phẩm này khỏi yêu thích?")) {
-      isDeleting.value = true;
-      try {
-        const success = await removeFromWishlist(props.item.product.product_id);
-        if (success) {
-          console.log("🟢 Product removed from wishlist");
-
-          // 🟢 HIỂN THỊ THÔNG BÁO THÀNH CÔNG
-          // toast.add({ title: "✅ Đã xóa khỏi yêu thích!", color: "success" });
-
-          // 🟢 EMIT EVENT ĐỂ PARENT BIẾT CÓ THAY ĐỔI
-          emit("wishlist-updated");
-        } else {
-          // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
-        }
-      } catch (error) {
-        console.error("❌ Error removing from wishlist:", error);
-        // toast.add({ title: "❌ Xóa thất bại!", color: "error" });
-      } finally {
-        isDeleting.value = false;
-      }
+  const removeFromWishlistHandler = async (closeCallback: () => void) => {
+    isDeleting.value = true;
+    try {
+      const success = await removeFromWishlist(props.item.product.product_id);
+      
+      
+    } catch (error) {
+      console.error("❌ Error removing from wishlist:", error);
+      
+    } finally {
+      isDeleting.value = false;
     }
   };
 </script>

@@ -7,14 +7,17 @@ interface Article {
   content: string;
   slug: string;
   image: string | null;
+  images: string[];
   created_at: string; // ISO 8601 string
+  updated_at: string;
+  name: string; // Author name
+  view: number;
+  category_id: number;
   category: {
     id: number;
     name: string;
     slug: string;
   };
-  // Thêm các thuộc tính khác nếu cần cho chi tiết/danh sách
-  // ...
 }
 
 interface ArticleDetail {

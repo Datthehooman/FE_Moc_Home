@@ -25,14 +25,6 @@
         <div
           class="bg-transparent mx-[109px] grid grid-cols-2 gap-25.5 relative"
         >
-          <div
-            class="absolute size-[115px] rounded-full bg-[#f05454] right-[450px] top-1/3 -translate-y-1/2 text-white font-bold flex justify-center items-center text-center"
-          >
-            <div>
-              <p class="text-xl">Giảm</p>
-              <p class="text-4xl">45%</p>
-            </div>
-          </div>
           <div class="min-w-[525px]">
             <p class="text-lg font-bold text-toned uppercase mb-3.5">
               ƯU ĐÃI TUẦN NÀY
