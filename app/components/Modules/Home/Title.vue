@@ -8,13 +8,6 @@
       </p>
       <div class="absolute w-10.5 h-0.5 bg-secondary" />
     </div>
-    <UButton
-      variant="link"
-      label="xem thêm"
-      trailing-icon="i-lucide-chevrons-right"
-      class="text-accent text-info cursor-pointer shrink-0 text-xs sm:text-sm"
-      size="sm"
-    />
   </div>
 </template>
 

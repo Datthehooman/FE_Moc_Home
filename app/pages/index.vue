@@ -165,33 +165,33 @@
             <UBadge
               class="text-white bg-secondary rounded-full size-[65px] justify-center"
               :ui="{ leadingIcon: 'size-10' }"
-              icon="i-lucide-truck"
+              icon="i-heroicons-arrow-path-solid"
             />
             <div class="border-r border-success pr-3 pl-3.5">
-              <p class="font-bold text-lg mb-3">Giao hàng miễn phí</p>
-              <p class="text-sm">Đơn hàng trên 5 triệu</p>
+              <p class="font-bold text-lg mb-3">Nhận hoàn tiền</p>
+              <p class="text-sm">Trả hàng trong vòng 30 ngày</p>
             </div>
           </div>
           <div class="flex justify-center items-center">
             <UBadge
               class="text-white bg-secondary rounded-full size-[65px] justify-center"
               :ui="{ leadingIcon: 'size-10' }"
-              icon="i-lucide-truck"
+              icon="i-lucide-wallet-minimal"
             />
             <div class="border-r border-success pr-3 pl-3.5">
-              <p class="font-bold text-lg mb-3">Giao hàng miễn phí</p>
-              <p class="text-sm">Đơn hàng trên 5 triệu</p>
+              <p class="font-bold text-lg mb-3">Uy tín</p>
+              <p class="text-sm">Thanh toán an toàn 100%</p>
             </div>
           </div>
           <div class="flex justify-center items-center">
             <UBadge
               class="text-white bg-secondary rounded-full size-[65px] justify-center"
               :ui="{ leadingIcon: 'size-10' }"
-              icon="i-lucide-truck"
+              icon="i-lucide-headphones"
             />
             <div class="pr-3 pl-3.5">
-              <p class="font-bold text-lg mb-3">Giao hàng miễn phí</p>
-              <p class="text-sm">Đơn hàng trên 5 triệu</p>
+              <p class="font-bold text-lg mb-3">Hỗ trợ 24/7</p>
+              <p class="text-sm">Hãy gọi cho chúng tôi</p>
             </div>
           </div>
         </div>
@@ -367,6 +367,7 @@
               size="xl"
               variant="solid"
               class="relative bg-success text-black rounded-md overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
+              @click="navigateTo('/ProductList')"
             >
               <span
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
@@ -491,113 +492,35 @@
             </p>
           </div>
           <div class="grid grid-cols-4 gap-7.5 mb-16">
-            <div class="col-span-2 rounded-xl overflow-hidden relative">
-              <div class="absolute top-51.5 left-[49px]">
-                <UTooltip
-                  :delay-duration="0"
-                  :content="{ side: 'bottom', sideOffset: 45, align: 'start' }"
-                  :ui="{
-                    content: 'ring-0 p-0',
-                  }"
-                >
-                  <div class="relative inline-flex">
-                    <div
-                      class="absolute inset-0 size-[40px] rounded-full bg-success animate-ping opacity-75"
-                    ></div>
-
-                    <div
-                      class="relative size-[40px] rounded-full bg-success text-primary flex justify-center items-center text-center"
-                    >
-                      <UIcon name="i-lucide-plus" class="text-2xl" />
-                    </div>
-                  </div>
-                  <template #content>
-                    <div class="flex items-center rounded-3xl bg-white p-3">
-                      <NuxtImg src="/image 10.png" class="size-[81px] mr-3" />
-                      <div>
-                        <p class="font-bold text-[16px] mb-1">Ghế sofa mini</p>
-                        <p class="text-[16px] mb-1">
-                          Giá:
-                          <span class="text-[#FF0000] font-semibold text-[13px]"
-                            >180.000 đ</span
-                          >
-                        </p>
-                        <UButton
-                          size="xl"
-                          variant="solid"
-                          class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
-                          @click="handleBuyNow(product)"
-                        >
-                          <span
-                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
-                          ></span>
-                          <span
-                            class="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500"
-                          >
-                            <span>Mua ngay</span>
-                            <UIcon name="i-lucide-arrow-right"></UIcon>
-                          </span>
-                        </UButton>
-                      </div>
-                    </div>
-                  </template>
-                </UTooltip>
+            <div
+              class="col-span-2 rounded-xl overflow-hidden relative group cursor-pointer"
+              @click="openLightbox('/Rectangle 52.png')"
+            >
+              <NuxtImg
+                src="/Rectangle 52.png"
+                class="w-full object-cover relative z-0"
+              />
+              <div
+                class="absolute inset-0 h-[200%] -translate-y-full group-hover:translate-y-0 transition-transform duration-1000 z-10"
+              >
+                <div class="h-1/2 bg-success/50"></div>
+                <div class="h-1/2 bg-success"></div>
               </div>
 
-              <div class="absolute top-53.5 right-31.5">
-                <UTooltip
-                  :delay-duration="0"
-                  :content="{ side: 'bottom', sideOffset: 45, align: 'start' }"
-                  :ui="{
-                    content: 'ring-0 p-0',
-                  }"
+              <div
+                class="absolute inset-0 flex items-center justify-center z-20 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-1000"
+              >
+                <div
+                  class="size-[50px] rounded-full bg-white text-primary flex justify-center items-center text-center"
                 >
-                  <div class="relative inline-flex">
-                    <div
-                      class="absolute inset-0 size-[40px] rounded-full bg-success animate-ping opacity-75"
-                    ></div>
-
-                    <div
-                      class="relative size-[40px] rounded-full bg-success text-primary flex justify-center items-center text-center"
-                    >
-                      <UIcon name="i-lucide-plus" class="text-2xl" />
-                    </div>
-                  </div>
-                  <template #content>
-                    <div class="flex items-center rounded-3xl bg-white p-3">
-                      <NuxtImg src="/image 10.png" class="size-[81px] mr-3" />
-                      <div>
-                        <p class="font-bold text-[16px] mb-1">Ghế sofa mini</p>
-                        <p class="text-[16px] mb-1">
-                          Giá:
-                          <span class="text-[#FF0000] font-semibold text-[13px]"
-                            >180.000 đ</span
-                          >
-                        </p>
-                        <UButton
-                          size="xl"
-                          variant="solid"
-                          class="relative bg-info rounded-md text-black overflow-hidden group transition-all duration-500 hover:rounded-md ease-out w-fit cursor-pointer"
-                          @click="handleBuyNow(product)"
-                        >
-                          <span
-                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black rounded-full scale-0 group-hover:scale-[3] transition-transform duration-500 ease-out w-32 h-32"
-                          ></span>
-                          <span
-                            class="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500"
-                          >
-                            <span>Mua ngay</span>
-                            <UIcon name="i-lucide-arrow-right"></UIcon>
-                          </span>
-                        </UButton>
-                      </div>
-                    </div>
-                  </template>
-                </UTooltip>
+                  <UIcon name="i-lucide-plus" class="text-4xl text-success" />
+                </div>
               </div>
-              <NuxtImg src="/Rectangle 52.png" class="w-full object-cover" />
             </div>
-            <div class="col-span-1 rounded-xl overflow-hidden relative group">
+            <div
+              class="col-span-1 rounded-xl overflow-hidden relative group cursor-pointer"
+              @click="openLightbox('/Home-GHE-005.jpg')"
+            >
               <NuxtImg
                 src="/Home-GHE-005.jpg"
                 class="h-full object-cover relative z-0"
@@ -619,7 +542,10 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-1 rounded-xl overflow-hidden relative group">
+            <div
+              class="col-span-1 rounded-xl overflow-hidden relative group cursor-pointer"
+              @click="openLightbox('/Home-GHE-004.avif')"
+            >
               <NuxtImg
                 src="/Home-GHE-004.avif"
                 class="h-full object-cover relative z-0"
@@ -642,7 +568,10 @@
               </div>
             </div>
 
-            <div class="col-span-1 rounded-xl overflow-hidden relative group">
+            <div
+              class="col-span-1 rounded-xl overflow-hidden relative group cursor-pointer"
+              @click="openLightbox('/Home-GHE-003.jpg')"
+            >
               <NuxtImg
                 src="/Home-GHE-003.jpg"
                 class="h-full object-cover relative z-0"
@@ -664,7 +593,10 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-1 rounded-xl overflow-hidden relative group">
+            <div
+              class="col-span-1 rounded-xl overflow-hidden relative group cursor-pointer"
+              @click="openLightbox('/Home-GHE-002.avif')"
+            >
               <NuxtImg
                 src="/Home-GHE-002.avif"
                 class="h-full object-cover relative z-0"
@@ -686,7 +618,10 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-2 rounded-xl overflow-hidden relative group">
+            <div
+              class="col-span-2 rounded-xl overflow-hidden relative group cursor-pointer"
+              @click="openLightbox('/Home-GHE-011.jpg')"
+            >
               <div class="h-[400px] w-full relative">
                 <NuxtImg
                   src="/Home-GHE-011.jpg"
@@ -715,7 +650,7 @@
         </div>
       </UContainer>
 
-      <ModulesHomeBanner5 class="mb-15.5" />
+      <ModulesHomeBanner5 class="mb-15.5" :reviews="latestReviews" />
 
       <UContainer class="lg:px-0">
         <ModulesHomeBlog class="mb-17.5" :articles="articles" />
@@ -723,6 +658,40 @@
         <ModulesHomeFacebookImages class="mb-[51px]" />
       </UContainer>
     </div>
+
+    <!-- Lightbox Modal -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-300 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="lightboxOpen"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 cursor-pointer"
+          @click="closeLightbox"
+        >
+          <Transition
+            enter-active-class="transition-all duration-500 ease-out"
+            enter-from-class="opacity-0 scale-50"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition-all duration-300 ease-in"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-50"
+          >
+            <div v-if="lightboxOpen" class="relative max-w-[90vw] max-h-[90vh]">
+              <NuxtImg
+                :src="lightboxImage"
+                class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              />
+            </div>
+          </Transition>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 <script setup lang="ts">
@@ -737,6 +706,27 @@
   const { topDiscount, topSelling, topRated, isLoading, error } =
     useHomeProducts();
   const { articles } = useArticle();
+  const { latestReviews, fetchLatestReviews } = useReview();
+
+  // Fetch latest reviews on mount
+  onMounted(() => {
+    fetchLatestReviews(6);
+  });
+
+  // Lightbox state
+  const lightboxOpen = ref(false);
+  const lightboxImage = ref("");
+
+  function openLightbox(imageSrc: string) {
+    lightboxImage.value = imageSrc;
+    lightboxOpen.value = true;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    lightboxOpen.value = false;
+    document.body.style.overflow = "";
+  }
 
   const { setBuyNowItem } = useCheckout();
 
