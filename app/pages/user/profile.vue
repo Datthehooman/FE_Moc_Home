@@ -71,17 +71,29 @@
         </section>
 
         <!-- BOX 2 - ĐỔI MẬT KHẨU -->
-        <!-- <section class="bg-white rounded-xl p-5 shadow">
+        <section class="bg-white rounded-xl p-5 shadow">
       <h3 class="font-semibold text-gray-700 text-[20px]">Đổi mật khẩu</h3>
       <hr class="border-t border-gray-200 my-4">
 
-      <form @submit.prevent="changePassword" class="space-y-4">
+      <form @submit.prevent="changePasswordHandler" class="space-y-4">
         <input v-model="password.old" type="password" placeholder="Mật khẩu cũ"
           class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px]">
-        <input v-model="password.newPass" type="password" placeholder="Mật khẩu mới"
-          class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px]">
-        <input v-model="password.confirm" type="password" placeholder="Nhập lại mật khẩu mới"
-          class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px]">
+       <input 
+  v-model="password.newPass" 
+  type="password" 
+  placeholder="Mật khẩu mới"
+  class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px]"
+  @paste.prevent
+/>
+
+<input 
+  v-model="password.confirm" 
+  type="password" 
+  placeholder="Nhập lại mật khẩu mới"
+  class="h-[50px] w-full px-4 border border-gray-300 rounded-[10px]"
+  @paste.prevent
+/>
+
 
         <button
           class="relative overflow-hidden px-6 py-3 bg-[#FED8B2] rounded-[10px] text-black font-medium shadow flex justify-center items-center group transition-colors duration-500">
@@ -95,7 +107,7 @@
 
         <p v-if="passwordError" class="text-red-500 text-sm">{{ passwordError }}</p>
       </form>
-    </section> -->
+    </section>
       </main>
     </div>
   </div>
@@ -188,23 +200,40 @@
   };
 
   // Đổi mật khẩu demo (có thể gọi API thực tế nếu backend hỗ trợ)
-  const changePassword = () => {
-    if (
-      !password.value.old ||
-      !password.value.newPass ||
-      !password.value.confirm
-    ) {
-      passwordError.value = "Không được bỏ trống.";
-      return;
-    }
-    if (password.value.newPass !== password.value.confirm) {
-      passwordError.value = "Mật khẩu mới không trùng khớp.";
-      return;
-    }
-    passwordError.value = "";
+ const changePasswordHandler = async () => {
+  if (!password.value.old || !password.value.newPass || !password.value.confirm) {
+    passwordError.value = "Không được bỏ trống.";
+    return;
+  }
+  if (password.value.newPass !== password.value.confirm) {
+    passwordError.value = "Mật khẩu mới không trùng khớp.";
+    return;
+  }
+
+  passwordError.value = "";
+
+  // Call API thực tế
+  const res = await auth.changePassword({
+    old_password: password.value.old,
+    new_password: password.value.newPass,
+    new_password_confirmation: password.value.confirm,
+  });
+
+  if (res.success) {
     toast.add({
-      title: "🔐 Đổi mật khẩu thành công!",
+      title: "🔐 Đổi mật khẩu thành công, vui lòng đăng nhập lại!",
       color: "success",
     });
-  };
+
+    // Xóa token cũ (logout) → redirect login
+    auth.logout();
+
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 1500);
+  } else {
+    passwordError.value = res.message;
+  }
+};
+
 </script>

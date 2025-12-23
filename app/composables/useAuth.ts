@@ -154,6 +154,33 @@ export const useAuth = () => {
       return null;
     }
   };
+  // ===================== CHANGE PASSWORD =====================
+const changePassword = async (data: {
+  old_password: string;
+  new_password: string;
+  new_password_confirmation: string;
+}) => {
+  try {
+    const res = await $fetch("https://api.mocfurni.shop/api/client/change-password", {
+      method: "POST",
+      headers: getAuthHeader(),
+      body: data,
+    });
+
+    if (res.success) {
+      // Không logout ngay, chỉ xóa token local sau khi user login lại
+      return { success: true, message: "Đổi mật khẩu thành công!" };
+    }
+
+    return { success: false, message: res.message || "Đổi mật khẩu thất bại" };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.data?.message || "Lỗi server khi đổi mật khẩu",
+    };
+  }
+};
+
 
   // ===================== UPDATE USER PROFILE =====================
   const updateUserProfile = async (data: {
@@ -259,6 +286,7 @@ const resetPasswordV1 = async (data: {
     checkEmailAvailable,
     checkPhoneAvailable,
     updateUserProfile,
+    changePassword,
     verifyOtp,
     resetPasswordV1,
     tokenCookie,
