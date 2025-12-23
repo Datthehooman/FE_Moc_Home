@@ -144,11 +144,19 @@ onMounted(async () => {
     conversationId.value = convo.id
     await loadMessages()
   }
-  startPolling()
 })
 
 onUnmounted(() => {
   stopPolling()
+})
+
+watch(isOpen, (open) => {
+  if (open) {
+    startPolling()
+    nextTick(scrollToBottom)
+  } else {
+    stopPolling()
+  }
 })
 
 watch(messages, () => nextTick(scrollToBottom))
@@ -172,9 +180,13 @@ async function loadMessages() {
 
 // --- POLLING ---
 function startPolling() {
+  if (pollingInterval) return // 👈 tránh tạo nhiều interval
+
   pollingInterval = setInterval(async () => {
     if (!conversationId.value) return
+
     const newMsgs = await getMessages(conversationId.value)
+
     if (newMsgs.length !== messages.value.length) {
       messages.value = newMsgs
       nextTick(scrollToBottom)
@@ -182,9 +194,14 @@ function startPolling() {
   }, 3000)
 }
 
+
 function stopPolling() {
-  if (pollingInterval) clearInterval(pollingInterval)
+  if (pollingInterval) {
+    clearInterval(pollingInterval)
+    pollingInterval = null
+  }
 }
+
 
 // --- IMAGE ---
 function handleSelectImages(e: Event) {

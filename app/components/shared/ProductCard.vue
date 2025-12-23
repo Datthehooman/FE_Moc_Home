@@ -300,7 +300,7 @@
 
   const handleAddToCart = async () => {
     if (!props.id) {
-      toast.add({ title: "Sản phẩm không hợp lệ", color: "error" });
+      toast.add({ title: "Sản phẩm không hợp lệ", color: "warning" });
       return;
     }
 
@@ -309,14 +309,14 @@
       if (result) {
         toast.add({ title: "Đã thêm vào giỏ hàng!", color: "success" });
       } else {
-        toast.add({ title: "Thêm giỏ hàng thất bại!", color: "error" });
+        toast.add({ title: "Thêm giỏ hàng thất bại!", color: "warning" });
       }
     } catch (error: any) {
       toast.add({
         title:
           "Lỗi khi thêm vào giỏ hàng: " +
           (error?.message || "Không rõ nguyên nhân"),
-        color: "error",
+        color: "warning",
       });
     }
   };

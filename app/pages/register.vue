@@ -269,7 +269,7 @@ const register = async () => {
       icon: "heroicons:exclamation-circle",
       timeout: 3000,
       position: "bottom-right",
-      color: "error",
+      color: "warning",
       iconColor: "#ffffff",
       style:
         "color:white; font-weight:600; box-shadow:0px 4px 10px rgba(0,0,0,0.2);",

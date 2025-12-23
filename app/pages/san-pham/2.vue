@@ -528,7 +528,7 @@
     if (!userComment.value) {
       toast.add({
         title: "Vui lòng nhập bình luận!",
-        color: "error",
+        color: "warning",
       });
       return;
     }

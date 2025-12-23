@@ -177,19 +177,19 @@ const handleAddToCart = async () => {
     if (result) {
       toast.add({ title: "✅ Đã thêm vào giỏ hàng!", color: "success" })
     } else {
-      toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "error" })
+      toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "warning" })
     }
   } catch (error: any) {
     toast.add({ 
       title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"), 
-      color: "error" 
+      color: "warning" 
     })
   }
 }
 
 const handleBuyNow = () => {
   if(!productDetail.value) { 
-    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" })
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "warning" })
     return 
   }
   checkoutStore.setBuyNowItem({
@@ -205,7 +205,7 @@ const handleBuyNow = () => {
 // 🟢 SỬA: HÀM THÊM VÀO YÊU THÍCH VỚI TOAST VÀ KIỂM TRA
 const handleAddToWishlist = async () => {
   if (!productDetail.value) {
-    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "error" })
+    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "warning" })
     return
   }
 
@@ -221,11 +221,21 @@ const handleAddToWishlist = async () => {
 
     const success = await addToWishlist(productDetail.value.product_id)
     
-    
+    if (success) {
+      toast.add({ 
+        title: "✅ Đã thêm sản phẩm vào yêu thích!", 
+        color: "success" 
+      })
+    } else {
+      toast.add({ 
+        title: "❌ Không thể thêm vào yêu thích!", 
+        color: "warning" 
+      })
+    }
   } catch (error: any) {
     toast.add({ 
       title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || 'Không rõ nguyên nhân'), 
-      color: "error" 
+      color: "warning" 
     })
   }
 }
