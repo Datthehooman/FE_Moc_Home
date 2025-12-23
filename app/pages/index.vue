@@ -682,10 +682,13 @@
             leave-from-class="opacity-100 scale-100"
             leave-to-class="opacity-0 scale-50"
           >
-            <div v-if="lightboxOpen" class="relative max-w-[90vw] max-h-[90vh]">
+            <div
+              v-if="lightboxOpen"
+              class="relative w-[95vw] h-[95vh] flex items-center justify-center"
+            >
               <NuxtImg
                 :src="lightboxImage"
-                class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                class="w-full h-full object-contain"
               />
             </div>
           </Transition>
