@@ -13,11 +13,15 @@
     <div class="absolute inset-0 flex justify-center top-[159px]">
       <UCarousel
         v-slot="{ item }"
-        :duration="50"
+        :duration="150"
         :items="items"
         dots
         :slides-to-scroll="2"
-        :autoplay="{ delay: 2000 }"
+        :autoplay="{
+          delay: 5000,
+          stopOnInteraction: false,
+          stopOnMouseEnter: true,
+        }"
         :ui="{
           viewport: 'mx-18.5',
           dot: [

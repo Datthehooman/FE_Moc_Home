@@ -5,13 +5,17 @@
 
     <UCarousel
       v-slot="{ item }"
-      :duration="50"
+      :duration="150"
       :items="items"
       dots
       loop
       arrows
       :class="['lg:absolute lg:inset-0 lg:top-[28px]', 'relative']"
-      :autoplay="{ delay: 2000 }"
+      :autoplay="{
+        delay: 5000,
+        stopOnInteraction: false,
+        stopOnMouseEnter: true,
+      }"
       :prev="{
         color: 'primary',
         icon: 'i-lucide-chevron-left',
@@ -55,7 +59,10 @@
               content: 'ring-0 p-0',
             }"
           >
-            <div class="relative inline-flex">
+            <div
+              class="relative inline-flex cursor-pointer"
+              @click="handleAddToCart(item)"
+            >
               <div
                 class="absolute inset-0 size-[40px] rounded-full bg-white animate-ping opacity-75"
               ></div>
@@ -265,6 +272,12 @@
 
   const router = useRouter();
   const { setBuyNowItem } = useCheckout();
+  const { addToCart } = useCart();
+
+  async function handleAddToCart(item: any) {
+    if (!item?.product_id) return;
+    await addToCart(item.product_id, 1);
+  }
 
   function handleBuyNow(item: Product) {
     setBuyNowItem({ ...item, quantity: 1 });

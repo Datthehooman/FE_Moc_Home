@@ -584,11 +584,16 @@
       </p>
       <UCarousel
         v-slot="{ item }"
+        :duration="150"
         :items="items"
         :slides-to-scroll="1"
-        :autoplay="{ delay: 2000 }"
+        :autoplay="{
+          delay: 5000,
+          stopOnInteraction: false,
+          stopOnMouseEnter: true,
+        }"
         :ui="{
-          container: 'gap-4', 
+          container: 'gap-4',
           item: 'basis-full sm:basis-1/3 md:basis-1/4 lg:basis-1/5',
         }"
       >

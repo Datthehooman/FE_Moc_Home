@@ -5,9 +5,14 @@
     </p>
     <UCarousel
       v-slot="{ item }"
+      :duration="150"
       :items="items"
       :slides-to-scroll="1"
-      :autoplay="{ delay: 2000 }"
+      :autoplay="{
+        delay: 5000,
+        stopOnInteraction: false,
+        stopOnMouseEnter: true,
+      }"
       :ui="{
         container: 'gap-[10px]',
         item: 'basis-[calc(20%-10px)]',
