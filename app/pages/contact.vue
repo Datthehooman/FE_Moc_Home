@@ -3,9 +3,9 @@
     <div class="p-6 space-y-10 w-full overflow-visible">
 
       <!-- GRID THÔNG TIN & FORM -->
-      <div class="max-w-[1200px] mx-auto grid md:grid-cols-2 gap-8">
+      <div class="max-w-[1200px] mx-auto grid md:grid-cols-2 gap-8 mb-10">
         <!-- LEFT -->
-        <div class="grid grid-cols-2 gap-6">
+        <div class="grid grid-cols-2 gap-6 ">
 
           <ModulesContactCard
             icon="heroicons:home"
@@ -16,7 +16,7 @@
           <ModulesContactCard
             icon="heroicons:phone"
             title="Gọi cho chúng tôi"
-            text="+84 348 706 723 +84 348 706 723"
+            text="0348706723"
           />
 
           <ModulesContactCard
@@ -37,8 +37,7 @@
         <ModulesContactForm />
       </div>
 
-      <!-- SUBSCRIBE -->
-      <ModulesContactSubscribe />
+
 
     </div>
 
