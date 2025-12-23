@@ -118,7 +118,6 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -126,29 +125,21 @@ import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const slug = route.params.slug as string
-const { categories, isLoading, error } = useCategories()
+const { categories } = useCategories()
+
 const categoryName = computed(() => {
   if (!productDetail.value || categories.value.length === 0) return "Không có";
-
-  const cat = categories.value.find(
-    c => Number(c.id) === Number(productDetail.value.category_id)
-  );
-
+  const cat = categories.value.find(c => Number(c.id) === Number(productDetail.value.category_id));
   return cat ? cat.category_name : "Không có";
-});
-
-
-
+})
 
 // API
 const { productDetail, loadingDetail, errorDetail, fetchProductDetail } = useProduct()
-// 🟢 SỬA: Thêm isInWishlist từ useWishlist
 const { addToWishlist, isInWishlist, fetchWishlist } = useWishlist()
-const toast = useToast()
 
 onMounted(async () => {
   fetchProductDetail(slug);
-  await fetchWishlist(); // 🔥 QUAN TRỌNG: Phải lấy danh sách về thì isInWishlist mới chạy đúng
+  await fetchWishlist();
 })
 
 // UI
@@ -171,27 +162,11 @@ const { addToCart } = useCart()
 
 const handleAddToCart = async () => {
   if(!productDetail.value) return
-  
-  try {
-    const result = await addToCart(productDetail.value.product_id, quantity.value)
-    if (result) {
-      toast.add({ title: "✅ Đã thêm vào giỏ hàng!", color: "success" })
-    } else {
-      toast.add({ title: "❌ Thêm giỏ hàng thất bại", color: "warning" })
-    }
-  } catch (error: any) {
-    toast.add({ 
-      title: "❌ Lỗi khi thêm vào giỏ hàng: " + (error?.message || "Không rõ nguyên nhân"), 
-      color: "warning" 
-    })
-  }
+  await addToCart(productDetail.value.product_id, quantity.value)
 }
 
 const handleBuyNow = () => {
-  if(!productDetail.value) { 
-    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "warning" })
-    return 
-  }
+  if(!productDetail.value) return
   checkoutStore.setBuyNowItem({
     product_id: productDetail.value.product_id,
     product_name: productDetail.value.product_name,
@@ -202,42 +177,11 @@ const handleBuyNow = () => {
   router.push('/checkout')
 }
 
-// 🟢 SỬA: HÀM THÊM VÀO YÊU THÍCH VỚI TOAST VÀ KIỂM TRA
+// Wishlist
 const handleAddToWishlist = async () => {
-  if (!productDetail.value) {
-    toast.add({ title: "❌ Sản phẩm không hợp lệ", color: "warning" })
-    return
-  }
-
-  try {
-    // 🟢 KIỂM TRA NẾU ĐÃ CÓ TRONG WISHLIST
-    if (isInWishlist(productDetail.value.product_id)) {
-      toast.add({
-        title: "ℹ️ Sản phẩm đã có trong yêu thích!",
-        color: "info"
-      })
-      return
-    }
-
-    const success = await addToWishlist(productDetail.value.product_id)
-    
-    if (success) {
-      toast.add({ 
-        title: "✅ Đã thêm sản phẩm vào yêu thích!", 
-        color: "success" 
-      })
-    } else {
-      toast.add({ 
-        title: "❌ Không thể thêm vào yêu thích!", 
-        color: "warning" 
-      })
-    }
-  } catch (error: any) {
-    toast.add({ 
-      title: "❌ Lỗi khi thêm vào yêu thích: " + (error?.message || 'Không rõ nguyên nhân'), 
-      color: "warning" 
-    })
-  }
+  if (!productDetail.value) return
+  if (isInWishlist(productDetail.value.product_id)) return
+  await addToWishlist(productDetail.value.product_id)
 }
 </script>
 
@@ -253,4 +197,4 @@ const handleAddToWishlist = async () => {
   opacity: 0;
   transform: translateY(20px);
 }
-</style>
+</style>  
