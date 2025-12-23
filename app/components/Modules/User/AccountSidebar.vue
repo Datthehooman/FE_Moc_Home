@@ -56,7 +56,7 @@ const menuItems = [
   { name: "Danh sách đơn hàng", path: "/user/orders/list", icon: "heroicons:list-bullet" },
   { name: "Danh sách yêu thích", path: "/user/wishlist", icon: "heroicons:heart" },
   { name: "Danh sách địa chỉ", path: "/user/address", icon: "heroicons:map-pin" },
-  { name: "Thông báo", path: "/user/notifications", icon: "heroicons:bell" },
+  // { name: "Thông báo", path: "/user/notifications", icon: "heroicons:bell" },
   { name: "Tin nhắn", path: "/user/messages", icon: "heroicons:chat-bubble-left-right" },
   { name: "Đăng xuất", path: "/logout", icon: "heroicons:arrow-right-on-rectangle" },
 ];
