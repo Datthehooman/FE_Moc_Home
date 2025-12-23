@@ -21,14 +21,11 @@
           class="text-primary size-[17px] mr-2"
           name="i-lucide-circle-user-round"
         />
-        Bởi Tiến Quân
+        {{ article.name || "Ẩn danh" }}
       </div>
       <div class="flex items-center">
-        <UIcon
-          class="text-primary size-[17px] mr-2"
-          name="i-lucide-messages-square"
-        />
-        3.5k Bình luận
+        <UIcon class="text-primary size-[17px] mr-2" name="i-lucide-eye" />
+        {{ article.view || 0 }} lượt xem
       </div>
     </div>
 
@@ -76,8 +73,9 @@
       content: string;
       slug: string;
       image: string | null;
-      created_at: string; // Đã được format từ index.vue
-      // ... các trường khác
+      created_at: string;
+      name?: string;
+      view?: number;
     };
   }>();
 
@@ -89,22 +87,61 @@
     slug: "#",
     image: null,
     created_at: new Date().toISOString(),
+    name: "Ẩn danh",
+    view: 0,
   };
 
   const article = computed(() => props.article || defaultArticle);
 
   /**
+   * Hàm loại bỏ markdown syntax và HTML tags khỏi nội dung
+   */
+  const stripMarkdown = (text: string): string => {
+    return (
+      text
+        // Loại bỏ hình ảnh markdown ![alt](url)
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+        // Loại bỏ link markdown [text](url)
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+        // Loại bỏ heading markdown (## heading)
+        .replace(/^#{1,6}\s+/gm, "")
+        // Loại bỏ bold **text** hoặc __text__
+        .replace(/(\*\*|__)(.*?)\1/g, "$2")
+        // Loại bỏ italic *text* hoặc _text_
+        .replace(/(\*|_)(.*?)\1/g, "$2")
+        // Loại bỏ strikethrough ~~text~~
+        .replace(/~~(.*?)~~/g, "$1")
+        // Loại bỏ inline code `code`
+        .replace(/`([^`]*)`/g, "$1")
+        // Loại bỏ code block ```code```
+        .replace(/```[\s\S]*?```/g, "")
+        // Loại bỏ blockquote >
+        .replace(/^>\s+/gm, "")
+        // Loại bỏ horizontal rule ---
+        .replace(/^-{3,}$/gm, "")
+        // Loại bỏ unordered list markers - hoặc *
+        .replace(/^[\s]*[-*+]\s+/gm, "")
+        // Loại bỏ ordered list markers 1. 2. etc
+        .replace(/^[\s]*\d+\.\s+/gm, "")
+        // Loại bỏ HTML tags
+        .replace(/<[^>]*>/g, "")
+        // Loại bỏ multiple newlines và spaces
+        .replace(/\n+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+  };
+
+  /**
    * Computed property để cắt ngắn nội dung cho phần tóm tắt (snippet)
-   * Đồng thời loại bỏ các thẻ HTML nếu có trong nội dung.
+   * Đồng thời loại bỏ markdown và HTML tags.
    */
   const contentSnippet = computed(() => {
     // Độ dài tối đa cho phần tóm tắt
     const maxLength = 120;
 
-    // Loại bỏ thẻ HTML trước
-    const cleanContent = (article.value.content || "")
-      .replace(/<[^>]*>/g, "")
-      .trim();
+    // Loại bỏ markdown và HTML
+    const cleanContent = stripMarkdown(article.value.content || "");
 
     if (cleanContent.length <= maxLength) {
       return cleanContent;

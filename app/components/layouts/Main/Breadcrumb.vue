@@ -1,5 +1,5 @@
 <template>
-  <section 
+  <section
     class="w-full h-[150px] bg-[url('/banner-breadcumb.png')] bg-cover bg-center relative flex flex-col justify-center"
   >
     <div class="absolute inset-0 bg-black/40"></div>
@@ -11,63 +11,102 @@
       </h1>
 
       <!-- Breadcrumb -->
-      <div class="flex items-center space-x-2 text-white text-[18px] font-medium">
+      <div
+        class="flex items-center space-x-2 text-white text-[18px] font-medium"
+      >
         <!-- Icon Trang chủ -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h5m10-11v10a1 1 0 01-1 1h-5" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h5m10-11v10a1 1 0 01-1 1h-5"
+          />
         </svg>
 
-        <NuxtLink to="/" class="hover:text-[#ffd8ad] text-[16px] transition-all duration-300 ease-in-out">Trang chủ</NuxtLink>
+        <NuxtLink
+          to="/"
+          class="hover:text-[#ffd8ad] text-[16px] transition-all duration-300 ease-in-out"
+          >Trang chủ</NuxtLink
+        >
 
         <!-- Icon >> -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8 5l6 7-6 7m4-14l6 7-6 7" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-8 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 5l6 7-6 7m4-14l6 7-6 7"
+          />
         </svg>
 
         <!-- Tên trang hiện tại -->
-        <span class="text-[#ffd8ad] text-[16px] capitalize">{{ pageTitle }}</span>
+        <span class="text-[#ffd8ad] text-[16px] capitalize">{{
+          pageTitle
+        }}</span>
       </div>
     </div>
   </section>
-</template><script setup>
-import { useRoute, useRouter } from 'vue-router'
-import { computed } from 'vue'
+</template>
+<script setup>
+  import { useRoute, useRouter } from "vue-router";
+  import { computed } from "vue";
 
-const route = useRoute()
+  const route = useRoute();
 
-const titles = {
-  login: 'Đăng nhập',
-  register: 'Đăng ký',
-  about: 'Giới thiệu',
-  contact: 'Liên hệ',
-  product: 'Sản phẩm',
-  cart: 'Giỏ hàng',
-  checkout: 'Thanh toán',
-  ProductList: 'Cửa hàng',
-  OtpVerify: 'Xác minh OTP',
-  thanks: 'Cảm ơn',
-  review: 'Đánh giá sản phẩm',
-  articles: 'Bài viết',
-  'article-detail': 'Chi tiết bài viết',
-  'reset-password': 'Đặt lại mật khẩu',
-  'user-dashboard': 'Bảng điều khiển',
-  'user-profile': 'Hồ sơ cá nhân',
-  'user-orders-list': 'Đơn hàng của tôi',
-  'user-wishlist': 'Danh sách yêu thích',
-  'user-address': 'Địa chỉ của tôi',
-  'user-support': 'Hỗ trợ',
-  'user-track-order': 'Theo dõi đơn hàng',
-  'user-payment': 'Phương thức thanh toán',
-  'user-notifications': 'Thông báo',
-  'user-messages': 'Tin nhắn',
-  'user-settings': 'Cài đặt',
-  'user-add_address': 'Thêm địa chỉ',
-}
+  const titles = {
+    login: "Đăng nhập",
+    register: "Đăng ký",
+    about: "Giới thiệu",
+    contact: "Liên hệ",
+    product: "Sản phẩm",
+    cart: "Giỏ hàng",
+    checkout: "Thanh toán",
+    ProductList: "Cửa hàng",
+    OtpVerify: "Xác minh OTP",
+    thanks: "Cảm ơn",
+    review: "Đánh giá sản phẩm",
+    articles: "Bài viết",
+    "articles-slug": "Chi tiết bài viết",
+    "reset-password": "Đặt lại mật khẩu",
+    "google-auth-complete": "Xác thực Google",
+    "auth-google-callback": "Đăng nhập Google",
+    "user-dashboard": "Bảng điều khiển",
+    "user-profile": "Hồ sơ cá nhân",
+    "user-orders-list": "Đơn hàng của tôi",
+    "user-orders-id": "Chi tiết đơn hàng",
+    "user-orderdetail": "Chi tiết đơn hàng",
+    "user-wishlist": "Danh sách yêu thích",
+    "user-address": "Địa chỉ của tôi",
+    "user-add_address": "Thêm địa chỉ",
+    "user-add_payment": "Thêm phương thức thanh toán",
+    "user-edit_address-id": "Chỉnh sửa địa chỉ",
+    "user-support": "Hỗ trợ",
+    "user-track-order": "Theo dõi đơn hàng",
+    "user-payment": "Phương thức thanh toán",
+    "user-notifications": "Thông báo",
+    "user-messages": "Tin nhắn",
+    "user-settings": "Cài đặt",
+    "san-pham-slug": "Chi tiết sản phẩm",
+  };
 
-// pageTitle sẽ tự động cập nhật khi route thay đổi
-const pageTitle = computed(() => {
-  if (route.path.startsWith('/san-pham/')) return 'Chi tiết sản phẩm'
-  if (route.path.startsWith('/user/edit_address/')) return 'Chỉnh sửa địa chỉ'
-  return titles[route.name] || 'Trang'
-})
+  // pageTitle sẽ tự động cập nhật khi route thay đổi
+  const pageTitle = computed(() => {
+    if (route.path.startsWith("/san-pham/")) return "Chi tiết sản phẩm";
+    if (route.path.startsWith("/user/edit_address/"))
+      return "Chỉnh sửa địa chỉ";
+    return titles[route.name] || "Trang";
+  });
 </script>

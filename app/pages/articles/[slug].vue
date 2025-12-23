@@ -1,5 +1,5 @@
 <template>
-  <UContainer class="lg:px-0 pt-16.5 flex justify-between">
+  <UContainer class="lg:px-0 pt-16.5 flex justify-between mb-30">
     <div class="flex-1 pr-10">
       <div v-if="isLoading" class="text-center py-20">
         <p>Đang tải bài viết...</p>
@@ -15,12 +15,10 @@
       </div>
       <div v-else>
         <div
+          v-if="articleDetail.article.image"
           class="w-full h-auto rounded-md mb-[23px] flex justify-center items-center"
         >
-          <NuxtImg
-            :src="articleDetail.article.image || '/Blog 2.png'"
-            alt="Hình ảnh bài viết"
-          />
+          <NuxtImg :src="articleDetail.article.image" alt="Hình ảnh bài viết" />
         </div>
 
         <div class="flex justify-between mb-[27px] text-sm">
@@ -42,7 +40,7 @@
               size="xs"
               color="primary"
               icon="i-lucide-circle-user-round"
-              label="Lê Phùng Tiến Quân"
+              :label="articleDetail.article.name || 'Ẩn danh'"
               :ui="{
                 base: 'hover:!text-black',
                 leadingIcon: '!text-primary !size-3',
@@ -50,11 +48,12 @@
               class="text-black font-semibold"
             />
             <UButton
+              v-if="articleDetail.article.category"
               variant="link"
               size="xs"
               color="primary"
-              icon="i-lucide-messages-square"
-              label="3.2k Bình luận"
+              icon="i-lucide-folder"
+              :label="articleDetail.article.category.name"
               :ui="{ leadingIcon: '!text-primary !size-3' }"
               class="text-black cursor-pointer font-semibold"
             />
@@ -62,8 +61,8 @@
               variant="link"
               size="xs"
               color="primary"
-              icon="i-lucide-thumbs-up"
-              label="1.4k thích"
+              icon="i-lucide-eye"
+              :label="`${articleDetail.article.view || 0} lượt xem`"
               :ui="{ leadingIcon: '!text-primary !size-3' }"
               class="text-black cursor-pointer font-semibold"
             />
@@ -96,37 +95,6 @@
           </li>
         </ul>
       </div>
-
-      <div v-if="relatedArticles.length > 0">
-        <h3 class="text-2xl font-semibold mb-6 border-b pb-3 border-gray-200">
-          Bài viết gần đây
-        </h3>
-        <div class="space-y-6">
-          <NuxtLink
-            v-for="relArticle in relatedArticles"
-            :key="relArticle.id"
-            :to="`/articles/${relArticle.slug}`"
-            class="flex gap-3 pb-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition p-2 rounded-md"
-          >
-            <div class="w-20 h-20 flex-shrink-0 overflow-hidden rounded-md">
-              <NuxtImg
-                :src="relArticle.image || '/blog 1.png'"
-                class="w-full h-full object-cover"
-                alt="Hình ảnh bài viết liên quan"
-              />
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="text-base font-medium line-clamp-2 hover:text-primary">
-                {{ relArticle.title }}
-              </h4>
-              <p class="text-sm text-gray-500 line-clamp-2 mt-1">
-                {{ truncateContent(relArticle.content, 50) }}
-              </p>
-            </div>
-          </NuxtLink>
-        </div>
-      </div>
-      <div v-else class="text-gray-500">Không có bài viết gần đây.</div>
     </div>
   </UContainer>
 </template>
@@ -135,7 +103,7 @@
   import { useRoute } from "vue-router";
   import { useArticle } from "~/composables/useArticle";
   import { useArticleCategory } from "~/composables/useArticleCategory";
-  import { computed, watch, ref } from "vue";
+  import { watch, ref } from "vue";
   import { MdPreview } from "md-editor-v3";
   import "md-editor-v3/lib/preview.css";
 
@@ -171,29 +139,6 @@
     },
     { immediate: false }
   );
-
-  const relatedArticles = computed(
-    () => articleDetail.value?.related_articles ?? []
-  );
-
-  /**
-   * Hàm cắt ngắn nội dung (content) và loại bỏ thẻ HTML để hiển thị tóm tắt.
-   */
-  const truncateContent = (content: string, maxLength: number = 120) => {
-    const cleanContent = (content || "").replace(/<[^>]*>/g, "").trim();
-
-    if (cleanContent.length <= maxLength) {
-      return cleanContent;
-    }
-
-    let truncated = cleanContent.substring(0, maxLength);
-    const lastSpace = truncated.lastIndexOf(" ");
-    if (lastSpace !== -1) {
-      truncated = truncated.substring(0, lastSpace);
-    }
-
-    return truncated.trim() + "...";
-  };
 </script>
 <style scoped>
   #preview-only {
